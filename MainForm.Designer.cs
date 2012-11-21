@@ -207,7 +207,7 @@ Authentication";
 			this.textBoxSQLServer.Name = "textBoxSQLServer";
 			this.textBoxSQLServer.Size = new System.Drawing.Size(138, 20);
 			this.textBoxSQLServer.TabIndex = 0;
-			this.textBoxSQLServer.Text = "ottpvirtual\\sql2008";
+			this.textBoxSQLServer.Text = "sqlServer";
 			// 
 			// groupBoxResults
 			// 
