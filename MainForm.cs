@@ -6,6 +6,8 @@ using System.Data.SqlClient;
 using System.Data.SqlTypes;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Configuration;
+using System.Collections.Specialized;
 
 namespace isblTest
 {
@@ -15,6 +17,8 @@ namespace isblTest
 	public partial class MainForm : Form
 	{
 		isblTest.Loader isblLoader;
+		Font fontBold;
+		Font fontBoldUnderline;
 
 		public MainForm()
 		{
@@ -23,9 +27,45 @@ namespace isblTest
 			//
 			InitializeComponent();
 			isblLoader = new isblTest.Loader();
+			
+			string sqlServer;
+			string dataBase;
+			string login;
+			
+			if(isblTest.Configuration.Load(out sqlServer, out dataBase, out login))
+			{
+				this.textBoxSQLServer.Text = sqlServer;
+				this.textBoxDB.Text = dataBase;
+				this.textBoxLogin.Text = login;
+				this.textBoxPassword.Text = "";
+			}
 			//
-			// TODO: Add constructor code after the InitializeComponent() call.
+			// TODO: Добавить хороший список предопределённых строк.
 			//
+			string[] defaultSearchStrings = 
+			{
+				"AddWhere",
+				"AddFrom",
+				"AddOrderBy",
+				"SQL(",
+				"Выполнить",
+				"Execute",
+				""
+			};
+			foreach(string searchString in defaultSearchStrings)
+			{
+				this.textBoxSearch.Text += (searchString + System.Environment.NewLine);
+			}
+			//
+			// TODO: Добавить хорошую стправку на начальной странице
+			//
+			this.richTextBoxResult.Text = @"ISBLTest
+Программа поиска в текстах прикладной разработки навигации по прикладной разработке.
+-=[ Элементы интерфейса ]=-
+
+-=[ Возможности программы ]=-
+";
+			HighLight("", null);
 		}
 		
 		void LoadSubNodes(TreeNodeCollection treeNodes, isblTest.Node isblNode)
@@ -48,19 +88,7 @@ namespace isblTest
 		}
 		void ButtonConnectClick(object sender, EventArgs e)
 		{
-			if(isblLoader.Connect(textBoxSQLServer.Text, textBoxDB.Text, textBoxLogin.Text, textBoxPassword.Text))
-			{
-				List<isblTest.Node> isblNodes = isblLoader.Load();
-				treeViewResults.Nodes.Clear();
-				foreach(isblTest.Node isblNode in isblNodes)
-				{
-					LoadSubNodes(this.treeViewResults.Nodes, isblNode);
-				}
-			}
-			else
-			{
-				MessageBox.Show(isblLoader.errorText, "Ошибка открытия базы данных");
-			}
+
 		}
 		
 		void TreeViewResultsAfterSelect(object sender, TreeViewEventArgs e)
@@ -72,7 +100,7 @@ namespace isblTest
 				richTextBoxResult.ClearUndo();
 				richTextBoxResult.Clear();
 				richTextBoxResult.Text = e.Node.Tag.ToString();
-				HaightLight(textBoxFilter.Text.Trim(), e.Node);
+				HighLight(textBoxSearch.Text.Trim(), e.Node);
 				richTextBoxResult.Enabled = true;
 				richTextBoxResult.ScrollBars =  RichTextBoxScrollBars.ForcedBoth;
 			}
@@ -130,22 +158,59 @@ namespace isblTest
 		
 		void ButtonFilterClick(object sender, EventArgs e)
 		{
-			textBoxFilter.Enabled = false;
-			buttonFilter.Enabled = false;
+			textBoxSearch.Enabled = false;
+			buttonSearch.Enabled = false;
 			foreach(TreeNode node in treeViewResults.Nodes)
 			{
-				FilterNode(node, textBoxFilter.Text);
+				FilterNode(node, textBoxSearch.Text);
 			}
-			buttonFilter.Enabled = true;
-			textBoxFilter.Enabled = true;
+			buttonSearch.Enabled = true;
+			textBoxSearch.Enabled = true;
 		}
-		public void HaightLight(string searchStr,  TreeNode treeNode)
+		
+		
+		/// <summary>
+		///Подстветка специальных конструкций в тексте 
+		/// </summary>
+		private void HighLightSpecialConstruction(ref int posStart, ref int posEnd)
+		{
+			//Если текущая позиция в начале строки
+			if((posStart == 0)||((posStart > 0)&&(richTextBoxResult.Text.Substring(posStart-1, 1)==System.Environment.NewLine)))
+			{
+				/********************************************************************
+				 * Подсветка специальных конструкций (заголовков, вставленных программой)
+				 ********************************************************************/
+				if((posStart+4<richTextBoxResult.Text.Length)&&(richTextBoxResult.Text.Substring(posStart, 4)=="-=[ "))
+				{
+					posEnd = richTextBoxResult.Text.IndexOf(" ]=-", posStart+1);
+					if(posEnd > posStart)
+					{
+						posEnd = posEnd+4;
+						richTextBoxResult.Select(posStart, posEnd-posStart);
+						richTextBoxResult.SelectionFont = this.fontBoldUnderline;
+						richTextBoxResult.SelectionBackColor = Color.LightGray;
+						posStart = posEnd;
+					}
+				}
+			}
+		}
+		/// <summary>
+		///Подсветка синтаксиса 
+		/// </summary>
+		/// <param name="searchStr">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <param name="treeNode">
+		/// A <see cref="TreeNode"/>
+		/// </param>
+		public void HighLight(string searchStr,  TreeNode treeNode)
 		{
 			String text = richTextBoxResult.Text.Replace("\r", "\n");
 			string strDelimeters = "%^&*()-=+\\/;:<>.,?[]{}\n\t ";
+
+			this.fontBold = new Font(richTextBoxResult.SelectionFont, FontStyle.Bold);
+			this.fontBoldUnderline = new Font(richTextBoxResult.SelectionFont, FontStyle.Bold | FontStyle.Underline);
 			
-			Font fontBold = new Font(richTextBoxResult.SelectionFont, FontStyle.Bold);
-			Font fontBoldUnderline = new Font(richTextBoxResult.SelectionFont, FontStyle.Bold | FontStyle.Underline);
 			//Подстветка строк
 			int posEnd = 0;
 			int posStart = 0;
@@ -199,12 +264,14 @@ namespace isblTest
 
 			while(posStart < text.Length)
 			{
+				HighLightSpecialConstruction(ref posStart, ref posEnd);
+				/*
 				//Если текущая позиция в начале строки
-				if((posStart == 0)||((posStart > 0)&&(text.Substring(posStart-1, 1)=="\n")))
+				if((posStart == 0)||((posStart > 0)&&(text.Substring(posStart-1, 1)==System.Environment.NewLine)))
 				{
-					/********************************************************************
-					 * Подсветка специальных конструкций (заголовков, вставленных программой)
-					 ********************************************************************/
+					// ----------------------------------------------------------------------
+					// Подсветка специальных конструкций (заголовков, вставленных программой)
+					// ----------------------------------------------------------------------
 					if((posStart+4<text.Length)&&(text.Substring(posStart, 4)=="-=[ "))
 					{
 						posEnd = text.IndexOf(" ]=-", posStart+1);
@@ -218,6 +285,7 @@ namespace isblTest
 						}
 					}
 				}
+				*/
 				/********************************************************************
 				 * Подсветка ключевых слов
 				 ********************************************************************/
@@ -505,6 +573,110 @@ namespace isblTest
 				richTextBoxResult.ScrollToCaret();
 			}
 		}
+		
+
+
+		/// <summary>
+		/// Обработка нажатия клавиши в форме аутентификации на SQL Server
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>		
+		void TextBoxLoginFormKeyDown(object sender, KeyEventArgs e)
+		{
+			if(e.KeyCode == Keys.Enter)
+			{
+				if((textBoxSQLServer.Text.Trim() != "")&&(textBoxDB.Text.Trim() != "")&&(textBoxLogin.Text.Trim() != ""))
+				{
+					if(isblLoader.Connect(textBoxSQLServer.Text, textBoxDB.Text, textBoxLogin.Text, textBoxPassword.Text))
+					{
+						isblTest.Configuration.Save(textBoxSQLServer.Text, textBoxDB.Text, textBoxLogin.Text);
+						List<isblTest.Node> isblNodes = isblLoader.Load();
+						treeViewResults.Nodes.Clear();
+						foreach(isblTest.Node isblNode in isblNodes)
+						{
+							LoadSubNodes(this.treeViewResults.Nodes, isblNode);
+						}
+					}
+					else
+					{
+						MessageBox.Show(isblLoader.errorText, "Ошибка открытия базы данных");
+					}
+				}
+				else
+				{
+					if(textBoxLogin.Text.Trim() == "")
+					{
+						textBoxLogin.Text = "Login";
+						textBoxLogin.Font = new Font(textBoxLogin.Font, FontStyle.Italic);
+						textBoxLogin.BackColor = Color.LightCoral;
+						textBoxLogin.SelectAll();
+						textBoxLogin.Focus();
+					}
+					if(textBoxDB.Text.Trim() == "")
+					{
+						textBoxDB.Text = "Data Base";
+						textBoxDB.Font = new Font(textBoxDB.Font, FontStyle.Italic);
+						textBoxDB.BackColor = Color.LightCoral;
+						textBoxDB.SelectAll();
+						textBoxDB.Focus();
+					}
+					if(textBoxSQLServer.Text.Trim() == "")
+					{
+						textBoxSQLServer.Text = "Sql Server";
+						textBoxSQLServer.Font = new Font(textBoxSQLServer.Font, FontStyle.Italic);
+						textBoxSQLServer.BackColor = Color.LightCoral;
+						textBoxSQLServer.SelectAll();
+						textBoxSQLServer.Focus();
+					}
+				}
+			}
+		}
+		
+		
+		
+		void TextBoxLoginFormTextChanged(object sender, EventArgs e)
+		{
+			(sender as TextBox).Font = new Font((sender as TextBox).Font, FontStyle.Regular);
+			(sender as TextBox).BackColor = this.textBoxSearch.BackColor;
+			(sender as TextBox).ForeColor = this.textBoxSearch.ForeColor;
+		}
+		
+		void RichTextBoxResultHScroll(object sender, EventArgs e)
+		{
+			
+		}
+		
+		void RichTextBoxResultVScroll(object sender, EventArgs e)
+		{
+			
+		}
+		void RichTextBoxResult_TextChanged(object sender, System.EventArgs e)
+		{
+			if(this.richTextBoxResult.Lines.Length > this.richTextBoxLineNumbers.Lines.Length)
+			{
+				for(int index = this.richTextBoxLineNumbers.Lines.Length + 1; index <= this.richTextBoxResult.Lines.Length; index++)
+				{
+					this.richTextBoxLineNumbers.AppendText(index.ToString("0000") + System.Environment.NewLine);
+				}
+			}
+			if(this.richTextBoxResult.Lines.Length < this.richTextBoxLineNumbers.Lines.Length)
+			{
+				int indexForRemove = this.richTextBoxResult.Lines.Length*(4+System.Environment.NewLine.Length)-1;
+				if (indexForRemove > 0)
+				{
+					this.richTextBoxLineNumbers.Text.Remove(indexForRemove);
+				}
+				else
+				{
+					this.richTextBoxLineNumbers.Clear();
+				}
+			}
+			
+			//Получить координаты первого символа
+			int indexFirstChar = this.richTextBoxResult.GetCharIndexFromPosition(new System.Drawing.Point(0, 0));
+			int indexFirstLine = this.richTextBoxResult.GetLineFromCharIndex(indexFirstChar);
+			//Получить координаты последнего символа
+			
+		}
 	}
-	
 }

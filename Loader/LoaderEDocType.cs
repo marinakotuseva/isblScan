@@ -11,7 +11,7 @@ using System.Collections.Generic;
 namespace isblTest
 {
 	/// <summary>
-	/// Description of LoaderEDocType.
+	/// Загрузчик прикладной разработки для типов карточек электронных документов (события и вычисления карточки и реквизитов документов)
 	/// </summary>
 	public class EDocType : LoaderCommon
 	{
@@ -24,9 +24,10 @@ namespace isblTest
 			List<isblTest.Node> listGroups = new List<isblTest.Node>();
 			
 			SqlCommand command = new SqlCommand();
+			command.CommandType = CommandType.Text;
 			command.Connection = connection;
-			command.CommandText = "select Razd from MBEDocTypeRecv where TypeID=@eDocTypeID and (not(Exprn is null) or not(InpExprn is null)) group by Razd order by Razd desc";
-			SqlParameter paramEDocTypeID = new SqlParameter("@eDocTypeID", SqlDbType.Int, 10);
+			command.CommandText = "select [Razd] from [MBEDocTypeRecv] where not(([Exprn] is null) and ([InpExprn] is null)) and ([TypeID] = @eDocTypeID ) group by [Razd] order by [Razd] desc";
+			SqlParameter paramEDocTypeID = new SqlParameter("@eDocTypeID", SqlDbType.Int);
 			paramEDocTypeID.Value = eDocTypeNode.id;
 			command.Parameters.Add(paramEDocTypeID);
 			command.Prepare();
@@ -92,7 +93,7 @@ namespace isblTest
 
 					SqlCommand command = new SqlCommand();
 					command.Connection = connection;
-					command.CommandText = "select XRecID, Name, Exprn, InpExprn, Kod from MBEDocTypeRecv where TypeID=@eDocTypeID and Razd=@RazdID and (not(Exprn is null) or not(InpExprn is null)) order by Name";
+					command.CommandText = "select [XRecID], [Name], [Exprn], [InpExprn], [Kod] from MBEDocTypeRecv where TypeID=@eDocTypeID and Razd=@RazdID and (not(Exprn is null) or not(InpExprn is null)) order by Name";
 					SqlParameter paramEDocTypeID = new SqlParameter("@eDocTypeID", SqlDbType.Int, 10);
 					SqlParameter paramRazdID = new SqlParameter("@RazdID", SqlDbType.Char, 1);
 					paramEDocTypeID.Value = eDocTypeNode.id;

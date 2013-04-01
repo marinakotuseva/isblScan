@@ -9,18 +9,35 @@ using System.Data.SqlClient;
 namespace isblTest
 {
 	/// <summary>
-	/// Description of LoaderCommon.
+	/// Базовый класс, от которого наследуются другие загрузчики прикладной разрабоки.
 	/// </summary>
 	public class LoaderCommon
 	{
-		//Соединение с БД
+		/// <summary>
+		///Соединение с БД 
+		/// </summary>
 		protected SqlConnection connection;
-
+		
+		/// <summary>
+		/// Конструктор базового класса для всех загрузчиков прикладной разработки.
+		/// </summary>
+		/// <param name="sqlConnect">
+		/// Соединение с базой данных (должно быть предварительно открыто)
+		/// </param>
 		public LoaderCommon(SqlConnection sqlConnect)
 		{
 			this.connection = sqlConnect;
 		}
 		
+		/// <summary>
+		/// Проверка наличия таблицы с указанным именем в базы данных 
+		/// </summary>
+		/// <param name="tableName">
+		/// Имя таблицы
+		/// </param>
+		/// <returns>
+		/// true - таблица, с указанным именем есть в базы данных; false - таблицы с указанным именем нет в базы данных.
+		/// </returns>
 		public bool checkTableExist(string tableName)
 		{
 			bool flagTableExist;
@@ -48,9 +65,19 @@ namespace isblTest
 			return flagTableExist;			
 		}
 		
-		public Int32 getVidAnalitID(string vidAnalitKod)
+		/// <summary>
+		/// Получение ИД для вида аналитики с указанным имененем.
+		/// Часто используемый метод, поэтому вынесен в базовый класс.
+		/// </summary>
+		/// <param name="vidAnalitKod">
+		/// Строка с кодом видам аналитики (значение колонки Kod в таблице MBVidAn)
+		/// </param>
+		/// <returns>
+		/// null - аналитика с указанным кодом не найдена, либо ИД аналитики
+		/// </returns>
+		public int getVidAnalitID(string vidAnalitKod)
 		{
-			Int32 vidAnalitID = -1;
+			int vidAnalitID = -1;
 			if(this.checkTableExist("MBVidAn"))
 			{
 				SqlCommand command = new SqlCommand();

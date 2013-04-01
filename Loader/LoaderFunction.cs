@@ -143,9 +143,10 @@ namespace isblTest
 						{
 							funcRecvNode.text += this.GetTypeName(reader.GetString(3)) + ".\t";
 						}
-						
+						funcRecvNode.text += "\r\n";
 					}
 				}
+				reader.Close();
 			}
 		}
 		public isblTest.Node Load()
@@ -208,7 +209,7 @@ namespace isblTest
 								if(! reader.IsDBNull(2))
 								{
 									isblTest.Node funcDescriptionNode = new isblTest.Node();
-									funcDescriptionNode.name = "-=[ ОПИСАНИЕ ФУНКЦИИ ]=-";
+									funcDescriptionNode.name = "-=[ Описание функции ]=-";
 									funcDescriptionNode.text = reader.GetString(2);
 									funcDescriptionNode.parent = functionNode;
 									functionNode.nodes.Add(funcDescriptionNode);
@@ -228,7 +229,7 @@ namespace isblTest
 								if(! reader.IsDBNull(4))
 								{
 									isblTest.Node funcTextNode = new isblTest.Node();
-									funcTextNode.name = "-=[ ТЕКСТ ФУНКЦИИ ]=-";
+									funcTextNode.name = "-=[ Текст функции ]=-";
 									funcTextNode.text = reader.GetString(4);
 									funcTextNode.parent = functionNode;
 									functionNode.nodes.Add(funcTextNode);
@@ -238,6 +239,11 @@ namespace isblTest
 							}
 						}
 						reader.Close();
+						//Загрузка параметров функций для функций текущей группы
+						foreach(isblTest.Node funcNode in groupNode.nodes)
+						{
+							this.LoadRecvisites(funcNode);
+						}
 					}				
 
 				}

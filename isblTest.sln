@@ -1,8 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-# SharpDevelop 4.2.1.8805
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "isblTest", "isblTest\isblTest.csproj", "{E0002903-9176-4E38-9F6E-35428BE789AE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "isblTest", "isblTest.csproj", "{E0002903-9176-4E38-9F6E-35428BE789AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "testConsole", "testConsole\testConsole.csproj", "{5165A987-C6AF-4DE0-A1F6-55ADF9770DB8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -10,9 +11,21 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E0002903-9176-4E38-9F6E-35428BE789AE}.Debug|x86.Build.0 = Debug|x86
+		{5165A987-C6AF-4DE0-A1F6-55ADF9770DB8}.Debug|x86.ActiveCfg = Debug|x86
+		{5165A987-C6AF-4DE0-A1F6-55ADF9770DB8}.Debug|x86.Build.0 = Debug|x86
+		{5165A987-C6AF-4DE0-A1F6-55ADF9770DB8}.Release|x86.ActiveCfg = Release|x86
+		{5165A987-C6AF-4DE0-A1F6-55ADF9770DB8}.Release|x86.Build.0 = Release|x86
 		{E0002903-9176-4E38-9F6E-35428BE789AE}.Debug|x86.ActiveCfg = Debug|x86
-		{E0002903-9176-4E38-9F6E-35428BE789AE}.Release|x86.Build.0 = Release|x86
+		{E0002903-9176-4E38-9F6E-35428BE789AE}.Debug|x86.Build.0 = Debug|x86
 		{E0002903-9176-4E38-9F6E-35428BE789AE}.Release|x86.ActiveCfg = Release|x86
+		{E0002903-9176-4E38-9F6E-35428BE789AE}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = isblTest.csproj
+		Policies = $0
+		$0.DotNetNamingPolicy = $1
+		$1.DirectoryNamespaceAssociation = None
+		$1.ResourceNamePolicy = FileFormatDefault
+		version = 0.0.5.beta
 	EndGlobalSection
 EndGlobal

@@ -10,13 +10,14 @@ using System.Data.SqlTypes;
 namespace isblTest
 {
 	/// <summary>
-	/// Description of Loader.
+	/// Загрузчик прикладной разработки. Устанавливает соединение с системой и вызывает загрузчики конкретных компонент.
 	/// </summary>
 	public class Loader
 	{
 		public Loader()
 		{
 		}
+		
 		private SqlConnection connection;
 
 		public isblTest.EDocType			loaderEDocType;
@@ -34,6 +35,14 @@ namespace isblTest
 		
 		public string errorText;
 		
+		/// <summary>
+		///Установка соединения с системой 
+		/// </summary>
+		/// <param name="server">Имя SQL Server</param>
+		/// <param name="dataBase">Имя базы данных</param>
+		/// <param name="login">Логин пользователя базы данных</param>
+		/// <param name="password">Пароль пользователя базы данных</param>
+		/// <returns>True - соединение успешно усановлено, False - соединение не установлено, текст ошибки соединения в поле errorText.</returns>
 		public bool Connect(string server, string dataBase, string login, string password)
 		{
 			SqlConnectionStringBuilder connBuilder = new SqlConnectionStringBuilder();
@@ -43,6 +52,7 @@ namespace isblTest
 			connBuilder.ApplicationName = "isblTest";
 			connBuilder.UserID = login;
 			connBuilder.Password = password;
+			connBuilder.Password = "1test1-"; // TODO : убрать
 			
 			try {
 				this.connection = new SqlConnection(connBuilder.ConnectionString);
@@ -55,11 +65,18 @@ namespace isblTest
 			}
 		}
 		
+		/// <summary>
+		///Отключиться от базы данных 
+		/// </summary>
 		public void disconnect()
 		{
 			this.connection.Close();
 		}
 		
+		/// <summary>
+		///Зарузка списка узлов, для их отображения в дереве элементов 
+		/// </summary>
+		/// <returns>Список узлов</returns>
 		public List<isblTest.Node> Load()
 		{
 			List<isblTest.Node> isblList = new List<isblTest.Node>();
@@ -78,10 +95,11 @@ namespace isblTest
 			loaderUserSearch			= new isblTest.UserSearch(this.connection);
 			loaderWizard				= new isblTest.Wizard(this.connection);
 			
+			
 			//Загрузка типов карточке электронных документов
 			isblNode = loaderEDocType.Load();
 			isblList.Add(isblNode);
-
+			/*
 			//Загрузка текстов функций
 			isblNode = loaderFunction.Load();
 			isblList.Add(isblNode);
@@ -125,7 +143,7 @@ namespace isblTest
 			//Загрузка вычислений мастеров действий
 			isblNode = loaderWizard.Load();
 			isblList.Add(isblNode);
-			
+			*/
 			return isblList;
 		}
 	}

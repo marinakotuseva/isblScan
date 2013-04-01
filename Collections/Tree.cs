@@ -1,4 +1,6 @@
 /*
+ * Author: Smirnov Vjacheslav
+ * Email: owasp@ya.ru
  * Date: 11.08.2012
  * Time: 0:44
  */

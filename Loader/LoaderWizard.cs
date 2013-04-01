@@ -249,6 +249,8 @@ namespace isblTest
 				wizardEventsNode.nodes.Add(wizardEventInfoNode);
 			}
 			wizardNode.nodes.Add(wizardEventsNode);
+			//Загрузка этапов мастера
+			
 		}
 		public isblTest.Node Load()
 		{
