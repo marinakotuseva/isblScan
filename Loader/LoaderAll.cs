@@ -52,8 +52,7 @@ namespace isblTest
 			connBuilder.ApplicationName = "isblTest";
 			connBuilder.UserID = login;
 			connBuilder.Password = password;
-			connBuilder.Password = "1test1-"; // TODO : убрать
-			
+
 			try {
 				this.connection = new SqlConnection(connBuilder.ConnectionString);
 				this.connection.Open();

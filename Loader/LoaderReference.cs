@@ -34,9 +34,9 @@ namespace isblTest
 				command.Connection = this.connection;
 				command.CommandText = "SELECT [Name], [Kod], [Exprn], [InpExprn] FROM [MBVidAnRecv] WHERE [Vid]=@Vid AND [Razd]=@Razd ORDER BY [NumRecv]";
 				SqlParameter paramVid = new SqlParameter("@Vid", SqlDbType.Int, 10);
-				paramVid.Value = recvGroupNode.id;
+				paramVid.Value = recvGroupNode.Id;
 				SqlParameter paramRazd = new SqlParameter("@Razd", SqlDbType.Char, 1);
-				paramRazd.Value = recvGroupNode.code;
+				paramRazd.Value = recvGroupNode.Code;
 				command.Parameters.Add(paramVid);
 				command.Parameters.Add(paramRazd);
 				command.Prepare();
@@ -46,34 +46,34 @@ namespace isblTest
 					while(reader.Read())
 					{
 						isblTest.Node recvNode = new isblTest.Node();
-						recvNode.parent = recvGroupNode;
-						recvNode.nodes = new List<isblTest.Node>();
+						recvNode.Parent = recvGroupNode;
+						recvNode.Nodes = new List<isblTest.Node>();
 						if(!reader.IsDBNull(0))
 						{
-							recvNode.name = reader.GetString(0);
+							recvNode.Name = reader.GetString(0);
 						}
 						if(!reader.IsDBNull(1))
 						{
-							recvNode.code = reader.GetString(1);
-							recvNode.name += " (" + recvNode.code + ")";
+							recvNode.Code = reader.GetString(1);
+							recvNode.Name += " (" + recvNode.Code + ")";
 						}
 						if(!reader.IsDBNull(2))
 						{
 							isblTest.Node exprnRefRecvNode = new isblTest.Node();
-							exprnRefRecvNode.name = "-=[ Вычисление ]=-";
-							exprnRefRecvNode.text = reader.GetString(2);
-							exprnRefRecvNode.parent = recvNode;
-							recvNode.nodes.Add(exprnRefRecvNode);
+							exprnRefRecvNode.Name = "-=[ Вычисление ]=-";
+							exprnRefRecvNode.Text = reader.GetString(2);
+							exprnRefRecvNode.Parent = recvNode;
+							recvNode.Nodes.Add(exprnRefRecvNode);
 						}
 						if(!reader.IsDBNull(3))
 						{
 							isblTest.Node inpExprnRefRecvNode = new isblTest.Node();
-							inpExprnRefRecvNode.name = "-=[ Выбор из справочника ]=-";
-							inpExprnRefRecvNode.text = reader.GetString(3);
-							inpExprnRefRecvNode.parent = recvNode;
-							recvNode.nodes.Add(inpExprnRefRecvNode);
+							inpExprnRefRecvNode.Name = "-=[ Выбор из справочника ]=-";
+							inpExprnRefRecvNode.Text = reader.GetString(3);
+							inpExprnRefRecvNode.Parent = recvNode;
+							recvNode.Nodes.Add(inpExprnRefRecvNode);
 						}
-						recvGroupNode.nodes.Add(recvNode);
+						recvGroupNode.Nodes.Add(recvNode);
 					}
 				}
 				reader.Close();
@@ -158,36 +158,36 @@ namespace isblTest
 				command.Connection = this.connection;
 				command.CommandText = "SELECT [Razd] FROM [MBVidAnRecv] WHERE [Vid] = @Vid GROUP BY [Razd] ORDER BY [Razd] DESC";
 				SqlParameter paramVid = new SqlParameter("@Vid", SqlDbType.Int, 10);
-				paramVid.Value = refNode.id;
+				paramVid.Value = refNode.Id;
 				command.Parameters.Add(paramVid);
 				command.Prepare();
 				SqlDataReader reader = command.ExecuteReader();
 
 				isblTest.Node refRecvNode = new isblTest.Node();
-				refRecvNode.nodes = new List<isblTest.Node>();
+				refRecvNode.Nodes = new List<isblTest.Node>();
 
 				if(reader.HasRows)
 				{
-					refRecvNode.name = "-=[ Реквизиты и действия типа справочника ]=-";
-					refRecvNode.text = null;
-					refRecvNode.parent = refNode;
-					refNode.nodes.Add(refRecvNode);
+					refRecvNode.Name = "-=[ Реквизиты и действия типа справочника ]=-";
+					refRecvNode.Text = null;
+					refRecvNode.Parent = refNode;
+					refNode.Nodes.Add(refRecvNode);
 
 					while(reader.Read())
 					{
 						isblTest.Node recvGroupNode = new isblTest.Node();
 						//Код раздела
-						recvGroupNode.code = reader.GetString(0);
+						recvGroupNode.Code = reader.GetString(0);
 						//Вид аналитики
-						recvGroupNode.id = refNode.id;
-						recvGroupNode.name = GetGroupRecvName(recvGroupNode.code[0]);
-						recvGroupNode.parent = refRecvNode;
-						recvGroupNode.nodes = new List<isblTest.Node>();
-						refRecvNode.nodes.Add(recvGroupNode);
+						recvGroupNode.Id = refNode.Id;
+						recvGroupNode.Name = GetGroupRecvName(recvGroupNode.Code[0]);
+						recvGroupNode.Parent = refRecvNode;
+						recvGroupNode.Nodes = new List<isblTest.Node>();
+						refRecvNode.Nodes.Add(recvGroupNode);
 					}
 				}
 				reader.Close();
-				foreach(isblTest.Node recvGroupNode in refRecvNode.nodes)
+				foreach(isblTest.Node recvGroupNode in refRecvNode.Nodes)
 				{
 					this.LoadRecvisite(recvGroupNode);
 				}
@@ -206,44 +206,44 @@ namespace isblTest
 				if(reader.HasRows)
 				{
 					rootRefNode = new isblTest.Node();
-					rootRefNode.name = "Тип справочника";
-					rootRefNode.text = null;
-					rootRefNode.parent = null;
-					rootRefNode.nodes = new List<Node>();
+					rootRefNode.Name = "Тип справочника";
+					rootRefNode.Text = null;
+					rootRefNode.Parent = null;
+					rootRefNode.Nodes = new List<Node>();
 					
 					while(reader.Read())
 					{
 						isblTest.Node refNode = new isblTest.Node();
-						refNode.parent = rootRefNode;
-						refNode.nodes = new List<isblTest.Node>();
+						refNode.Parent = rootRefNode;
+						refNode.Nodes = new List<isblTest.Node>();
 						//ИД 
-						refNode.id = reader.GetInt32(0);
+						refNode.Id = reader.GetInt32(0);
 						//Имя (Код)
 						if((! reader.IsDBNull(1))&&(! reader.IsDBNull(2)))
 						{
-							refNode.name = reader.GetString(1).Trim() + " (" + reader.GetString(2).Trim() + ")";
+							refNode.Name = reader.GetString(1).Trim() + " (" + reader.GetString(2).Trim() + ")";
 						}
-						refNode.nodes = new List<isblTest.Node>();
+						refNode.Nodes = new List<isblTest.Node>();
 						//Примечание к типу справочника
 						if(! reader.IsDBNull(3))
 						{
-							refNode.text = reader.GetString(3).Trim();
+							refNode.Text = reader.GetString(3).Trim();
 						}
 						//События типа справочника
 						if(! reader.IsDBNull(4))
 						{
 							isblTest.Node refEventNode = new isblTest.Node();
-							refEventNode.name = "-=[ События ]=-";
-							refEventNode.text = reader.GetString(4).Trim();
-							refEventNode.parent = refNode;
-							refNode.nodes.Add(refEventNode);
+							refEventNode.Name = "-=[ События ]=-";
+							refEventNode.Text = reader.GetString(4).Trim();
+							refEventNode.Parent = refNode;
+							refNode.Nodes.Add(refEventNode);
 						}
-						rootRefNode.nodes.Add(refNode);
+						rootRefNode.Nodes.Add(refNode);
 					}
 				}
 				reader.Close();
 
-				foreach(isblTest.Node refNode in rootRefNode.nodes)
+				foreach(isblTest.Node refNode in rootRefNode.Nodes)
 				{
 					LoadGroupRecv(refNode);
 				}

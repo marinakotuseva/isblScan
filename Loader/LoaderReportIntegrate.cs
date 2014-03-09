@@ -24,10 +24,10 @@ namespace isblTest
 			if(this.checkTableExist("MBReports"))
 			{
 				listNode = new isblTest.Node();
-				listNode.name = "Интегрированный отчёт";
-				listNode.text = null;
-				listNode.parent = null;
-				listNode.nodes = new List<Node>();
+				listNode.Name = "Интегрированный отчёт";
+				listNode.Text = null;
+				listNode.Parent = null;
+				listNode.Nodes = new List<Node>();
 				
 				{
 					SqlCommand command = new SqlCommand();
@@ -39,20 +39,20 @@ namespace isblTest
 						while(reader.Read())
 						{
 							isblTest.Node reportNode = new isblTest.Node();
-							reportNode.parent = listNode;
+							reportNode.Parent = listNode;
 							//ИД отчёта
-							reportNode.id = reader.GetInt32(0);
+							reportNode.Id = reader.GetInt32(0);
 							//Имя отчёта
 							if(! reader.IsDBNull(1))
 							{
-								reportNode.name = reader.GetString(1);
+								reportNode.Name = reader.GetString(1);
 							}
 							//Описание отчёта
 							if(! reader.IsDBNull(2))
 							{
-								reportNode.text = reader.GetString(2);
+								reportNode.Text = reader.GetString(2);
 							}
-							reportNode.nodes = new List<isblTest.Node>();
+							reportNode.Nodes = new List<isblTest.Node>();
 							//Шаблон отчёта
 							if(! reader.IsDBNull(4))
 							{
@@ -60,22 +60,22 @@ namespace isblTest
 								System.Text.Encoding win1251 = System.Text.Encoding.GetEncoding(1251);
 								string scriptText = win1251.GetString(sqlbytes.Value);
 								isblTest.Node reportTextNode = new isblTest.Node();
-								reportTextNode.name = "-=[ Шаблон ]=-";
-								reportTextNode.text = scriptText;
-								reportTextNode.parent = reportNode;
-								reportNode.nodes.Add(reportTextNode);
+								reportTextNode.Name = "-=[ Шаблон ]=-";
+								reportTextNode.Text = scriptText;
+								reportTextNode.Parent = reportNode;
+								reportNode.Nodes.Add(reportTextNode);
 							}
 							//Расчёт отчёта
 							if(! reader.IsDBNull(3))
 							{
 								string templateText = reader.GetString(3);
 								isblTest.Node reportTemplateNode = new isblTest.Node();
-								reportTemplateNode.name = "-=[ Расчёт ]=-";
-								reportTemplateNode.text = templateText;
-								reportTemplateNode.parent = reportNode;
-								reportNode.nodes.Add(reportTemplateNode);
+								reportTemplateNode.Name = "-=[ Расчёт ]=-";
+								reportTemplateNode.Text = templateText;
+								reportTemplateNode.Parent = reportNode;
+								reportNode.Nodes.Add(reportTemplateNode);
 							}
-							listNode.nodes.Add(reportNode);
+							listNode.Nodes.Add(reportNode);
 						}
 					}
 					reader.Close();

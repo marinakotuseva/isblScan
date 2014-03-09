@@ -72,14 +72,14 @@ namespace isblTest
 		{
 			if(isblNode != null)
 			{
-				TreeNode treeNode = treeNodes.Add(isblNode.name);
-				if(isblNode.text != null)
+				TreeNode treeNode = treeNodes.Add(isblNode.Name);
+				if(isblNode.Text != null)
 				{
-					treeNode.Tag = isblNode.text;
+					treeNode.Tag = isblNode.Text;
 				}
-				if(isblNode.nodes != null)
+				if(isblNode.Nodes != null)
 				{
-					foreach(isblTest.Node isblSubNode in isblNode.nodes)
+					foreach(isblTest.Node isblSubNode in isblNode.Nodes)
 					{
 						LoadSubNodes(treeNode.Nodes, isblSubNode);
 					}

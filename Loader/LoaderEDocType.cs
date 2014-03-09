@@ -28,7 +28,7 @@ namespace isblTest
 			command.Connection = connection;
 			command.CommandText = "select [Razd] from [MBEDocTypeRecv] where not(([Exprn] is null) and ([InpExprn] is null)) and ([TypeID] = @eDocTypeID ) group by [Razd] order by [Razd] desc";
 			SqlParameter paramEDocTypeID = new SqlParameter("@eDocTypeID", SqlDbType.Int);
-			paramEDocTypeID.Value = eDocTypeNode.id;
+			paramEDocTypeID.Value = eDocTypeNode.Id;
 			command.Parameters.Add(paramEDocTypeID);
 			command.Prepare();
 			SqlDataReader reader = command.ExecuteReader();
@@ -39,41 +39,41 @@ namespace isblTest
 					if(! reader.IsDBNull(0))
 					{
 						isblTest.Node groupNode = new isblTest.Node();
-						groupNode.parent = eDocTypeNode;
-						groupNode.nodes = new List<isblTest.Node>();
+						groupNode.Parent = eDocTypeNode;
+						groupNode.Nodes = new List<isblTest.Node>();
 						string recvRazdel = reader.GetString(0);
-						groupNode.text = recvRazdel;
+						groupNode.Text = recvRazdel;
 						switch (recvRazdel)
 						{
 							case "Ш":
-								groupNode.name = "Карточка";
+								groupNode.Name = "Карточка";
 								break;
 							case "Т":
-								groupNode.name = "Таблица";
+								groupNode.Name = "Таблица";
 								break;
 							case "С":
-								groupNode.name = "Таблица 2";
+								groupNode.Name = "Таблица 2";
 								break;
 							case "Р":
-								groupNode.name = "Таблица 3";
+								groupNode.Name = "Таблица 3";
 								break;
 							case "О":
-								groupNode.name = "Таблица 4";
+								groupNode.Name = "Таблица 4";
 								break;
 							case "Н":
-								groupNode.name = "Таблица 5";
+								groupNode.Name = "Таблица 5";
 								break;
 							case "М":
-								groupNode.name = "Таблица 6";
+								groupNode.Name = "Таблица 6";
 								break;
 							case "К":
-								groupNode.name = "Действие";
+								groupNode.Name = "Действие";
 								break;
 							default:
-								groupNode.name = "Неизвестно ["+recvRazdel+"]";
+								groupNode.Name = "Неизвестно ["+recvRazdel+"]";
 								break;
 						}
-						eDocTypeNode.nodes.Add(groupNode);
+						eDocTypeNode.Nodes.Add(groupNode);
 						listGroups.Add(groupNode);
 					}
 				}
@@ -88,15 +88,15 @@ namespace isblTest
 				List<isblTest.Node> listGroups = LoadGroupRecvisite(eDocTypeNode);
 				foreach(isblTest.Node groupNode in listGroups)
 				{
-					char charGroup = groupNode.text.ToCharArray()[0];
-					groupNode.text = null;
+					char charGroup = groupNode.Text.ToCharArray()[0];
+					groupNode.Text = null;
 
 					SqlCommand command = new SqlCommand();
 					command.Connection = connection;
-					command.CommandText = "select [XRecID], [Name], [Exprn], [InpExprn], [Kod] from MBEDocTypeRecv where TypeID=@eDocTypeID and Razd=@RazdID and (not(Exprn is null) or not(InpExprn is null)) order by Name";
-					SqlParameter paramEDocTypeID = new SqlParameter("@eDocTypeID", SqlDbType.Int, 10);
-					SqlParameter paramRazdID = new SqlParameter("@RazdID", SqlDbType.Char, 1);
-					paramEDocTypeID.Value = eDocTypeNode.id;
+					command.CommandText = "select [XRecID], [Name], [Exprn], [InpExprn], [Kod] from MBEDocTypeRecv where [TypeID] = @eDocTypeID and [Razd] = @RazdID and (not([Exprn] is null) or not([InpExprn] is null)) order by [Name]";
+					SqlParameter paramEDocTypeID = new SqlParameter("@eDocTypeID", SqlDbType.Int);
+					SqlParameter paramRazdID = new SqlParameter("@RazdID", SqlDbType.NChar, 1);
+					paramEDocTypeID.Value = eDocTypeNode.Id;
 					paramRazdID.Value = charGroup;
 					command.Parameters.Add(paramEDocTypeID);
 					command.Parameters.Add(paramRazdID);
@@ -108,9 +108,9 @@ namespace isblTest
 						while(reader.Read())
 						{
 							isblTest.Node eDocRecvNode = new isblTest.Node();
-							eDocRecvNode.parent = groupNode;
+							eDocRecvNode.Parent = groupNode;
 							//ИД
-							eDocRecvNode.id = reader.GetInt32(0);
+							eDocRecvNode.Id = reader.GetInt32(0);
 							//Код реквизита
 							string strRecvCode = "";
 							if(!reader.IsDBNull(4))
@@ -118,27 +118,27 @@ namespace isblTest
 								strRecvCode = reader.GetString(4);
 							}							
 							//Имя
-							eDocRecvNode.name = "";
+							eDocRecvNode.Name = "";
 							if(!reader.IsDBNull(1))
 							{
-								eDocRecvNode.name = strRecvCode + " (" +reader.GetString(1)+")";
+								eDocRecvNode.Name = strRecvCode + " (" +reader.GetString(1)+")";
 							}
 							//Вычисление для реквизита и действия
 							if(!reader.IsDBNull(2))
 							{
-								eDocRecvNode.text = "-=[ ВЫЧИСЛЕНИЕ ]=-\n"+
+								eDocRecvNode.Text = "-=[ ВЫЧИСЛЕНИЕ ]=-\n"+
 									reader.GetString(2)+
 									"\n\n";
 							}
 							//Выбор из справочника для реквизита типа "справочник" или "строка"
 							if(!reader.IsDBNull(3))
 							{
-								eDocRecvNode.text = eDocRecvNode.text+
+								eDocRecvNode.Text = eDocRecvNode.Text+
 									"-=[ ВЫБОР ИЗ СПРАВОЧНИКА ДЛЯ РЕКВИЗИТА ]=-\n"+
 									reader.GetString(3);
 							}
 							
-							groupNode.nodes.Add(eDocRecvNode);
+							groupNode.Nodes.Add(eDocRecvNode);
 						}
 					}
 					reader.Close();
@@ -224,33 +224,33 @@ namespace isblTest
 				if(reader.HasRows)
 				{
 					listNode = new isblTest.Node();
-					listNode.name = "Тип карточки электронного документа";
-					listNode.text = null;
-					listNode.parent = null;
-					listNode.nodes = new List<Node>();
+					listNode.Name = "Тип карточки электронного документа";
+					listNode.Text = null;
+					listNode.Parent = null;
+					listNode.Nodes = new List<Node>();
 					
 					while(reader.Read())
 					{
 						isblTest.Node eDocNode = new isblTest.Node();
-						eDocNode.parent = listNode;
+						eDocNode.Parent = listNode;
 						//ИД 
-						eDocNode.id = reader.GetInt32(0);
+						eDocNode.Id = reader.GetInt32(0);
 						//Имя 
 						if(! reader.IsDBNull(1))
 						{
-							eDocNode.name = reader.GetString(1);
+							eDocNode.Name = reader.GetString(1);
 						}
-						eDocNode.nodes = new List<isblTest.Node>();
+						eDocNode.Nodes = new List<isblTest.Node>();
 						//Текст событий
 						if(! reader.IsDBNull(2))
 						{
-							eDocNode.text = parseEventText(reader.GetString(2));
+							eDocNode.Text = parseEventText(reader.GetString(2));
 						}
-						listNode.nodes.Add(eDocNode);
+						listNode.Nodes.Add(eDocNode);
 					}
 				}
 				reader.Close();
-				foreach(isblTest.Node eDocNode in listNode.nodes)
+				foreach(isblTest.Node eDocNode in listNode.Nodes)
 				{
 					LoadRecvisite(eDocNode);
 				}

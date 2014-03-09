@@ -1,46 +1,48 @@
-/*
- * Author: Smirnov Vjacheslav
- * Email: owasp@ya.ru
- * Date: 11.08.2012
- * Time: 0:44
- */
-using System;
-using System.Collections.Generic;
-
 namespace isblTest
 {
-	public class Node
-	{
-		/// <summary>
-		///ИД записи, группы, вида, ...
-		/// </summary>
-		public int id;
-		/// <summary>
-		///Код записи, группы, вида, ...
-		/// </summary>
-		public string code;
-		/// <summary>
-		///Имя узла, отображаемое в дереве
-		/// </summary>
-		public string name;
-		/// <summary>
-		///Текст отображаемый при выборе узла
-		/// </summary>
-		public string text;
-		/// <summary>
-		///Признак того, что узел явялется конечным
-		/// </summary>
-		public bool flag;
-		/// <summary>
-		///Список подузлов
-		/// </summary>
-		public List<Node> nodes;
-		/// <summary>
-		///Список родительского узла
-		/// </summary>
-		public Node parent;
-		
-	}
+    using System;
+    using System.Collections.Generic;
+
+    /// <summary>
+    /// Узел дерева элементов разработки
+    /// </summary>
+    public class Node
+    {
+        /// <summary>
+        /// Gets or sets ИД записи
+        /// </summary>
+        public int Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets Код записи, группы, вида, ...
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// Gets or sets Имя узла, отображаемое в дереве
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets Текст отображаемый при выборе узла
+        /// </summary>
+        public string Text { get; set; }
+
+        /// <summary>
+        /// Gets or sets Признак того, что узел явялется конечным
+        /// </summary>
+        public bool Flag { get; set; }
+
+        /// <summary>
+        /// Gets or sets Список подузлов
+        /// </summary>
+        public List<Node> Nodes { get; set; }
+
+        /// <summary>
+        /// Gets or sets Список родительского узла
+        /// </summary>
+        public Node Parent { get; set; }
+    }
 	/// <summary>
 	/// Description of Tree.
 	/// </summary>

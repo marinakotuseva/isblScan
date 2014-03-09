@@ -27,7 +27,7 @@ namespace isblTest
 				command.Connection = connection;
 				command.CommandText = "select SearchCondition, BeforeSearch, Tekst from MBText where SrcRecID=@userSearchAnalit";
 				SqlParameter userSearchAnalit = new SqlParameter("@userSearchAnalit", SqlDbType.Int, 10);
-				userSearchAnalit.Value = userSeachNode.id;
+				userSearchAnalit.Value = userSeachNode.Id;
 				command.Parameters.Add(userSearchAnalit);
 				command.Prepare();
 				SqlDataReader reader = command.ExecuteReader();
@@ -40,36 +40,36 @@ namespace isblTest
 							SqlBytes sqlbytes = reader.GetSqlBytes(0);
 							
 							isblTest.Node userSearchSearchConditionNode = new isblTest.Node();
-							userSearchSearchConditionNode.name = "-=[ Критерии поиска ]=-";
-							userSearchSearchConditionNode.parent = userSeachNode;
-							userSeachNode.nodes.Add(userSearchSearchConditionNode);
+							userSearchSearchConditionNode.Name = "-=[ Критерии поиска ]=-";
+							userSearchSearchConditionNode.Parent = userSeachNode;
+							userSeachNode.Nodes.Add(userSearchSearchConditionNode);
 							
 							System.Text.Encoding win1251 = System.Text.Encoding.GetEncoding(1251);
-							userSearchSearchConditionNode.text = win1251.GetString(sqlbytes.Value);
+							userSearchSearchConditionNode.Text = win1251.GetString(sqlbytes.Value);
 						}
 						if(!reader.IsDBNull(1))
 						{
 							SqlBytes sqlbytes = reader.GetSqlBytes(1);
 							
 							isblTest.Node userSearchBeforeSearchNode = new isblTest.Node();
-							userSearchBeforeSearchNode.name = "-=[ Обработчик события \"До поиска\" ]=-";
-							userSearchBeforeSearchNode.parent = userSeachNode;
-							userSeachNode.nodes.Add(userSearchBeforeSearchNode);
+							userSearchBeforeSearchNode.Name = "-=[ Обработчик события \"До поиска\" ]=-";
+							userSearchBeforeSearchNode.Parent = userSeachNode;
+							userSeachNode.Nodes.Add(userSearchBeforeSearchNode);
 
 							System.Text.Encoding win1251 = System.Text.Encoding.GetEncoding(1251);
-							userSearchBeforeSearchNode.text = win1251.GetString(sqlbytes.Value);
+							userSearchBeforeSearchNode.Text = win1251.GetString(sqlbytes.Value);
 						}
 						if(!reader.IsDBNull(2))
 						{
 							SqlBytes sqlbytes = reader.GetSqlBytes(2);
 							
 							isblTest.Node userSearchTextNode = new isblTest.Node();
-							userSearchTextNode.name = "-=[ Текст ]=-";
-							userSearchTextNode.parent = userSeachNode;
-							userSeachNode.nodes.Add(userSearchTextNode);
+							userSearchTextNode.Name = "-=[ Текст ]=-";
+							userSearchTextNode.Parent = userSeachNode;
+							userSeachNode.Nodes.Add(userSearchTextNode);
 
 							System.Text.Encoding win1251 = System.Text.Encoding.GetEncoding(1251);
-							userSearchTextNode.text = win1251.GetString(sqlbytes.Value);
+							userSearchTextNode.Text = win1251.GetString(sqlbytes.Value);
 						}
 					}
 				}
@@ -83,11 +83,11 @@ namespace isblTest
 			if(vidAnalitID >= 0)
 			{
 				listNode = new isblTest.Node();
-				listNode.name = "Пользовательский поиск";
-				listNode.text = null;
-				listNode.id = vidAnalitID;
-				listNode.parent = null;
-				listNode.nodes = new List<Node>();
+				listNode.Name = "Пользовательский поиск";
+				listNode.Text = null;
+				listNode.Id = vidAnalitID;
+				listNode.Parent = null;
+				listNode.Nodes = new List<Node>();
 				
 				{
 					SqlCommand command = new SqlCommand();
@@ -103,22 +103,22 @@ namespace isblTest
 						while(reader.Read())
 						{
 							isblTest.Node userSearchNode = new isblTest.Node();
-							userSearchNode.parent = listNode;
-							userSearchNode.nodes = new List<isblTest.Node>();
-							userSearchNode.id = reader.GetInt32(0);
+							userSearchNode.Parent = listNode;
+							userSearchNode.Nodes = new List<isblTest.Node>();
+							userSearchNode.Id = reader.GetInt32(0);
 							if(! reader.IsDBNull(1))
 							{
-								userSearchNode.name = reader.GetString(1);
+								userSearchNode.Name = reader.GetString(1);
 							}
 							if(! reader.IsDBNull(2))
 							{
-								userSearchNode.text = reader.GetString(2);
+								userSearchNode.Text = reader.GetString(2);
 							}
-							listNode.nodes.Add(userSearchNode);
+							listNode.Nodes.Add(userSearchNode);
 						}
 					}
 					reader.Close();
-					foreach(isblTest.Node userScriptNode in listNode.nodes)
+					foreach(isblTest.Node userScriptNode in listNode.Nodes)
 					{
 						LoadText(userScriptNode);
 					}

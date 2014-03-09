@@ -33,14 +33,14 @@ namespace isblTest
 					while(reader.Read())
 					{
 						isblTest.Node node = new isblTest.Node();
-						node.parent = rootNode;
-						node.id = reader.GetInt32(0);
+						node.Parent = rootNode;
+						node.Id = reader.GetInt32(0);
 						if(! reader.IsDBNull(1))
 						{
-							node.name = reader.GetString(1);
+							node.Name = reader.GetString(1);
 						}
-						node.nodes = new List<isblTest.Node>();
-						rootNode.nodes.Add(node);
+						node.Nodes = new List<isblTest.Node>();
+						rootNode.Nodes.Add(node);
 						listGroups.Add(node);
 					}
 				}
@@ -55,10 +55,10 @@ namespace isblTest
 			if(this.checkTableExist("MBReports"))
 			{
 				listNode = new isblTest.Node();
-				listNode.name = "Сценарий (расчёт)";
-				listNode.text = null;
-				listNode.parent = null;
-				listNode.nodes = new List<Node>();
+				listNode.Name = "Сценарий (расчёт)";
+				listNode.Text = null;
+				listNode.Parent = null;
+				listNode.Nodes = new List<Node>();
 				
 				List<isblTest.Node> listGroups = LoadGroups(listNode);
 				foreach(isblTest.Node groupNode in listGroups)
@@ -67,7 +67,7 @@ namespace isblTest
 					command.Connection = connection;
 					command.CommandText = "select XRecID, NameRpt, Comment, Report from MBReports where TypeRpt='Function' and RegUnit=@groupID order by NameRpt";
 					SqlParameter paramGroupID = new SqlParameter("@groupID", SqlDbType.Int, 10);
-					paramGroupID.Value = groupNode.id;
+					paramGroupID.Value = groupNode.Id;
 					command.Parameters.Add(paramGroupID);
 					command.Prepare();
 					SqlDataReader reader = command.ExecuteReader();
@@ -76,17 +76,17 @@ namespace isblTest
 						while(reader.Read())
 						{
 							isblTest.Node scriptNode = new isblTest.Node();
-							scriptNode.parent = groupNode;
-							scriptNode.id = reader.GetInt32(0);
+							scriptNode.Parent = groupNode;
+							scriptNode.Id = reader.GetInt32(0);
 							if(! reader.IsDBNull(1))
 							{
-								scriptNode.name = reader.GetString(1);
+								scriptNode.Name = reader.GetString(1);
 							}
 							if(! reader.IsDBNull(2))
 							{
-								scriptNode.text = reader.GetString(2);
+								scriptNode.Text = reader.GetString(2);
 							}
-							scriptNode.nodes = new List<isblTest.Node>();
+							scriptNode.Nodes = new List<isblTest.Node>();
 							
 							if(! reader.IsDBNull(3))
 							{
@@ -94,12 +94,12 @@ namespace isblTest
 								System.Text.Encoding win1251 = System.Text.Encoding.GetEncoding(1251);
 								string scriptText = win1251.GetString(sqlbytes.Value);
 								isblTest.Node scriptTextNode = new isblTest.Node();
-								scriptTextNode.name = "-=[ Текст сценария ]=-";
-								scriptTextNode.text = scriptText;
-								scriptTextNode.parent = scriptNode;
-								scriptNode.nodes.Add(scriptTextNode);
+								scriptTextNode.Name = "-=[ Текст сценария ]=-";
+								scriptTextNode.Text = scriptText;
+								scriptTextNode.Parent = scriptNode;
+								scriptNode.Nodes.Add(scriptTextNode);
 							}
-							groupNode.nodes.Add(scriptNode);
+							groupNode.Nodes.Add(scriptNode);
 						}
 					}
 					reader.Close();

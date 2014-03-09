@@ -26,7 +26,7 @@ namespace isblTest
 				command.Connection = connection;
 				command.CommandText = "select Tekst from MBText where SrcRecID=@userScriptAnalit";
 				SqlParameter userScriptAnalit = new SqlParameter("@userScriptAnalit", SqlDbType.Int, 10);
-				userScriptAnalit.Value = userScriptNode.id;
+				userScriptAnalit.Value = userScriptNode.Id;
 				command.Parameters.Add(userScriptAnalit);
 				command.Prepare();
 				SqlDataReader reader = command.ExecuteReader();
@@ -39,11 +39,11 @@ namespace isblTest
 							SqlBytes sqlbytes = reader.GetSqlBytes(0);
 							
 							isblTest.Node userScriptText = new isblTest.Node();
-							userScriptText.name = "-=[ Расчёт ]=-";
-							userScriptText.parent = userScriptNode;
-							userScriptNode.nodes.Add(userScriptText);
+							userScriptText.Name = "-=[ Расчёт ]=-";
+							userScriptText.Parent = userScriptNode;
+							userScriptNode.Nodes.Add(userScriptText);
 							System.Text.Encoding win1251 = System.Text.Encoding.GetEncoding(1251);
-							userScriptText.text = win1251.GetString(sqlbytes.Value);
+							userScriptText.Text = win1251.GetString(sqlbytes.Value);
 						}
 					}
 				}
@@ -57,11 +57,11 @@ namespace isblTest
 			if(vidAnalitID >= 0)
 			{
 				listNode = new isblTest.Node();
-				listNode.name = "Пользовательский расчёт";
-				listNode.text = null;
-				listNode.id = vidAnalitID;
-				listNode.parent = null;
-				listNode.nodes = new List<Node>();
+				listNode.Name = "Пользовательский расчёт";
+				listNode.Text = null;
+				listNode.Id = vidAnalitID;
+				listNode.Parent = null;
+				listNode.Nodes = new List<Node>();
 				
 				{
 					SqlCommand command = new SqlCommand();
@@ -77,22 +77,22 @@ namespace isblTest
 						while(reader.Read())
 						{
 							isblTest.Node userScriptNode = new isblTest.Node();
-							userScriptNode.parent = listNode;
-							userScriptNode.nodes = new List<isblTest.Node>();
-							userScriptNode.id = reader.GetInt32(0);
+							userScriptNode.Parent = listNode;
+							userScriptNode.Nodes = new List<isblTest.Node>();
+							userScriptNode.Id = reader.GetInt32(0);
 							if(! reader.IsDBNull(1))
 							{
-								userScriptNode.name = reader.GetString(1);
+								userScriptNode.Name = reader.GetString(1);
 							}
 							if(! reader.IsDBNull(2))
 							{
-								userScriptNode.text = reader.GetString(2);
+								userScriptNode.Text = reader.GetString(2);
 							}
-							listNode.nodes.Add(userScriptNode);
+							listNode.Nodes.Add(userScriptNode);
 						}
 					}
 					reader.Close();
-					foreach(isblTest.Node userScriptNode in listNode.nodes)
+					foreach(isblTest.Node userScriptNode in listNode.Nodes)
 					{
 						LoadText(userScriptNode);
 					}

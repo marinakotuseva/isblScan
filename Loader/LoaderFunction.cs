@@ -38,14 +38,14 @@ namespace isblTest
 					while(reader.Read())
 					{
 						isblTest.Node node = new isblTest.Node();
-						node.parent = rootNode;
-						node.id = reader.GetInt32(0);
+						node.Parent = rootNode;
+						node.Id = reader.GetInt32(0);
 						if(! reader.IsDBNull(1))
 						{
-							node.name = reader.GetString(1);
+							node.Name = reader.GetString(1);
 						}
-						node.nodes = new List<isblTest.Node>();
-						rootNode.nodes.Add(node);
+						node.Nodes = new List<isblTest.Node>();
+						rootNode.Nodes.Add(node);
 						listGroups.Add(node);
 					}
 				}
@@ -114,36 +114,36 @@ namespace isblTest
 				command.Connection = this.connection;
 				command.CommandText = "SELECT [NumPar], [Ident], [Name], [Type], [ValueDef] FROM [MBFuncRecv] WHERE [FName] = @funcName";
 				SqlParameter paramFuncName = new SqlParameter ("@funcName", SqlDbType.VarChar, 512);
-				paramFuncName.Value = rootNode.name;
+				paramFuncName.Value = rootNode.Name;
 				command.Parameters.Add (paramFuncName);
 				command.Prepare ();
 				SqlDataReader reader = command.ExecuteReader ();
 				if (reader.HasRows)
 				{
 					isblTest.Node funcRecvNode = new isblTest.Node ();
-					funcRecvNode.name = "-=[ Параметры функции ]=-";
-					funcRecvNode.parent = rootNode;
-					rootNode.nodes.Add (funcRecvNode);
+					funcRecvNode.Name = "-=[ Параметры функции ]=-";
+					funcRecvNode.Parent = rootNode;
+					rootNode.Nodes.Add (funcRecvNode);
 					while (reader.Read ())
 					{
 						//Номер параметра функции
-						funcRecvNode.text += reader.GetInt32 (0).ToString () + ".\t";
+						funcRecvNode.Text += reader.GetInt32 (0).ToString () + ".\t";
 						//Идентификатор параметра
 						if (!reader.IsDBNull (1))
 						{
-							funcRecvNode.text += reader.GetString (1) + ".\t";
+							funcRecvNode.Text += reader.GetString (1) + ".\t";
 						}
 						//Для внутреннего использования
 						if (!reader.IsDBNull (2))
 						{
-							funcRecvNode.text += reader.GetString (2) + ".\t";
+							funcRecvNode.Text += reader.GetString (2) + ".\t";
 						}
 						//Тип параметра
 						if (!reader.IsDBNull (3))
 						{
-							funcRecvNode.text += this.GetTypeName(reader.GetString(3)) + ".\t";
+							funcRecvNode.Text += this.GetTypeName(reader.GetString(3)) + ".\t";
 						}
-						funcRecvNode.text += "\r\n";
+						funcRecvNode.Text += "\r\n";
 					}
 				}
 				reader.Close();
@@ -155,26 +155,26 @@ namespace isblTest
 			if(this.checkTableExist("MBFunc"))
 			{
 				listNode = new isblTest.Node();
-				listNode.name = "Функция";
-				listNode.text = null;
-				listNode.parent = null;
-				listNode.nodes = new List<Node>();
+				listNode.Name = "Функция";
+				listNode.Text = null;
+				listNode.Parent = null;
+				listNode.Nodes = new List<Node>();
 				char[] charsSysUserFunc = {'P', 'S'};
 				foreach(char charSysFunc in charsSysUserFunc)
 				{
 					isblTest.Node systemFuncNode = new isblTest.Node();
 					if(charSysFunc == 'P')
 					{
-						systemFuncNode.name = "Пользовательская";
+						systemFuncNode.Name = "Пользовательская";
 					}
 					else
 					{
-						systemFuncNode.name = "Системная";
+						systemFuncNode.Name = "Системная";
 					}
-					systemFuncNode.text = null;
-					systemFuncNode.parent = listNode;
-					systemFuncNode.nodes = new List<Node>();
-					listNode.nodes.Add(systemFuncNode);
+					systemFuncNode.Text = null;
+					systemFuncNode.Parent = listNode;
+					systemFuncNode.Nodes = new List<Node>();
+					listNode.Nodes.Add(systemFuncNode);
 					
 					List<isblTest.Node> listGroups = LoadGroups(systemFuncNode, charSysFunc);
 					foreach(isblTest.Node groupNode in listGroups)
@@ -185,7 +185,7 @@ namespace isblTest
 						command.CommandText = "select XRecID, FName, Comment, Help, Txt from MBFunc where NGroup=@groupID and SysFunc=@sysFunc order by FName";
 						SqlParameter paramGroupID = new SqlParameter("@groupID", SqlDbType.Int, 10);
 						SqlParameter paramSysFunc = new SqlParameter("@sysFunc", SqlDbType.Char, 1);
-						paramGroupID.Value = groupNode.id;
+						paramGroupID.Value = groupNode.Id;
 						paramSysFunc.Value = charSysFunc;
 						command.Parameters.Add(paramGroupID);
 						command.Parameters.Add(paramSysFunc);
@@ -196,23 +196,23 @@ namespace isblTest
 							while(reader.Read())
 							{
 								isblTest.Node functionNode = new isblTest.Node();
-								functionNode.nodes = new List<isblTest.Node>();
-								functionNode.parent = groupNode;
+								functionNode.Nodes = new List<isblTest.Node>();
+								functionNode.Parent = groupNode;
 								//ИД
-								functionNode.id = reader.GetInt32(0);
+								functionNode.Id = reader.GetInt32(0);
 								//Имя функции
 								if(! reader.IsDBNull(1))
 								{
-									functionNode.name = reader.GetString(1);
+									functionNode.Name = reader.GetString(1);
 								}
 								//Комментарий к функции
 								if(! reader.IsDBNull(2))
 								{
 									isblTest.Node funcDescriptionNode = new isblTest.Node();
-									funcDescriptionNode.name = "-=[ Описание функции ]=-";
-									funcDescriptionNode.text = reader.GetString(2);
-									funcDescriptionNode.parent = functionNode;
-									functionNode.nodes.Add(funcDescriptionNode);
+									funcDescriptionNode.Name = "-=[ Описание функции ]=-";
+									funcDescriptionNode.Text = reader.GetString(2);
+									funcDescriptionNode.Parent = functionNode;
+									functionNode.Nodes.Add(funcDescriptionNode);
 								}
 								//Справка по функции
 								/*
@@ -229,18 +229,18 @@ namespace isblTest
 								if(! reader.IsDBNull(4))
 								{
 									isblTest.Node funcTextNode = new isblTest.Node();
-									funcTextNode.name = "-=[ Текст функции ]=-";
-									funcTextNode.text = reader.GetString(4);
-									funcTextNode.parent = functionNode;
-									functionNode.nodes.Add(funcTextNode);
+									funcTextNode.Name = "-=[ Текст функции ]=-";
+									funcTextNode.Text = reader.GetString(4);
+									funcTextNode.Parent = functionNode;
+									functionNode.Nodes.Add(funcTextNode);
 								}
 								
-								groupNode.nodes.Add(functionNode);
+								groupNode.Nodes.Add(functionNode);
 							}
 						}
 						reader.Close();
 						//Загрузка параметров функций для функций текущей группы
-						foreach(isblTest.Node funcNode in groupNode.nodes)
+						foreach(isblTest.Node funcNode in groupNode.Nodes)
 						{
 							this.LoadRecvisites(funcNode);
 						}
