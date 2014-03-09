@@ -65,7 +65,7 @@ namespace isblTest
 					SqlCommand command = new SqlCommand();
 					command.Connection = connection;
 					command.CommandText = "select XRecID, NameRpt, Comment, Exprn, Report, Viewer from MBReports where TypeRpt='MBAnAccRpt' and RegUnit=@groupID order by NameRpt ASC";
-					SqlParameter paramGroupID = new SqlParameter("@groupID", SqlDbType.Int, 10);
+					SqlParameter paramGroupID = new SqlParameter("@groupID", SqlDbType.Int);
 					paramGroupID.Value = groupNode.Id;
 					command.Parameters.Add(paramGroupID);
 					command.Prepare();

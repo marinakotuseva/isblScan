@@ -74,7 +74,7 @@ namespace isblTest
 				SqlCommand command = new SqlCommand();
 				command.Connection = connection;
 				command.CommandText = "select SearchCondition from MBText where SrcRecID=@wizardAnalit";
-				SqlParameter wizardAnalit = new SqlParameter("@wizardAnalit", SqlDbType.Int, 10);
+				SqlParameter wizardAnalit = new SqlParameter("@wizardAnalit", SqlDbType.Int);
 				wizardAnalit.Value = wizardNode.Id;
 				command.Parameters.Add(wizardAnalit);
 				command.Prepare();
@@ -271,8 +271,8 @@ namespace isblTest
 					SqlCommand command = new SqlCommand();
 					command.Connection = connection;
 					command.CommandText = "select Analit, NameAn, Soder from MBAnalit where Vid=@vidAnalit and HighLvl=@groupID";
-					SqlParameter paramVidAnalit = new SqlParameter("@vidAnalit", SqlDbType.Int, 10);
-					SqlParameter paramGroupID = new SqlParameter("@groupID", SqlDbType.Int, 10);
+					SqlParameter paramVidAnalit = new SqlParameter("@vidAnalit", SqlDbType.Int);
+					SqlParameter paramGroupID = new SqlParameter("@groupID", SqlDbType.Int);
 					paramVidAnalit.Value = vidAnalitID;
 					paramGroupID.Value = groupNode.Id;
 					command.Parameters.Add(paramVidAnalit);

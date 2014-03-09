@@ -5,6 +5,19 @@
 	* LoaderScript.cs:
 	* LoaderWizard.cs:
 	* LoaderCommon.cs:
+	* LoaderFunction.cs:
+	* LoaderReference.cs:
+	* LoaderUserSearch.cs:
+	* LoaderRouteBlock.cs:
+	* LoaderUserScript.cs: 
+
+2014-03-09  polarnik  <owasp@ya.ru>
+
+	* LoaderAll.cs:
+	* LoaderReport.cs:
+	* LoaderScript.cs:
+	* LoaderWizard.cs:
+	* LoaderCommon.cs:
 	* LoaderEDocType.cs:
 	* LoaderFunction.cs:
 	* LoaderReference.cs:

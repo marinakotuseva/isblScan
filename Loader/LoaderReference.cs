@@ -33,9 +33,9 @@ namespace isblTest
 				SqlCommand command = new SqlCommand();
 				command.Connection = this.connection;
 				command.CommandText = "SELECT [Name], [Kod], [Exprn], [InpExprn] FROM [MBVidAnRecv] WHERE [Vid]=@Vid AND [Razd]=@Razd ORDER BY [NumRecv]";
-				SqlParameter paramVid = new SqlParameter("@Vid", SqlDbType.Int, 10);
+				SqlParameter paramVid = new SqlParameter("@Vid", SqlDbType.Int);
 				paramVid.Value = recvGroupNode.Id;
-				SqlParameter paramRazd = new SqlParameter("@Razd", SqlDbType.Char, 1);
+				SqlParameter paramRazd = new SqlParameter("@Razd", SqlDbType.NChar, 1);
 				paramRazd.Value = recvGroupNode.Code;
 				command.Parameters.Add(paramVid);
 				command.Parameters.Add(paramRazd);
@@ -157,7 +157,7 @@ namespace isblTest
 				SqlCommand command = new SqlCommand();
 				command.Connection = this.connection;
 				command.CommandText = "SELECT [Razd] FROM [MBVidAnRecv] WHERE [Vid] = @Vid GROUP BY [Razd] ORDER BY [Razd] DESC";
-				SqlParameter paramVid = new SqlParameter("@Vid", SqlDbType.Int, 10);
+				SqlParameter paramVid = new SqlParameter("@Vid", SqlDbType.Int);
 				paramVid.Value = refNode.Id;
 				command.Parameters.Add(paramVid);
 				command.Prepare();

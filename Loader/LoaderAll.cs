@@ -98,7 +98,7 @@ namespace isblTest
 			//Загрузка типов карточке электронных документов
 			isblNode = loaderEDocType.Load();
 			isblList.Add(isblNode);
-			/*
+
 			//Загрузка текстов функций
 			isblNode = loaderFunction.Load();
 			isblList.Add(isblNode);
@@ -142,7 +142,7 @@ namespace isblTest
 			//Загрузка вычислений мастеров действий
 			isblNode = loaderWizard.Load();
 			isblList.Add(isblNode);
-			*/
+
 			return isblList;
 		}
 	}

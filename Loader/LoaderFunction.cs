@@ -28,7 +28,7 @@ namespace isblTest
 				command.Connection = this.connection;
 				//command.CommandText = "select t.id, t.name from (select MBGrFunc.NGroup [id], Max(MBGrFunc.GrName) [name] from MBGrFunc join MBFunc on (MBGrFunc.NGroup = MBFunc.NGroup) where MBFunc.SysFunc=@funcCategory and not(Txt is null) group by MBGrFunc.NGroup) t order by t.name";
 				command.CommandText = "select t.id, t.name from (select MBGrFunc.NGroup [id], Max(MBGrFunc.GrName) [name] from MBGrFunc join MBFunc on (MBGrFunc.NGroup = MBFunc.NGroup) where MBFunc.SysFunc=@funcCategory group by MBGrFunc.NGroup) t order by t.name";
-				SqlParameter paramFuncCategory = new SqlParameter("@funcCategory", SqlDbType.Char, 1);
+				SqlParameter paramFuncCategory = new SqlParameter("@funcCategory", SqlDbType.NChar, 1);
 				paramFuncCategory.Value = charSysFunc;
 				command.Parameters.Add(paramFuncCategory);
 				command.Prepare();
@@ -113,7 +113,7 @@ namespace isblTest
 				SqlCommand command = new SqlCommand ();
 				command.Connection = this.connection;
 				command.CommandText = "SELECT [NumPar], [Ident], [Name], [Type], [ValueDef] FROM [MBFuncRecv] WHERE [FName] = @funcName";
-				SqlParameter paramFuncName = new SqlParameter ("@funcName", SqlDbType.VarChar, 512);
+				SqlParameter paramFuncName = new SqlParameter ("@funcName", SqlDbType.NVarChar, 512);
 				paramFuncName.Value = rootNode.Name;
 				command.Parameters.Add (paramFuncName);
 				command.Prepare ();
@@ -183,8 +183,8 @@ namespace isblTest
 						command.Connection = connection;
 						//command.CommandText = "select XRecID, FName, Comment, Help, Txt from MBFunc where NGroup=@groupID and SysFunc=@sysFunc and not(Txt is null) order by FName";
 						command.CommandText = "select XRecID, FName, Comment, Help, Txt from MBFunc where NGroup=@groupID and SysFunc=@sysFunc order by FName";
-						SqlParameter paramGroupID = new SqlParameter("@groupID", SqlDbType.Int, 10);
-						SqlParameter paramSysFunc = new SqlParameter("@sysFunc", SqlDbType.Char, 1);
+						SqlParameter paramGroupID = new SqlParameter("@groupID", SqlDbType.Int);
+						SqlParameter paramSysFunc = new SqlParameter("@sysFunc", SqlDbType.NChar, 1);
 						paramGroupID.Value = groupNode.Id;
 						paramSysFunc.Value = charSysFunc;
 						command.Parameters.Add(paramGroupID);

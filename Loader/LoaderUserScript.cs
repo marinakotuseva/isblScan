@@ -25,7 +25,7 @@ namespace isblTest
 				SqlCommand command = new SqlCommand();
 				command.Connection = connection;
 				command.CommandText = "select Tekst from MBText where SrcRecID=@userScriptAnalit";
-				SqlParameter userScriptAnalit = new SqlParameter("@userScriptAnalit", SqlDbType.Int, 10);
+				SqlParameter userScriptAnalit = new SqlParameter("@userScriptAnalit", SqlDbType.Int);
 				userScriptAnalit.Value = userScriptNode.Id;
 				command.Parameters.Add(userScriptAnalit);
 				command.Prepare();
@@ -67,7 +67,7 @@ namespace isblTest
 					SqlCommand command = new SqlCommand();
 					command.Connection = connection;
 					command.CommandText = "select Analit, NameAn, Prim from MBAnalit where Vid=@vidAnalit order by NameAn";
-					SqlParameter paramVidAnalit = new SqlParameter("@vidAnalit", SqlDbType.Int, 10);
+					SqlParameter paramVidAnalit = new SqlParameter("@vidAnalit", SqlDbType.Int);
 					paramVidAnalit.Value = vidAnalitID;
 					command.Parameters.Add(paramVidAnalit);
 					command.Prepare();

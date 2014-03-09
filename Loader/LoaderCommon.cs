@@ -45,7 +45,7 @@ namespace isblTest
 			SqlCommand command = new SqlCommand();
 			command.Connection = connection;
 			command.CommandText = "select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME = @tableName";
-			SqlParameter paramTableName = new SqlParameter("@tableName", SqlDbType.VarChar, 255);
+			SqlParameter paramTableName = new SqlParameter("@tableName", SqlDbType.NVarChar, 255);
 			paramTableName.Value = tableName;
 			command.Parameters.Add(paramTableName);
 			command.DesignTimeVisible = false;
@@ -83,7 +83,7 @@ namespace isblTest
 				SqlCommand command = new SqlCommand();
 				command.Connection = connection;
 				command.CommandText = "select Vid from MBVidAn where Kod = @vidAnalitKod";
-				SqlParameter paramVidAnalitKod = new SqlParameter("@vidAnalitKod", SqlDbType.VarChar, 255);
+				SqlParameter paramVidAnalitKod = new SqlParameter("@vidAnalitKod", SqlDbType.NVarChar, 255);
 				paramVidAnalitKod.Value = vidAnalitKod;
 				command.Parameters.Add(paramVidAnalitKod);
 				command.Prepare();
