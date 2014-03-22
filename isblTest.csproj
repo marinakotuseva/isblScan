@@ -78,6 +78,28 @@
   <ItemGroup>
     <None Include="isblTest.sln" />
     <None Include="Loader\WizardTextSample.txt" />
+    <None Include="ChangeLog" />
+    <None Include="MainForm.resources" />
+    <None Include="README.md" />
+    <None Include="Resources.resources" />
+    <None Include="StyleCop.Cache" />
+    <None Include="isblTest.userprefs" />
+    <None Include="isblTest.usertasks" />
+    <None Include="Collections\ChangeLog" />
+    <None Include="Images\ChangeLog" />
+    <None Include="Images\Filter.16.png" />
+    <None Include="Images\Logo.svg" />
+    <None Include="Images\isbTest.16.ico" />
+    <None Include="Images\isbTest.16.png" />
+    <None Include="Images\isbTest.32.ico" />
+    <None Include="Images\isbTest.32.png" />
+    <None Include="Images\isbTest.48.png" />
+    <None Include="Images\isbTest.ico" />
+    <None Include="Images\isbTest.jpg" />
+    <None Include="Images\isblTest.128.ico" />
+    <None Include="Images\isblTest.128.png" />
+    <None Include="Images\path2826.png" />
+    <None Include="Loader\ChangeLog" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
@@ -147,4 +169,10 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
+  <ItemGroup>
+    <ProjectReference Include="..\..\TextEditor\Src\ICSharpCode.TextEditor\Project\ICSharpCode.TextEditor.csproj">
+      <Project>{2D18BE89-D210-49EB-A9DD-2246FBB3DF6D}</Project>
+      <Name>ICSharpCode.TextEditor</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>
