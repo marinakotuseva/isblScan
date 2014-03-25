@@ -1,25 +1,36 @@
 ﻿<Properties GitUserInfo="UsingMD">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Program.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="MainForm.cs">
     <Files>
-      <File FileName="MainForm.cs" Line="1" Column="1" />
-      <File FileName="Loader/LoaderAll.cs" Line="1" Column="1" />
+      <File FileName="MainForm.cs" Line="707" Column="1" />
+      <File FileName="Loader/LoaderAll.cs" Line="79" Column="34" />
       <File FileName="Program.cs" Line="21" Column="1" />
-      <File FileName="Loader/LoaderEDocType.cs" Line="1" Column="1" />
       <File FileName="Loader/LoaderCommon.cs" Line="1" Column="1" />
       <File FileName="Loader/LoaderFunction.cs" Line="1" Column="1" />
-      <File FileName="Collections/Tree.cs" Line="39" Column="20" />
-      <File FileName="Disassembly" />
+      <File FileName="Collections/Tree.cs" Line="57" Column="16" />
+      <File FileName="../../TextEditor/Src/ICSharpCode.TextEditor/Project/Resources/SyntaxModes.xml" Line="58" Column="34" />
+      <File FileName="../../TextEditor/Src/ICSharpCode.TextEditor/Project/Resources/HTML-Mode.xshd" Line="1" Column="1" />
+      <File FileName="../../TextEditor/Src/ICSharpCode.TextEditor/Project/Resources/CPP-Mode.xshd" Line="15" Column="3" />
+      <File FileName="../../TextEditor/Src/ICSharpCode.TextEditor/Project/Resources/Mode.xsd" Line="1" Column="1" />
+      <File FileName="../../TextEditor/Src/ICSharpCode.TextEditor/Project/Resources/CSharp-Mode.xshd" Line="309" Column="4" />
+      <File FileName="../../TextEditor/Src/ICSharpCode.TextEditor/Project/Resources/ISBL-Mode.xshd" Line="1" Column="1" />
+      <File FileName="../../TextEditor/Src/TextEditor/Program.cs" Line="15" Column="1" />
+      <File FileName="../../TextEditor/Src/TextEditor/TextEditorForm.Designer.cs" Line="404" Column="51" />
+      <File FileName="../../TextEditor/Src/ICSharpCode.TextEditor/Project/Src/Document/HighlightingStrategy/SyntaxModes/ResourceSyntaxModeProvider.cs" Line="40" Column="1" />
+      <File FileName="../../TextEditor/Src/ICSharpCode.TextEditor/Project/ICSharpCode.TextEditor.cd" Line="1" Column="1" />
+      <File FileName="../../TextEditor/Src/ICSharpCode.TextEditor/Project/GlobalAssemblyInfo.cs" Line="1" Column="1" />
+      <File FileName="MainForm.Designer.cs" Line="264" Column="34" />
+      <File FileName="../../TextEditor/Src/TextEditor/TextEditorForm.cs" Line="36" Column="25" />
+      <File FileName="../../TextEditor/Src/ICSharpCode.TextEditor/Project/Src/Gui/TextEditorControl.cs" Line="23" Column="44" />
+      <File FileName="../../TextEditor/Src/ICSharpCode.TextEditor/Project/Src/Gui/TextEditorControlBase.cs" Line="649" Column="5" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="isblTest" expanded="True">
-            <Node name="References" expanded="True" />
             <Node name="Collections" expanded="True" />
             <Node name="Loader" expanded="True" />
-            <Node name="MainForm.cs" expanded="True" />
-            <Node name="Program.cs" selected="True" />
+            <Node name="MainForm.cs" expanded="True" selected="True" />
           </Node>
         </State>
       </Pad>
@@ -195,6 +206,8 @@
       <Catchpoint exceptionName="System.Xml.XPath.XPathException" />
       <Catchpoint exceptionName="System.Xml.Xsl.XsltCompileException" />
       <Catchpoint exceptionName="System.Xml.Xsl.XsltException" />
+      <Breakpoint file="/files/Project/isblTest/isblTest.main/MainForm.cs" line="751" />
+      <Breakpoint file="/files/Project/isblTest/isblTest.main/MainForm.cs" line="695" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

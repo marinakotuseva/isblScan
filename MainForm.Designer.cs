@@ -44,7 +44,7 @@ namespace isblTest
 			this.panelTree = new System.Windows.Forms.Panel();
 			this.treeViewResults = new System.Windows.Forms.TreeView();
 			this.panelFilterTree = new System.Windows.Forms.Panel();
-			this.textBox1 = new System.Windows.Forms.TextBox();
+			this.textBoxFilter = new System.Windows.Forms.TextBox();
 			this.panelISBLResult = new System.Windows.Forms.Panel();
 			this.richTextBoxResult = new isblTest.SynchronizedScrollRichTextBox();
 			this.richTextBoxLineNumbers = new isblTest.SynchronizedScrollRichTextBox();
@@ -247,20 +247,22 @@ namespace isblTest
 			// 
 			// panelFilterTree
 			// 
-			this.panelFilterTree.Controls.Add(this.textBox1);
+			this.panelFilterTree.Controls.Add(this.textBoxFilter);
 			this.panelFilterTree.Dock = System.Windows.Forms.DockStyle.Top;
 			this.panelFilterTree.Location = new System.Drawing.Point(0, 0);
 			this.panelFilterTree.Name = "panelFilterTree";
 			this.panelFilterTree.Size = new System.Drawing.Size(207, 20);
 			this.panelFilterTree.TabIndex = 211;
 			// 
-			// textBox1
+			// textBoxFilter
 			// 
-			this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.textBox1.Location = new System.Drawing.Point(0, 0);
-			this.textBox1.Name = "textBox1";
-			this.textBox1.Size = new System.Drawing.Size(207, 20);
-			this.textBox1.TabIndex = 2111;
+			this.textBoxFilter.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.textBoxFilter.Location = new System.Drawing.Point(0, 0);
+			this.textBoxFilter.Name = "textBoxFilter";
+			this.textBoxFilter.Size = new System.Drawing.Size(207, 20);
+			this.textBoxFilter.TabIndex = 2111;
+			this.textBoxFilter.Text = "XML";
+			this.textBoxFilter.TextChanged += TextBoxFilter_TextChanged;
 			// 
 			// panelISBLResult
 			// 
@@ -349,8 +351,9 @@ namespace isblTest
 			this.panelISBLLineNumber.ResumeLayout(false);
 			this.ResumeLayout(false);
 		}
+
 		private System.Windows.Forms.Label labelDebug;
-		private System.Windows.Forms.TextBox textBox1;
+		private System.Windows.Forms.TextBox textBoxFilter;
 		private System.Windows.Forms.Panel panelFilterTree;
 		private System.Windows.Forms.Panel panelTree;
 		private System.Windows.Forms.Panel panelResults;

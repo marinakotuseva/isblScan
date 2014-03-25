@@ -32,6 +32,14 @@ namespace isblTest
         /// Gets or sets Признак того, что узел явялется конечным
         /// </summary>
         public bool Flag { get; set; }
+	
+	/// <summary>
+	/// Gets or sets a value indicating whether this <see cref="isblTest.Node"/> is visible.
+	/// </summary>
+	/// <value>
+	/// <c>true</c> if visible; otherwise, <c>false</c>.
+	/// </value>
+	public bool Visible { get; set; }
 
         /// <summary>
         /// Gets or sets Список подузлов
@@ -42,6 +50,12 @@ namespace isblTest
         /// Gets or sets Список родительского узла
         /// </summary>
         public Node Parent { get; set; }
+
+	public Node()
+	{
+			Visible = true;
+			Flag = true;
+	}
     }
 	/// <summary>
 	/// Description of Tree.

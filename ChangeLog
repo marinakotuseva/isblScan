@@ -1,3 +1,8 @@
+2014-03-25  polarnik  <owasp@ya.ru>
+
+	* MainForm.cs: Добавил фильтрацию элементов дерева по наименованию.
+	* MainForm.Designer.cs: Добавил обработчик сообытия ввода текста в поле фильтрации элементов дерева.
+
 2014-03-22  polarnik  <owasp@ya.ru>
 
 	* isblTest.sln: В решение добавлены проекты TestEditor и ICSharpCode.TextEditor. Функциональность ICSharpCode.TextEditor пока не используется в isblTest, но планируется её использование.

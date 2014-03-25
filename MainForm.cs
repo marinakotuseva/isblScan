@@ -20,6 +20,8 @@ namespace isblTest
 		Font fontBold;
 		Font fontBoldUnderline;
 
+		List<isblTest.Node> ISBLNodes { get; set; }
+
 		public MainForm()
 		{
 			//
@@ -70,7 +72,7 @@ namespace isblTest
 		
 		void LoadSubNodes(TreeNodeCollection treeNodes, isblTest.Node isblNode)
 		{
-			if(isblNode != null)
+			if(isblNode != null && isblNode.Visible)
 			{
 				TreeNode treeNode = treeNodes.Add(isblNode.Name);
 				if(isblNode.Text != null)
@@ -590,9 +592,9 @@ namespace isblTest
 					if(isblLoader.Connect(textBoxSQLServer.Text, textBoxDB.Text, textBoxLogin.Text, textBoxPassword.Text))
 					{
 						isblTest.Configuration.Save(textBoxSQLServer.Text, textBoxDB.Text, textBoxLogin.Text);
-						List<isblTest.Node> isblNodes = isblLoader.Load();
+						ISBLNodes = isblLoader.Load();
 						treeViewResults.Nodes.Clear();
-						foreach(isblTest.Node isblNode in isblNodes)
+						foreach(isblTest.Node isblNode in ISBLNodes)
 						{
 							LoadSubNodes(this.treeViewResults.Nodes, isblNode);
 						}
@@ -677,6 +679,79 @@ namespace isblTest
 			int indexFirstLine = this.richTextBoxResult.GetLineFromCharIndex(indexFirstChar);
 			//Получить координаты последнего символа
 			
+		}
+
+		//Рекурсивный поиск по дереву разработки
+		bool FilterNodeByName (isblTest.Node node, string nameFilter)
+		{
+			if(node == null)
+				return false;
+
+			bool isFound = false;
+			//Пропуск пустых поисковых строк
+			if (node.Name.ToUpper ().Contains (nameFilter.ToUpper ()))
+			{
+				SetVisible (node, true);
+				isFound = true;
+			}
+			else
+			{
+				if(node.Nodes != null)
+				{
+					foreach(isblTest.Node subNode in node.Nodes)
+					{
+						if(FilterNodeByName(subNode, nameFilter))
+						{
+							isFound = true;
+						}
+					}
+				}
+			}
+			node.Visible = isFound;
+			return isFound;
+		}
+
+		void SetVisible (isblTest.Node node, bool isVisible)
+		{
+			if(node == null)
+				return;
+			node.Visible = isVisible;
+			if (node.Nodes != null)
+			{
+				foreach(isblTest.Node subNode in node.Nodes)
+				{
+					SetVisible(subNode, isVisible);
+				}
+			}
+		}
+
+
+		/// <summary>
+		/// Изменение текста в поле фильтрации дерева проекта
+		/// </summary>
+		void TextBoxFilter_TextChanged (object sender, System.EventArgs e)
+		{
+			if(ISBLNodes == null)
+				return;
+			if (textBoxFilter.Text == "")
+			{
+				foreach (Node node in ISBLNodes)
+				{
+					SetVisible (node, true);
+				}
+			}
+			else
+			{
+				foreach (Node node in ISBLNodes)
+				{
+					FilterNodeByName (node, textBoxFilter.Text);
+				}
+			}
+			treeViewResults.Nodes.Clear();
+			foreach(isblTest.Node isblNode in ISBLNodes)
+			{
+				LoadSubNodes(this.treeViewResults.Nodes, isblNode);
+			}
 		}
 	}
 }
