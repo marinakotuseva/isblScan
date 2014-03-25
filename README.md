@@ -1,1 +1,1 @@
-# isblTest - tool tool for review ISBL-code
+# isblTest — инструмент для поиска ISBL-кода и навигации по разработке IS-Builder 5, IS-Builder 7
