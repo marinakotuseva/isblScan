@@ -1,5 +1,34 @@
 2014-03-29  polarnik  <owasp@ya.ru>
 
+	* ApplicationInfo.cs: ApplicationInfo class change as non
+	  static.
+
+	* Configuration.cs: Add isWinAuthArgument for Load and Save
+	  methods. Добавлено сохранение/загрузка параметра,
+	  указывающего, что для соединения с базой данных надо
+	  использовать Windows-аутентификацию.
+
+	* MainForm.Designer.cs: Add new controls: checkBoxWinAuth,
+	  buttonRefresh, buttonConnect.
+	Remove control: labelDebug, groupActions.
+	Move control: buttonSearch.
+	Fix bug with namespace (crete new custom control
+	  SynchronizedScrollRichTextBox not worked without namespace
+	  prefix).
+
+	* MainForm.cs: Support work with new controls:
+	  checkBoxWinAuth, buttonConnect.
+	Add new words for performing text searches (code inspection):
+	  CSQL, Exec,Pass, Secret, xp_, ...
+	Use any spaces (\n, \r, \t, space) as delimiter symbols on
+	  split search text. Now support use search string with
+	  spaces: "word1 word2 word3" for 3 separete words.
+	Disable line numering.
+
+	* MainForm.resources: 
+
+2014-03-29  polarnik  <owasp@ya.ru>
+
 	* Program.cs:
 	* MainForm.cs:
 	* isblTest.csproj:

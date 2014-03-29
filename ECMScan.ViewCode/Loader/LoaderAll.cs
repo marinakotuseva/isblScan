@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Date: 30.09.2012
  * Time: 14:59
  */
@@ -43,16 +43,22 @@ namespace ISBLScan.ViewCode
 		/// <param name="login">Логин пользователя базы данных</param>
 		/// <param name="password">Пароль пользователя базы данных</param>
 		/// <returns>True - соединение успешно усановлено, False - соединение не установлено, текст ошибки соединения в поле errorText.</returns>
-		public bool Connect(string server, string dataBase, string login, string password)
+		public bool Connect(string server, string dataBase, string login = "", string password = "", bool isWinAuth = false)
 		{
 			SqlConnectionStringBuilder connBuilder = new SqlConnectionStringBuilder();
 			connBuilder.DataSource = server;
 			connBuilder.Pooling = false;
 			connBuilder.InitialCatalog = dataBase;
 			connBuilder.ApplicationName = "ECMScan CodeView";
-			connBuilder.UserID = login;
-			connBuilder.Password = password;
-
+			if(isWinAuth)
+			{
+				connBuilder.IntegratedSecurity = true;
+			}
+			else
+			{
+				connBuilder.UserID = login;
+				connBuilder.Password = password;
+			}
 			try {
 				this.connection = new SqlConnection(connBuilder.ConnectionString);
 				this.connection.Open();

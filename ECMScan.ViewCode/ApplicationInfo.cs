@@ -8,15 +8,24 @@ namespace ISBLScan.ViewCode
 	/// </summary>
 	/// <see cref="http://stackoverflow.com/questions/909555/how-can-i-get-the-assembly-file-version/10723966#10723966"/>
 	/// <see cref="http://stackoverflow.com/users/196919/clark-kent"/>
-	static public class ApplicationInfo
+	public class ApplicationInfo
 	{
-		public static Version Version { get { return Assembly.GetCallingAssembly ().GetName ().Version; } }
+		public ApplicationInfo()
+		{
+			CallingAssembly = Assembly.GetCallingAssembly ();
+		}
+		Assembly CallingAssembly
+		{
+			get; set;
+		}
+		
+		public Version Version { get { return CallingAssembly.GetName ().Version; } }
 
-		public static string Title
+		public string Title
 		{
 			get
 			{
-				object[] attributes = Assembly.GetCallingAssembly().GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
+				object[] attributes = CallingAssembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
 				if (attributes.Length > 0)
 				{
 					AssemblyTitleAttribute titleAttribute = (AssemblyTitleAttribute)attributes[0];
@@ -26,38 +35,38 @@ namespace ISBLScan.ViewCode
 			}
 		}
 
-		public static string ProductName
+		public string ProductName
 		{
 			get
 			{
-				object[] attributes = Assembly.GetCallingAssembly().GetCustomAttributes(typeof(AssemblyProductAttribute), false);
+				object[] attributes = CallingAssembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false);
 				return attributes.Length == 0 ? "" : ((AssemblyProductAttribute)attributes[0]).Product;
 			}
 		}
 
-		public static string Description
+		public string Description
 		{
 			get
 			{
-				object[] attributes = Assembly.GetCallingAssembly().GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false);
+				object[] attributes = CallingAssembly.GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false);
 				return attributes.Length == 0 ? "" : ((AssemblyDescriptionAttribute)attributes[0]).Description;
 			}
 		}
 
-		public static string CopyrightHolder
+		public string CopyrightHolder
 		{
 			get
 			{
-				object[] attributes = Assembly.GetCallingAssembly().GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
+				object[] attributes = CallingAssembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
 				return attributes.Length == 0 ? "" : ((AssemblyCopyrightAttribute)attributes[0]).Copyright;
 			}
 		}
 
-		public static string CompanyName
+		public string CompanyName
 		{
 			get
 			{
-				object[] attributes = Assembly.GetCallingAssembly().GetCustomAttributes(typeof(AssemblyCompanyAttribute), false);
+				object[] attributes = CallingAssembly.GetCustomAttributes(typeof(AssemblyCompanyAttribute), false);
 				return attributes.Length == 0 ? "" : ((AssemblyCompanyAttribute)attributes[0]).Company;
 			}
 		}

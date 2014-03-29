@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -34,25 +34,37 @@ namespace ISBLScan.ViewCode
 			string sqlServer;
 			string dataBase;
 			string login;
-			
-			if(Configuration.Load(out sqlServer, out dataBase, out login))
+			bool isWinAuth;
+			if(Configuration.Load(out sqlServer, out dataBase, out login, out isWinAuth))
 			{
-				this.textBoxSQLServer.Text = sqlServer;
-				this.textBoxDB.Text = dataBase;
-				this.textBoxLogin.Text = login;
-				this.textBoxPassword.Text = "";
+				textBoxSQLServer.Text = sqlServer;
+				textBoxDB.Text = dataBase;
+				textBoxLogin.Text = login;
+				if(isWinAuth)
+				{
+					checkBoxWinAuth.Checked = isWinAuth;
+				}
+				else
+				{
+					textBoxPassword.Text = "";
+				}
 			}
 			//
 			// TODO: Добавить хороший список предопределённых строк.
 			//
 			string[] defaultSearchStrings = 
 			{
-				"AddWhere",
-				"AddFrom",
-				"AddOrderBy",
-				"SQL(",
-				"Выполнить",
-				"Execute",
+				"AddWhere     AddFrom  AddOrderBy",
+				"SQL(         CSQL",
+				"Выполнить    Execute  Exec",
+				"Login        Логин",
+				"Pass         Пароль",
+				"Secret       Секрет",
+				"Admin        Админ",
+				"drop         xp_",
+				"AccessRights Grant    ",
+				"Encrypt      Decrypt  Шифр",
+				"CreateObject ActiveX",
 				""
 			};
 			foreach(string searchString in defaultSearchStrings)
@@ -62,7 +74,8 @@ namespace ISBLScan.ViewCode
 			//
 			// TODO: Добавить хорошую стправку на начальной странице
 			//
-			this.richTextBoxResult.Text = string.Format("{0} {1}\n{2}", ApplicationInfo.ProductName, ApplicationInfo.Version, ApplicationInfo.Description);
+			ApplicationInfo applicationInfo = new ApplicationInfo();
+			this.richTextBoxResult.Text = string.Format("{0} {1}\n{2}", applicationInfo.ProductName, applicationInfo.Version, applicationInfo.Description);
 			HighLight("", null);
 		}
 		
@@ -84,9 +97,92 @@ namespace ISBLScan.ViewCode
 				}
 			}
 		}
+		
+		bool Conenct()
+		{
+			bool connect;
+			if(checkBoxWinAuth.Checked)
+			{
+				connect = isblLoader.Connect(textBoxSQLServer.Text,
+				                   textBoxDB.Text,
+				                   "",
+				                   "",
+				                   true);
+			}
+			else
+			{
+				connect = isblLoader.Connect(textBoxSQLServer.Text,
+				                   textBoxDB.Text,
+				                   textBoxLogin.Text,
+				                   textBoxPassword.Text,
+				                   false
+				                  );
+			}
+			if(connect)
+			{
+				Configuration.Save(textBoxSQLServer.Text, textBoxDB.Text, textBoxLogin.Text, checkBoxWinAuth.Checked);
+			}
+			return connect;
+		}
+		
+		void GetISBL()
+		{
+			ISBLNodes = isblLoader.Load();
+			treeViewResults.Nodes.Clear();
+			foreach(Node isblNode in ISBLNodes)
+			{
+				LoadSubNodes(this.treeViewResults.Nodes, isblNode);
+			}
+		}
+		
+		void ConnectAndGetISBL()
+		{
+				if((textBoxSQLServer.Text.Trim() != "")&&(textBoxDB.Text.Trim() != "")&&
+			   		(checkBoxWinAuth.Checked || (!checkBoxWinAuth.Checked && textBoxLogin.Text.Trim() != ""))
+			  	)
+				{
+					if(Conenct())
+					{
+						GetISBL();
+						buttonRefresh.Enabled = true;
+						buttonSearch.Enabled = true;
+					}
+					else
+					{
+						MessageBox.Show(isblLoader.errorText, "Ошибка открытия базы данных");
+					}
+				}
+				else
+				{
+					if(textBoxLogin.Text.Trim() == "")
+					{
+						textBoxLogin.Text = "Login";
+						textBoxLogin.Font = new Font(textBoxLogin.Font, FontStyle.Italic);
+						textBoxLogin.BackColor = Color.LightCoral;
+						textBoxLogin.SelectAll();
+						textBoxLogin.Focus();
+					}
+					if(textBoxDB.Text.Trim() == "")
+					{
+						textBoxDB.Text = "Data Base";
+						textBoxDB.Font = new Font(textBoxDB.Font, FontStyle.Italic);
+						textBoxDB.BackColor = Color.LightCoral;
+						textBoxDB.SelectAll();
+						textBoxDB.Focus();
+					}
+					if(textBoxSQLServer.Text.Trim() == "")
+					{
+						textBoxSQLServer.Text = "Sql Server";
+						textBoxSQLServer.Font = new Font(textBoxSQLServer.Font, FontStyle.Italic);
+						textBoxSQLServer.BackColor = Color.LightCoral;
+						textBoxSQLServer.SelectAll();
+						textBoxSQLServer.Focus();
+					}
+				}			
+		}
 		void ButtonConnectClick(object sender, EventArgs e)
 		{
-
+			 ConnectAndGetISBL();
 		}
 		
 		void TreeViewResultsAfterSelect(object sender, TreeViewEventArgs e)
@@ -131,7 +227,7 @@ namespace ISBLScan.ViewCode
 			{
 				//RegexOptions ro = RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase;
 				//Разделение поисковых фраз по строкам
-				char[] arrDelimeters = {'\n'};
+				char[] arrDelimeters = {'\n', '\t', ' ', '\r'};
 				string[] searchPhrases = searchStrs.ToUpper().Split(arrDelimeters);
 				string isblText = node.Tag.ToString().ToUpper();
 				string nodeName = node.Name;
@@ -531,7 +627,7 @@ namespace ISBLScan.ViewCode
 			//Подсветка искомого текста
 			if(searchStr != "")
 			{
-				char[] charsDelimeters = {'\n'};
+				char[] charsDelimeters = {'\n', '\t', ' ', '\r'};
 				string[] strs = searchStr.Split(charsDelimeters);
 				int minumumPosStart = 0;
 				int indexStrs = 0;
@@ -583,50 +679,7 @@ namespace ISBLScan.ViewCode
 		{
 			if(e.KeyCode == Keys.Enter)
 			{
-				if((textBoxSQLServer.Text.Trim() != "")&&(textBoxDB.Text.Trim() != "")&&(textBoxLogin.Text.Trim() != ""))
-				{
-					if(isblLoader.Connect(textBoxSQLServer.Text, textBoxDB.Text, textBoxLogin.Text, textBoxPassword.Text))
-					{
-						Configuration.Save(textBoxSQLServer.Text, textBoxDB.Text, textBoxLogin.Text);
-						ISBLNodes = isblLoader.Load();
-						treeViewResults.Nodes.Clear();
-						foreach(Node isblNode in ISBLNodes)
-						{
-							LoadSubNodes(this.treeViewResults.Nodes, isblNode);
-						}
-					}
-					else
-					{
-						MessageBox.Show(isblLoader.errorText, "Ошибка открытия базы данных");
-					}
-				}
-				else
-				{
-					if(textBoxLogin.Text.Trim() == "")
-					{
-						textBoxLogin.Text = "Login";
-						textBoxLogin.Font = new Font(textBoxLogin.Font, FontStyle.Italic);
-						textBoxLogin.BackColor = Color.LightCoral;
-						textBoxLogin.SelectAll();
-						textBoxLogin.Focus();
-					}
-					if(textBoxDB.Text.Trim() == "")
-					{
-						textBoxDB.Text = "Data Base";
-						textBoxDB.Font = new Font(textBoxDB.Font, FontStyle.Italic);
-						textBoxDB.BackColor = Color.LightCoral;
-						textBoxDB.SelectAll();
-						textBoxDB.Focus();
-					}
-					if(textBoxSQLServer.Text.Trim() == "")
-					{
-						textBoxSQLServer.Text = "Sql Server";
-						textBoxSQLServer.Font = new Font(textBoxSQLServer.Font, FontStyle.Italic);
-						textBoxSQLServer.BackColor = Color.LightCoral;
-						textBoxSQLServer.SelectAll();
-						textBoxSQLServer.Focus();
-					}
-				}
+				ConnectAndGetISBL();
 			}
 		}
 		
@@ -662,7 +715,7 @@ namespace ISBLScan.ViewCode
 				int indexForRemove = this.richTextBoxResult.Lines.Length*(4+System.Environment.NewLine.Length)-1;
 				if (indexForRemove > 0)
 				{
-					this.richTextBoxLineNumbers.Text.Remove(indexForRemove);
+					//this.richTextBoxLineNumbers.Text.Remove(indexForRemove);
 				}
 				else
 				{
@@ -749,5 +802,17 @@ namespace ISBLScan.ViewCode
 				LoadSubNodes(this.treeViewResults.Nodes, isblNode);
 			}
 		}
+		
+		void ButtonRefreshClick(object sender, EventArgs e)
+		{
+			GetISBL();
+		}
+		
+		void CheckBoxWinAuthCheckedChanged(object sender, EventArgs e)
+		{
+			textBoxLogin.Enabled = !checkBoxWinAuth.Checked;
+			textBoxPassword.Enabled = textBoxLogin.Enabled;
+		}
+		
 	}
 }

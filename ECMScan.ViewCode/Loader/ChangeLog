@@ -1,5 +1,11 @@
 2014-03-29  polarnik  <owasp@ya.ru>
 
+	* LoaderAll.cs: Suppport Windows Authentification. Добавлена
+	  поддержка Windows-аутентификации при загрузке ISBL-кода из
+	  базы данных.
+
+2014-03-29  polarnik  <owasp@ya.ru>
+
 	* LoaderAll.cs:
 	* LoaderRoute.cs:
 	* LoaderReport.cs:

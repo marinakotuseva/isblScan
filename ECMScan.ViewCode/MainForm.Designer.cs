@@ -1,3 +1,4 @@
+using ISBLScan.ViewCode;
 namespace ISBLScan.ViewCode
 {
 	partial class MainForm
@@ -31,9 +32,11 @@ namespace ISBLScan.ViewCode
 			this.panelOptions = new System.Windows.Forms.Panel();
 			this.groupBoxSearch = new System.Windows.Forms.GroupBox();
 			this.textBoxSearch = new System.Windows.Forms.TextBox();
-			this.groupBoxActions = new System.Windows.Forms.GroupBox();
-			this.buttonSearch = new System.Windows.Forms.Button();
 			this.groupBoxConnect = new System.Windows.Forms.GroupBox();
+			this.buttonSearch = new System.Windows.Forms.Button();
+			this.buttonRefresh = new System.Windows.Forms.Button();
+			this.buttonConnect = new System.Windows.Forms.Button();
+			this.checkBoxWinAuth = new System.Windows.Forms.CheckBox();
 			this.textBoxPassword = new System.Windows.Forms.TextBox();
 			this.textBoxLogin = new System.Windows.Forms.TextBox();
 			this.textBoxDB = new System.Windows.Forms.TextBox();
@@ -46,13 +49,11 @@ namespace ISBLScan.ViewCode
 			this.panelFilterTree = new System.Windows.Forms.Panel();
 			this.textBoxFilter = new System.Windows.Forms.TextBox();
 			this.panelISBLResult = new System.Windows.Forms.Panel();
-			this.richTextBoxResult = new SynchronizedScrollRichTextBox();
-			this.richTextBoxLineNumbers = new SynchronizedScrollRichTextBox();
+			this.richTextBoxResult = new ISBLScan.ViewCode.SynchronizedScrollRichTextBox();
 			this.panelISBLLineNumber = new System.Windows.Forms.Panel();
-			this.labelDebug = new System.Windows.Forms.Label();
+			this.richTextBoxLineNumbers = new ISBLScan.ViewCode.SynchronizedScrollRichTextBox();
 			this.panelOptions.SuspendLayout();
 			this.groupBoxSearch.SuspendLayout();
-			this.groupBoxActions.SuspendLayout();
 			this.groupBoxConnect.SuspendLayout();
 			this.panelResults.SuspendLayout();
 			this.groupBoxResults.SuspendLayout();
@@ -72,17 +73,16 @@ namespace ISBLScan.ViewCode
 			this.panelOptions.Dock = System.Windows.Forms.DockStyle.Top;
 			this.panelOptions.Location = new System.Drawing.Point(0, 0);
 			this.panelOptions.Name = "panelOptions";
-			this.panelOptions.Size = new System.Drawing.Size(632, 100);
+			this.panelOptions.Size = new System.Drawing.Size(632, 202);
 			this.panelOptions.TabIndex = 1;
 			// 
 			// groupBoxSearch
 			// 
 			this.groupBoxSearch.Controls.Add(this.textBoxSearch);
-			this.groupBoxSearch.Controls.Add(this.groupBoxActions);
 			this.groupBoxSearch.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.groupBoxSearch.Location = new System.Drawing.Point(144, 0);
+			this.groupBoxSearch.Location = new System.Drawing.Point(146, 0);
 			this.groupBoxSearch.Name = "groupBoxSearch";
-			this.groupBoxSearch.Size = new System.Drawing.Size(488, 100);
+			this.groupBoxSearch.Size = new System.Drawing.Size(486, 202);
 			this.groupBoxSearch.TabIndex = 12;
 			this.groupBoxSearch.TabStop = false;
 			this.groupBoxSearch.Text = "Search Text";
@@ -90,38 +90,20 @@ namespace ISBLScan.ViewCode
 			// textBoxSearch
 			// 
 			this.textBoxSearch.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.textBoxSearch.Font = new System.Drawing.Font("Courier New", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
 			this.textBoxSearch.Location = new System.Drawing.Point(3, 16);
 			this.textBoxSearch.Multiline = true;
 			this.textBoxSearch.Name = "textBoxSearch";
 			this.textBoxSearch.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-			this.textBoxSearch.Size = new System.Drawing.Size(423, 81);
+			this.textBoxSearch.Size = new System.Drawing.Size(480, 183);
 			this.textBoxSearch.TabIndex = 121;
-			// 
-			// groupBoxActions
-			// 
-			this.groupBoxActions.Controls.Add(this.labelDebug);
-			this.groupBoxActions.Controls.Add(this.buttonSearch);
-			this.groupBoxActions.Dock = System.Windows.Forms.DockStyle.Right;
-			this.groupBoxActions.Location = new System.Drawing.Point(426, 16);
-			this.groupBoxActions.Name = "groupBoxActions";
-			this.groupBoxActions.Size = new System.Drawing.Size(59, 81);
-			this.groupBoxActions.TabIndex = 122;
-			this.groupBoxActions.TabStop = false;
-			this.groupBoxActions.Text = "Actions";
-			// 
-			// buttonSearch
-			// 
-			this.buttonSearch.Dock = System.Windows.Forms.DockStyle.Top;
-			this.buttonSearch.Location = new System.Drawing.Point(3, 16);
-			this.buttonSearch.Name = "buttonSearch";
-			this.buttonSearch.Size = new System.Drawing.Size(53, 23);
-			this.buttonSearch.TabIndex = 1221;
-			this.buttonSearch.Text = "Search";
-			this.buttonSearch.UseVisualStyleBackColor = true;
-			this.buttonSearch.Click += new System.EventHandler(this.ButtonFilterClick);
 			// 
 			// groupBoxConnect
 			// 
+			this.groupBoxConnect.Controls.Add(this.buttonSearch);
+			this.groupBoxConnect.Controls.Add(this.buttonRefresh);
+			this.groupBoxConnect.Controls.Add(this.buttonConnect);
+			this.groupBoxConnect.Controls.Add(this.checkBoxWinAuth);
 			this.groupBoxConnect.Controls.Add(this.textBoxPassword);
 			this.groupBoxConnect.Controls.Add(this.textBoxLogin);
 			this.groupBoxConnect.Controls.Add(this.textBoxDB);
@@ -129,10 +111,56 @@ namespace ISBLScan.ViewCode
 			this.groupBoxConnect.Dock = System.Windows.Forms.DockStyle.Left;
 			this.groupBoxConnect.Location = new System.Drawing.Point(0, 0);
 			this.groupBoxConnect.Name = "groupBoxConnect";
-			this.groupBoxConnect.Size = new System.Drawing.Size(144, 100);
+			this.groupBoxConnect.Size = new System.Drawing.Size(146, 202);
 			this.groupBoxConnect.TabIndex = 11;
 			this.groupBoxConnect.TabStop = false;
 			this.groupBoxConnect.Text = "Connect";
+			// 
+			// buttonSearch
+			// 
+			this.buttonSearch.Dock = System.Windows.Forms.DockStyle.Top;
+			this.buttonSearch.Enabled = false;
+			this.buttonSearch.Location = new System.Drawing.Point(3, 166);
+			this.buttonSearch.Name = "buttonSearch";
+			this.buttonSearch.Size = new System.Drawing.Size(140, 23);
+			this.buttonSearch.TabIndex = 1222;
+			this.buttonSearch.Text = "Search";
+			this.buttonSearch.UseVisualStyleBackColor = true;
+			this.buttonSearch.Click += new System.EventHandler(this.ButtonFilterClick);
+			// 
+			// buttonRefresh
+			// 
+			this.buttonRefresh.Dock = System.Windows.Forms.DockStyle.Top;
+			this.buttonRefresh.Enabled = false;
+			this.buttonRefresh.Location = new System.Drawing.Point(3, 143);
+			this.buttonRefresh.Name = "buttonRefresh";
+			this.buttonRefresh.Size = new System.Drawing.Size(140, 23);
+			this.buttonRefresh.TabIndex = 117;
+			this.buttonRefresh.Text = "Reload ISBL";
+			this.buttonRefresh.UseVisualStyleBackColor = true;
+			this.buttonRefresh.Click += new System.EventHandler(this.ButtonRefreshClick);
+			// 
+			// buttonConnect
+			// 
+			this.buttonConnect.Dock = System.Windows.Forms.DockStyle.Top;
+			this.buttonConnect.Location = new System.Drawing.Point(3, 120);
+			this.buttonConnect.Name = "buttonConnect";
+			this.buttonConnect.Size = new System.Drawing.Size(140, 23);
+			this.buttonConnect.TabIndex = 116;
+			this.buttonConnect.Text = "Connect and Load ISBL";
+			this.buttonConnect.UseVisualStyleBackColor = true;
+			this.buttonConnect.Click += new System.EventHandler(this.ButtonConnectClick);
+			// 
+			// checkBoxWinAuth
+			// 
+			this.checkBoxWinAuth.Dock = System.Windows.Forms.DockStyle.Top;
+			this.checkBoxWinAuth.Location = new System.Drawing.Point(3, 96);
+			this.checkBoxWinAuth.Name = "checkBoxWinAuth";
+			this.checkBoxWinAuth.Size = new System.Drawing.Size(140, 24);
+			this.checkBoxWinAuth.TabIndex = 115;
+			this.checkBoxWinAuth.Text = "Windows authentication";
+			this.checkBoxWinAuth.UseVisualStyleBackColor = true;
+			this.checkBoxWinAuth.CheckedChanged += new System.EventHandler(this.CheckBoxWinAuthCheckedChanged);
 			// 
 			// textBoxPassword
 			// 
@@ -140,7 +168,7 @@ namespace ISBLScan.ViewCode
 			this.textBoxPassword.ForeColor = System.Drawing.SystemColors.GrayText;
 			this.textBoxPassword.Location = new System.Drawing.Point(3, 76);
 			this.textBoxPassword.Name = "textBoxPassword";
-			this.textBoxPassword.Size = new System.Drawing.Size(138, 20);
+			this.textBoxPassword.Size = new System.Drawing.Size(140, 20);
 			this.textBoxPassword.TabIndex = 114;
 			this.textBoxPassword.Text = "**************";
 			this.textBoxPassword.UseSystemPasswordChar = true;
@@ -152,9 +180,10 @@ namespace ISBLScan.ViewCode
 			this.textBoxLogin.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.HistoryList;
 			this.textBoxLogin.Dock = System.Windows.Forms.DockStyle.Top;
 			this.textBoxLogin.ForeColor = System.Drawing.SystemColors.GrayText;
+			this.textBoxLogin.HideSelection = false;
 			this.textBoxLogin.Location = new System.Drawing.Point(3, 56);
 			this.textBoxLogin.Name = "textBoxLogin";
-			this.textBoxLogin.Size = new System.Drawing.Size(138, 20);
+			this.textBoxLogin.Size = new System.Drawing.Size(140, 20);
 			this.textBoxLogin.TabIndex = 113;
 			this.textBoxLogin.Text = "Login";
 			this.textBoxLogin.TextChanged += new System.EventHandler(this.TextBoxLoginFormTextChanged);
@@ -167,7 +196,7 @@ namespace ISBLScan.ViewCode
 			this.textBoxDB.ForeColor = System.Drawing.SystemColors.GrayText;
 			this.textBoxDB.Location = new System.Drawing.Point(3, 36);
 			this.textBoxDB.Name = "textBoxDB";
-			this.textBoxDB.Size = new System.Drawing.Size(138, 20);
+			this.textBoxDB.Size = new System.Drawing.Size(140, 20);
 			this.textBoxDB.TabIndex = 112;
 			this.textBoxDB.Text = "Data Base";
 			this.textBoxDB.TextChanged += new System.EventHandler(this.TextBoxLoginFormTextChanged);
@@ -180,7 +209,7 @@ namespace ISBLScan.ViewCode
 			this.textBoxSQLServer.ForeColor = System.Drawing.SystemColors.GrayText;
 			this.textBoxSQLServer.Location = new System.Drawing.Point(3, 16);
 			this.textBoxSQLServer.Name = "textBoxSQLServer";
-			this.textBoxSQLServer.Size = new System.Drawing.Size(138, 20);
+			this.textBoxSQLServer.Size = new System.Drawing.Size(140, 20);
 			this.textBoxSQLServer.TabIndex = 111;
 			this.textBoxSQLServer.Text = "Sql Server";
 			this.textBoxSQLServer.TextChanged += new System.EventHandler(this.TextBoxLoginFormTextChanged);
@@ -190,9 +219,9 @@ namespace ISBLScan.ViewCode
 			// 
 			this.panelResults.Controls.Add(this.groupBoxResults);
 			this.panelResults.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.panelResults.Location = new System.Drawing.Point(0, 100);
+			this.panelResults.Location = new System.Drawing.Point(0, 202);
 			this.panelResults.Name = "panelResults";
-			this.panelResults.Size = new System.Drawing.Size(632, 353);
+			this.panelResults.Size = new System.Drawing.Size(632, 251);
 			this.panelResults.TabIndex = 2;
 			// 
 			// groupBoxResults
@@ -201,7 +230,7 @@ namespace ISBLScan.ViewCode
 			this.groupBoxResults.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBoxResults.Location = new System.Drawing.Point(0, 0);
 			this.groupBoxResults.Name = "groupBoxResults";
-			this.groupBoxResults.Size = new System.Drawing.Size(632, 353);
+			this.groupBoxResults.Size = new System.Drawing.Size(632, 251);
 			this.groupBoxResults.TabIndex = 0;
 			this.groupBoxResults.TabStop = false;
 			this.groupBoxResults.Text = "Results";
@@ -221,7 +250,7 @@ namespace ISBLScan.ViewCode
 			// 
 			this.splitContainerResults.Panel2.Controls.Add(this.panelISBLResult);
 			this.splitContainerResults.Panel2.Controls.Add(this.panelISBLLineNumber);
-			this.splitContainerResults.Size = new System.Drawing.Size(626, 334);
+			this.splitContainerResults.Size = new System.Drawing.Size(626, 232);
 			this.splitContainerResults.SplitterDistance = 207;
 			this.splitContainerResults.TabIndex = 0;
 			// 
@@ -231,7 +260,7 @@ namespace ISBLScan.ViewCode
 			this.panelTree.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.panelTree.Location = new System.Drawing.Point(0, 20);
 			this.panelTree.Name = "panelTree";
-			this.panelTree.Size = new System.Drawing.Size(207, 314);
+			this.panelTree.Size = new System.Drawing.Size(207, 212);
 			this.panelTree.TabIndex = 212;
 			// 
 			// treeViewResults
@@ -241,7 +270,7 @@ namespace ISBLScan.ViewCode
 			this.treeViewResults.HideSelection = false;
 			this.treeViewResults.Location = new System.Drawing.Point(0, 0);
 			this.treeViewResults.Name = "treeViewResults";
-			this.treeViewResults.Size = new System.Drawing.Size(207, 314);
+			this.treeViewResults.Size = new System.Drawing.Size(207, 212);
 			this.treeViewResults.TabIndex = 2121;
 			this.treeViewResults.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewResultsAfterSelect);
 			// 
@@ -261,8 +290,6 @@ namespace ISBLScan.ViewCode
 			this.textBoxFilter.Name = "textBoxFilter";
 			this.textBoxFilter.Size = new System.Drawing.Size(207, 20);
 			this.textBoxFilter.TabIndex = 2111;
-			this.textBoxFilter.Text = "";
-			this.textBoxFilter.TextChanged += TextBoxFilter_TextChanged;
 			// 
 			// panelISBLResult
 			// 
@@ -271,39 +298,22 @@ namespace ISBLScan.ViewCode
 			this.panelISBLResult.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.panelISBLResult.Location = new System.Drawing.Point(45, 0);
 			this.panelISBLResult.Name = "panelISBLResult";
-			this.panelISBLResult.Size = new System.Drawing.Size(370, 334);
+			this.panelISBLResult.Size = new System.Drawing.Size(370, 232);
 			this.panelISBLResult.TabIndex = 220;
 			// 
 			// richTextBoxResult
 			// 
 			this.richTextBoxResult.AutoWordSelection = true;
 			this.richTextBoxResult.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.richTextBoxResult.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedBoth;
 			this.richTextBoxResult.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
 			this.richTextBoxResult.Location = new System.Drawing.Point(0, 0);
 			this.richTextBoxResult.Name = "richTextBoxResult";
-			this.richTextBoxResult.Size = new System.Drawing.Size(370, 334);
+			this.richTextBoxResult.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedBoth;
+			this.richTextBoxResult.Size = new System.Drawing.Size(370, 232);
 			this.richTextBoxResult.TabIndex = 2212;
+			this.richTextBoxResult.Text = "";
 			this.richTextBoxResult.WordWrap = false;
 			this.richTextBoxResult.VScroll += new System.EventHandler(this.RichTextBoxResultVScroll);
-			this.richTextBoxResult.AddPeer(this.richTextBoxLineNumbers);
-			this.richTextBoxResult.TextChanged += RichTextBoxResult_TextChanged;
-			// 
-			// richTextBoxLineNumbers
-			// 
-			this.richTextBoxLineNumbers.DetectUrls = false;
-			this.richTextBoxLineNumbers.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.richTextBoxLineNumbers.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-			this.richTextBoxLineNumbers.Location = new System.Drawing.Point(0, 0);
-			this.richTextBoxLineNumbers.Name = "richTextBoxLineNumbers";
-			this.richTextBoxLineNumbers.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-			this.richTextBoxLineNumbers.Size = new System.Drawing.Size(45, 334);
-			this.richTextBoxLineNumbers.TabIndex = 2212;
-			this.richTextBoxLineNumbers.TabStop = false;
-			this.richTextBoxLineNumbers.WordWrap = false;
-			this.richTextBoxLineNumbers.ReadOnly = true;
-			this.richTextBoxLineNumbers.AcceptsTab = false;
-			this.richTextBoxLineNumbers.AllowDrop = false;
 			// 
 			// panelISBLLineNumber
 			// 
@@ -312,16 +322,23 @@ namespace ISBLScan.ViewCode
 			this.panelISBLLineNumber.Dock = System.Windows.Forms.DockStyle.Left;
 			this.panelISBLLineNumber.Location = new System.Drawing.Point(0, 0);
 			this.panelISBLLineNumber.Name = "panelISBLLineNumber";
-			this.panelISBLLineNumber.Size = new System.Drawing.Size(45, 334);
+			this.panelISBLLineNumber.Size = new System.Drawing.Size(45, 232);
 			this.panelISBLLineNumber.TabIndex = 221;
 			// 
-			// labelDebug
+			// richTextBoxLineNumbers
 			// 
-			this.labelDebug.Location = new System.Drawing.Point(3, 55);
-			this.labelDebug.Name = "labelDebug";
-			this.labelDebug.Size = new System.Drawing.Size(100, 23);
-			this.labelDebug.TabIndex = 1222;
-			this.labelDebug.Text = "";
+			this.richTextBoxLineNumbers.DetectUrls = false;
+			this.richTextBoxLineNumbers.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.richTextBoxLineNumbers.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+			this.richTextBoxLineNumbers.Location = new System.Drawing.Point(0, 0);
+			this.richTextBoxLineNumbers.Name = "richTextBoxLineNumbers";
+			this.richTextBoxLineNumbers.ReadOnly = true;
+			this.richTextBoxLineNumbers.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
+			this.richTextBoxLineNumbers.Size = new System.Drawing.Size(45, 232);
+			this.richTextBoxLineNumbers.TabIndex = 2212;
+			this.richTextBoxLineNumbers.TabStop = false;
+			this.richTextBoxLineNumbers.Text = "";
+			this.richTextBoxLineNumbers.WordWrap = false;
 			// 
 			// MainForm
 			// 
@@ -332,11 +349,10 @@ namespace ISBLScan.ViewCode
 			this.Controls.Add(this.panelOptions);
 			this.HelpButton = true;
 			this.Name = "MainForm";
-			this.Text = ApplicationInfo.Title;
+			this.Text = "ISBLScan ViewCode";
 			this.panelOptions.ResumeLayout(false);
 			this.groupBoxSearch.ResumeLayout(false);
 			this.groupBoxSearch.PerformLayout();
-			this.groupBoxActions.ResumeLayout(false);
 			this.groupBoxConnect.ResumeLayout(false);
 			this.groupBoxConnect.PerformLayout();
 			this.panelResults.ResumeLayout(false);
@@ -351,16 +367,17 @@ namespace ISBLScan.ViewCode
 			this.panelISBLLineNumber.ResumeLayout(false);
 			this.ResumeLayout(false);
 		}
+		private System.Windows.Forms.CheckBox checkBoxWinAuth;
+		private System.Windows.Forms.Button buttonConnect;
+		private System.Windows.Forms.Button buttonRefresh;
 
-		private System.Windows.Forms.Label labelDebug;
 		private System.Windows.Forms.TextBox textBoxFilter;
 		private System.Windows.Forms.Panel panelFilterTree;
 		private System.Windows.Forms.Panel panelTree;
 		private System.Windows.Forms.Panel panelResults;
 		private System.Windows.Forms.Panel panelOptions;
 		private System.Windows.Forms.Button buttonSearch;
-		private System.Windows.Forms.GroupBox groupBoxActions;
-		private SynchronizedScrollRichTextBox richTextBoxResult;
+		private ISBLScan.ViewCode.SynchronizedScrollRichTextBox richTextBoxResult;
 		private System.Windows.Forms.TreeView treeViewResults;
 		private System.Windows.Forms.SplitContainer splitContainerResults;
 		private System.Windows.Forms.GroupBox groupBoxResults;
@@ -371,7 +388,7 @@ namespace ISBLScan.ViewCode
 		private System.Windows.Forms.GroupBox groupBoxConnect;
 		private System.Windows.Forms.TextBox textBoxSearch;
 		private System.Windows.Forms.GroupBox groupBoxSearch;
-		private SynchronizedScrollRichTextBox richTextBoxLineNumbers;
+		private ISBLScan.ViewCode.SynchronizedScrollRichTextBox richTextBoxLineNumbers;
 		private System.Windows.Forms.Panel panelISBLResult;
 		private System.Windows.Forms.Panel panelISBLLineNumber;
 		//Main menu
