@@ -73,7 +73,11 @@ namespace isblTest
 							inpExprnRefRecvNode.Parent = recvNode;
 							recvNode.Nodes.Add(inpExprnRefRecvNode);
 						}
-						recvGroupNode.Nodes.Add(recvNode);
+						//Добавить реквизит в дерево, если у него есть вычисления (подузлы)
+						if(recvNode.Nodes.Count > 0)
+						{
+							recvGroupNode.Nodes.Add(recvNode);
+						}
 					}
 				}
 				reader.Close();

@@ -93,7 +93,7 @@ namespace isblTest
 
 					SqlCommand command = new SqlCommand();
 					command.Connection = connection;
-					command.CommandText = "select [XRecID], [Name], [Exprn], [InpExprn], [Kod] from MBEDocTypeRecv where [TypeID] = @eDocTypeID and [Razd] = @RazdID and (not([Exprn] is null) or not([InpExprn] is null)) order by [Name]";
+					command.CommandText = "select [XRecID], [Name], [Kod], [Exprn], [InpExprn] from MBEDocTypeRecv where [TypeID] = @eDocTypeID and [Razd] = @RazdID and (not([Exprn] is null) or not([InpExprn] is null)) order by [Name]";
 					SqlParameter paramEDocTypeID = new SqlParameter("@eDocTypeID", SqlDbType.Int);
 					SqlParameter paramRazdID = new SqlParameter("@RazdID", SqlDbType.NChar, 1);
 					paramEDocTypeID.Value = eDocTypeNode.Id;
@@ -109,36 +109,43 @@ namespace isblTest
 						{
 							isblTest.Node eDocRecvNode = new isblTest.Node();
 							eDocRecvNode.Parent = groupNode;
+							eDocRecvNode.Nodes = new List<Node>();
 							//ИД
 							eDocRecvNode.Id = reader.GetInt32(0);
-							//Код реквизита
-							string strRecvCode = "";
-							if(!reader.IsDBNull(4))
-							{
-								strRecvCode = reader.GetString(4);
-							}							
 							//Имя
-							eDocRecvNode.Name = "";
 							if(!reader.IsDBNull(1))
 							{
-								eDocRecvNode.Name = strRecvCode + " (" +reader.GetString(1)+")";
+								eDocRecvNode.Name = reader.GetString(1);
 							}
-							//Вычисление для реквизита и действия
+							//Код реквизита
 							if(!reader.IsDBNull(2))
 							{
-								eDocRecvNode.Text = "-=[ ВЫЧИСЛЕНИЕ ]=-\n"+
-									reader.GetString(2)+
-									"\n\n";
-							}
-							//Выбор из справочника для реквизита типа "справочник" или "строка"
+								eDocRecvNode.Code = reader.GetString(2);
+								eDocRecvNode.Name = string.Format("{0} ({1})", eDocRecvNode.Name, eDocRecvNode.Code);
+							}							
+							//Вычисление для реквизита и действия
 							if(!reader.IsDBNull(3))
 							{
-								eDocRecvNode.Text = eDocRecvNode.Text+
-									"-=[ ВЫБОР ИЗ СПРАВОЧНИКА ДЛЯ РЕКВИЗИТА ]=-\n"+
-									reader.GetString(3);
+								isblTest.Node exprnEDocRecvNode = new isblTest.Node();
+								exprnEDocRecvNode.Name = "-=[ Вычисление ]=-";
+								exprnEDocRecvNode.Text = reader.GetString(3);
+								exprnEDocRecvNode.Parent = eDocRecvNode;
+								eDocRecvNode.Nodes.Add(exprnEDocRecvNode);
 							}
-							
-							groupNode.Nodes.Add(eDocRecvNode);
+							//Выбор из справочника для реквизита типа "справочник" или "строка"
+							if(!reader.IsDBNull(4))
+							{
+								isblTest.Node eventEDocRecvNode = new isblTest.Node();
+								eventEDocRecvNode.Name = "-=[ Выбор из справочника ]=-";
+								eventEDocRecvNode.Text = reader.GetString(4);
+								eventEDocRecvNode.Parent = eDocRecvNode;
+								eDocRecvNode.Nodes.Add(eventEDocRecvNode);
+							}
+							//Добавление в дерево элементов, если есть вычисления
+							if(eDocRecvNode.Nodes.Count > 0)
+							{
+								groupNode.Nodes.Add(eDocRecvNode);
+							}
 						}
 					}
 					reader.Close();

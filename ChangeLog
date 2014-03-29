@@ -1,3 +1,7 @@
+2014-03-29  polarnik  <owasp@ya.ru>
+
+	* MainForm.Designer.cs: из формы убран отладочный текст.
+
 2014-03-25  polarnik  <owasp@ya.ru>
 
 	* README.md: изменил описание проекта на русский язык.

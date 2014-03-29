@@ -261,7 +261,7 @@ namespace isblTest
 			this.textBoxFilter.Name = "textBoxFilter";
 			this.textBoxFilter.Size = new System.Drawing.Size(207, 20);
 			this.textBoxFilter.TabIndex = 2111;
-			this.textBoxFilter.Text = "XML";
+			this.textBoxFilter.Text = "";
 			this.textBoxFilter.TextChanged += TextBoxFilter_TextChanged;
 			// 
 			// panelISBLResult
@@ -321,7 +321,7 @@ namespace isblTest
 			this.labelDebug.Name = "labelDebug";
 			this.labelDebug.Size = new System.Drawing.Size(100, 23);
 			this.labelDebug.TabIndex = 1222;
-			this.labelDebug.Text = "label1";
+			this.labelDebug.Text = "";
 			// 
 			// MainForm
 			// 
