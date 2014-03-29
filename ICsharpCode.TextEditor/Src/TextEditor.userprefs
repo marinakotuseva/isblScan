@@ -1,0 +1,29 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="TextEditor/FindAndReplaceForm.cs">
+    <Files>
+      <File FileName="TextEditor/Program.cs" Line="1" Column="1" />
+      <File FileName="TextEditor/FindAndReplaceForm.cs" Line="255" Column="23" />
+      <File FileName="TextEditor/TextEditorForm.cs" Line="423" Column="87" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="ICSharpCode.TextEditor" expanded="True">
+            <Node name="References" expanded="True" />
+            <Node name="Src" expanded="True">
+              <Node name="Gui" expanded="True" />
+            </Node>
+          </Node>
+          <Node name="TextEditor" expanded="True" selected="True">
+            <Node name="References" expanded="True" />
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

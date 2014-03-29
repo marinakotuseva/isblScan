@@ -1,0 +1,47 @@
+2014-03-29  polarnik  <owasp@ya.ru>
+
+	* README.md:
+	* ChangeLog:
+	* Program.cs:
+	* MainForm.cs:
+	* MainForm.resx:
+	* Resources.resx:
+	* isblTest.csproj:
+	* Configuration.cs:
+	* MainForm.resources:
+	* Resources.resources:
+	* MainForm.Designer.cs:
+	* SynchronizedScrollRichTextBox.cs: 
+
+2014-03-29  polarnik  <owasp@ya.ru>
+
+	* MainForm.Designer.cs: из формы убран отладочный текст.
+
+2014-03-25  polarnik  <owasp@ya.ru>
+
+	* README.md: изменил описание проекта на русский язык.
+
+2014-03-25  polarnik  <owasp@ya.ru>
+
+	* MainForm.cs: Добавил фильтрацию элементов дерева по наименованию.
+	* MainForm.Designer.cs: Добавил обработчик сообытия ввода текста в поле фильтрации элементов дерева.
+
+2014-03-22  polarnik  <owasp@ya.ru>
+
+	* isblTest.sln: В решение добавлены проекты TestEditor и ICSharpCode.TextEditor. Функциональность ICSharpCode.TextEditor пока не используется в isblTest, но планируется её использование.
+
+2014-03-09  polarnik  <owasp@ya.ru>
+
+	* Program.cs:
+	* MainForm.cs: 
+
+2014-03-09  polarnik  <owasp@ya.ru>
+
+	* Program.cs:
+	* MainForm.cs:
+	* isblTest.sln:
+	* StyleCop.Cache:
+	* isblTest.userprefs:
+	* isblTest.usertasks:
+	* Resources.resources: 
+
