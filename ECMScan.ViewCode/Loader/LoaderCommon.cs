@@ -6,7 +6,7 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace isblTest
+namespace ISBLScan.ViewCode
 {
 	/// <summary>
 	/// Базовый класс, от которого наследуются другие загрузчики прикладной разрабоки.

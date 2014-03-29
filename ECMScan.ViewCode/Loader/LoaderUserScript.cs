@@ -7,7 +7,7 @@ using System.Data;
 using System.Data.SqlTypes;
 using System.Data.SqlClient;
 using System.Collections.Generic;
-namespace isblTest
+namespace ISBLScan.ViewCode
 {
 	/// <summary>
 	/// Пользовательский расчёт.
@@ -18,7 +18,7 @@ namespace isblTest
 		{
 		}
 		
-		private void LoadText(isblTest.Node userScriptNode)
+		private void LoadText(Node userScriptNode)
 		{
 			if(checkTableExist("MBText"))
 			{
@@ -38,7 +38,7 @@ namespace isblTest
 						{
 							SqlBytes sqlbytes = reader.GetSqlBytes(0);
 							
-							isblTest.Node userScriptText = new isblTest.Node();
+							Node userScriptText = new Node();
 							userScriptText.Name = "-=[ Расчёт ]=-";
 							userScriptText.Parent = userScriptNode;
 							userScriptNode.Nodes.Add(userScriptText);
@@ -50,13 +50,13 @@ namespace isblTest
 				reader.Close();
 			}
 		}
-		public isblTest.Node Load()
+		public Node Load()
 		{
-			isblTest.Node listNode = null;
+			Node listNode = null;
 			Int32 vidAnalitID = getVidAnalitID("РСЧ");
 			if(vidAnalitID >= 0)
 			{
-				listNode = new isblTest.Node();
+				listNode = new Node();
 				listNode.Name = "Пользовательский расчёт";
 				listNode.Text = null;
 				listNode.Id = vidAnalitID;
@@ -76,9 +76,9 @@ namespace isblTest
 					{
 						while(reader.Read())
 						{
-							isblTest.Node userScriptNode = new isblTest.Node();
+							Node userScriptNode = new Node();
 							userScriptNode.Parent = listNode;
-							userScriptNode.Nodes = new List<isblTest.Node>();
+							userScriptNode.Nodes = new List<Node>();
 							userScriptNode.Id = reader.GetInt32(0);
 							if(! reader.IsDBNull(1))
 							{
@@ -92,7 +92,7 @@ namespace isblTest
 						}
 					}
 					reader.Close();
-					foreach(isblTest.Node userScriptNode in listNode.Nodes)
+					foreach(Node userScriptNode in listNode.Nodes)
 					{
 						LoadText(userScriptNode);
 					}

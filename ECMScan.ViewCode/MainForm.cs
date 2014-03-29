@@ -8,19 +8,20 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Configuration;
 using System.Collections.Specialized;
+using System.Reflection;
 
-namespace isblTest
+namespace ISBLScan.ViewCode
 {
 	/// <summary>
 	/// Description of MainForm.
 	/// </summary>
 	public partial class MainForm : Form
 	{
-		isblTest.Loader isblLoader;
+		Loader isblLoader;
 		Font fontBold;
 		Font fontBoldUnderline;
 
-		List<isblTest.Node> ISBLNodes { get; set; }
+		List<Node> ISBLNodes { get; set; }
 
 		public MainForm()
 		{
@@ -28,13 +29,13 @@ namespace isblTest
 			// The InitializeComponent() call is required for Windows Forms designer support.
 			//
 			InitializeComponent();
-			isblLoader = new isblTest.Loader();
+			isblLoader = new Loader();
 			
 			string sqlServer;
 			string dataBase;
 			string login;
 			
-			if(isblTest.Configuration.Load(out sqlServer, out dataBase, out login))
+			if(Configuration.Load(out sqlServer, out dataBase, out login))
 			{
 				this.textBoxSQLServer.Text = sqlServer;
 				this.textBoxDB.Text = dataBase;
@@ -61,16 +62,11 @@ namespace isblTest
 			//
 			// TODO: Добавить хорошую стправку на начальной странице
 			//
-			this.richTextBoxResult.Text = @"ISBLTest
-Программа поиска в текстах прикладной разработки навигации по прикладной разработке.
--=[ Элементы интерфейса ]=-
-
--=[ Возможности программы ]=-
-";
+			this.richTextBoxResult.Text = string.Format("{0} {1}\n{2}", ApplicationInfo.ProductName, ApplicationInfo.Version, ApplicationInfo.Description);
 			HighLight("", null);
 		}
 		
-		void LoadSubNodes(TreeNodeCollection treeNodes, isblTest.Node isblNode)
+		void LoadSubNodes(TreeNodeCollection treeNodes, Node isblNode)
 		{
 			if(isblNode != null && isblNode.Visible)
 			{
@@ -81,7 +77,7 @@ namespace isblTest
 				}
 				if(isblNode.Nodes != null)
 				{
-					foreach(isblTest.Node isblSubNode in isblNode.Nodes)
+					foreach(Node isblSubNode in isblNode.Nodes)
 					{
 						LoadSubNodes(treeNode.Nodes, isblSubNode);
 					}
@@ -591,10 +587,10 @@ namespace isblTest
 				{
 					if(isblLoader.Connect(textBoxSQLServer.Text, textBoxDB.Text, textBoxLogin.Text, textBoxPassword.Text))
 					{
-						isblTest.Configuration.Save(textBoxSQLServer.Text, textBoxDB.Text, textBoxLogin.Text);
+						Configuration.Save(textBoxSQLServer.Text, textBoxDB.Text, textBoxLogin.Text);
 						ISBLNodes = isblLoader.Load();
 						treeViewResults.Nodes.Clear();
-						foreach(isblTest.Node isblNode in ISBLNodes)
+						foreach(Node isblNode in ISBLNodes)
 						{
 							LoadSubNodes(this.treeViewResults.Nodes, isblNode);
 						}
@@ -682,7 +678,7 @@ namespace isblTest
 		}
 
 		//Рекурсивный поиск по дереву разработки
-		bool FilterNodeByName (isblTest.Node node, string nameFilter)
+		bool FilterNodeByName (Node node, string nameFilter)
 		{
 			if(node == null)
 				return false;
@@ -698,7 +694,7 @@ namespace isblTest
 			{
 				if(node.Nodes != null)
 				{
-					foreach(isblTest.Node subNode in node.Nodes)
+					foreach(Node subNode in node.Nodes)
 					{
 						if(FilterNodeByName(subNode, nameFilter))
 						{
@@ -711,14 +707,14 @@ namespace isblTest
 			return isFound;
 		}
 
-		void SetVisible (isblTest.Node node, bool isVisible)
+		void SetVisible (Node node, bool isVisible)
 		{
 			if(node == null)
 				return;
 			node.Visible = isVisible;
 			if (node.Nodes != null)
 			{
-				foreach(isblTest.Node subNode in node.Nodes)
+				foreach(Node subNode in node.Nodes)
 				{
 					SetVisible(subNode, isVisible);
 				}
@@ -748,7 +744,7 @@ namespace isblTest
 				}
 			}
 			treeViewResults.Nodes.Clear();
-			foreach(isblTest.Node isblNode in ISBLNodes)
+			foreach(Node isblNode in ISBLNodes)
 			{
 				LoadSubNodes(this.treeViewResults.Nodes, isblNode);
 			}

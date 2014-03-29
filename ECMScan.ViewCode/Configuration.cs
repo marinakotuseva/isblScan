@@ -1,7 +1,7 @@
 
 using System;
 
-namespace isblTest
+namespace ISBLScan.ViewCode
 {
 
 	/// <summary>
@@ -13,7 +13,7 @@ namespace isblTest
 		private static string nameDataBase = "Data Base:";
 		private static string nameLogin = "Login:";
 		
-		private static string configFilePath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData) + "/isblTest.cfg";
+		private static string configFilePath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData) + "/ISBLScan.ViewCode.cfg";
 		
 
 		public static bool Load(out string sqlServer, out string dataBase, out string login)

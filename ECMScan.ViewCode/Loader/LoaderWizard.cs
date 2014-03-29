@@ -8,7 +8,7 @@ using System.Data.SqlTypes;
 using System.Data.SqlClient;
 using System.Collections.Generic;
 
-namespace isblTest
+namespace ISBLScan.ViewCode
 {
 	struct EventStruct
 	{
@@ -28,9 +28,9 @@ namespace isblTest
 		{
 		}
 		
-		private List<isblTest.Node> LoadGroups(isblTest.Node rootNode)
+		private List<Node> LoadGroups(Node rootNode)
 		{
-			List<isblTest.Node> listGroups = new List<Node>();
+			List<Node> listGroups = new List<Node>();
 			Int32 vidAnalitID = getVidAnalitID("WIZARD_GROUPS");
 			if(vidAnalitID >= 0)
 			{
@@ -46,7 +46,7 @@ namespace isblTest
 				{
 					while(reader.Read())
 					{
-						isblTest.Node node = new isblTest.Node();
+						Node node = new Node();
 						node.Parent = rootNode;
 						node.Id = reader.GetInt32(0);
 						if(! reader.IsDBNull(1))
@@ -57,7 +57,7 @@ namespace isblTest
 						{
 							node.Text = reader.GetString(2);
 						}
-						node.Nodes = new List<isblTest.Node>();
+						node.Nodes = new List<Node>();
 						rootNode.Nodes.Add(node);
 						listGroups.Add(node);
 					}
@@ -66,7 +66,7 @@ namespace isblTest
 			}
 			return listGroups;
 		}
-		private void LoadText(isblTest.Node wizardNode)
+		private void LoadText(Node wizardNode)
 		{
 			string wizardText;
 			if(checkTableExist("MBText"))
@@ -175,7 +175,7 @@ namespace isblTest
 			return res;
 		}
 		
-		private void parseWizardText(string originText, isblTest.Node wizardNode)
+		private void parseWizardText(string originText, Node wizardNode)
 		{
 			this.originWizardText = originText;
 		
@@ -217,18 +217,18 @@ namespace isblTest
 			}
 
 			
-			isblTest.Node wizardEventsNode = new isblTest.Node();
+			Node wizardEventsNode = new Node();
 			wizardEventsNode.Name = "События мастера";
 			wizardEventsNode.Text = "";
 			wizardEventsNode.Parent = wizardNode;
-			wizardEventsNode.Nodes = new List<isblTest.Node>();
+			wizardEventsNode.Nodes = new List<Node>();
 			//Загрузка "События мастера"
 			while((this.lineIndex < this.linesWizardCount) && (linesWizardText[this.lineIndex].Replace("\r", "") != "    end>"))
 			{
 				//переходим к следующей строке
 				this.lineIndex++;
 				EventStruct eventInfo = this.parseEventWizard();
-				isblTest.Node wizardEventInfoNode = new isblTest.Node();
+				Node wizardEventInfoNode = new Node();
 				switch (eventInfo.name)
 				{
 				case "wetWizardBeforeSelection":
@@ -252,21 +252,21 @@ namespace isblTest
 			//Загрузка этапов мастера
 			
 		}
-		public isblTest.Node Load()
+		public Node Load()
 		{
-			isblTest.Node listNode = null;
+			Node listNode = null;
 			Int32 vidAnalitID = getVidAnalitID("WIZARDS");
 			if(vidAnalitID >= 0)
 			{
-				listNode = new isblTest.Node();
+				listNode = new Node();
 				listNode.Name = "Мастер действий";
 				listNode.Text = null;
 				listNode.Id = vidAnalitID;
 				listNode.Parent = null;
 				listNode.Nodes = new List<Node>();
 				
-				List<isblTest.Node> listGroups = LoadGroups(listNode);
-				foreach(isblTest.Node groupNode in listGroups)
+				List<Node> listGroups = LoadGroups(listNode);
+				foreach(Node groupNode in listGroups)
 				{
 					SqlCommand command = new SqlCommand();
 					command.Connection = connection;
@@ -283,7 +283,7 @@ namespace isblTest
 					{
 						while(reader.Read())
 						{
-							isblTest.Node wizardNode = new isblTest.Node();
+							Node wizardNode = new Node();
 							wizardNode.Parent = groupNode;
 							wizardNode.Id = reader.GetInt32(0);
 							if(! reader.IsDBNull(1))
@@ -294,12 +294,12 @@ namespace isblTest
 							{
 								wizardNode.Text = reader.GetString(2);
 							}
-							wizardNode.Nodes = new List<isblTest.Node>();
+							wizardNode.Nodes = new List<Node>();
 							groupNode.Nodes.Add(wizardNode);
 						}
 					}
 					reader.Close();
-					foreach(isblTest.Node wizardNode in groupNode.Nodes)
+					foreach(Node wizardNode in groupNode.Nodes)
 					{
 						LoadText(wizardNode);
 					}

@@ -8,7 +8,7 @@ using System.Data.SqlTypes;
 using System.Data.SqlClient;
 using System.Collections.Generic;
 
-namespace isblTest
+namespace ISBLScan.ViewCode
 {
 	/// <summary>
 	/// Справочник (аналитика).
@@ -24,9 +24,9 @@ namespace isblTest
 		/// </summary>
 		/// <param name="refNode">
 		/// Ссылка на узел справочника
-		/// A <see cref="isblTest.Node"/>
+		/// A <see cref="Node"/>
 		/// </param>
-		void LoadRecvisite(isblTest.Node recvGroupNode)
+		void LoadRecvisite(Node recvGroupNode)
 		{
 			if(this.checkTableExist("MBVidAnRecv"))
 			{
@@ -45,9 +45,9 @@ namespace isblTest
 				{
 					while(reader.Read())
 					{
-						isblTest.Node recvNode = new isblTest.Node();
+						Node recvNode = new Node();
 						recvNode.Parent = recvGroupNode;
-						recvNode.Nodes = new List<isblTest.Node>();
+						recvNode.Nodes = new List<Node>();
 						if(!reader.IsDBNull(0))
 						{
 							recvNode.Name = reader.GetString(0);
@@ -59,7 +59,7 @@ namespace isblTest
 						}
 						if(!reader.IsDBNull(2))
 						{
-							isblTest.Node exprnRefRecvNode = new isblTest.Node();
+							Node exprnRefRecvNode = new Node();
 							exprnRefRecvNode.Name = "-=[ Вычисление ]=-";
 							exprnRefRecvNode.Text = reader.GetString(2);
 							exprnRefRecvNode.Parent = recvNode;
@@ -67,7 +67,7 @@ namespace isblTest
 						}
 						if(!reader.IsDBNull(3))
 						{
-							isblTest.Node inpExprnRefRecvNode = new isblTest.Node();
+							Node inpExprnRefRecvNode = new Node();
 							inpExprnRefRecvNode.Name = "-=[ Выбор из справочника ]=-";
 							inpExprnRefRecvNode.Text = reader.GetString(3);
 							inpExprnRefRecvNode.Parent = recvNode;
@@ -152,9 +152,9 @@ namespace isblTest
 		/// Загрузка разделов реквизитов
 		/// </summary>
 		/// <param name="refNode">
-		/// A <see cref="isblTest.Node"/>
+		/// A <see cref="Node"/>
 		/// </param>
-		void LoadGroupRecv(isblTest.Node refNode)
+		void LoadGroupRecv(Node refNode)
 		{
 			if(this.checkTableExist("MBVidAnRecv"))
 			{
@@ -167,8 +167,8 @@ namespace isblTest
 				command.Prepare();
 				SqlDataReader reader = command.ExecuteReader();
 
-				isblTest.Node refRecvNode = new isblTest.Node();
-				refRecvNode.Nodes = new List<isblTest.Node>();
+				Node refRecvNode = new Node();
+				refRecvNode.Nodes = new List<Node>();
 
 				if(reader.HasRows)
 				{
@@ -179,28 +179,28 @@ namespace isblTest
 
 					while(reader.Read())
 					{
-						isblTest.Node recvGroupNode = new isblTest.Node();
+						Node recvGroupNode = new Node();
 						//Код раздела
 						recvGroupNode.Code = reader.GetString(0);
 						//Вид аналитики
 						recvGroupNode.Id = refNode.Id;
 						recvGroupNode.Name = GetGroupRecvName(recvGroupNode.Code[0]);
 						recvGroupNode.Parent = refRecvNode;
-						recvGroupNode.Nodes = new List<isblTest.Node>();
+						recvGroupNode.Nodes = new List<Node>();
 						refRecvNode.Nodes.Add(recvGroupNode);
 					}
 				}
 				reader.Close();
-				foreach(isblTest.Node recvGroupNode in refRecvNode.Nodes)
+				foreach(Node recvGroupNode in refRecvNode.Nodes)
 				{
 					this.LoadRecvisite(recvGroupNode);
 				}
 			}
 		}
 
-		public isblTest.Node Load()
+		public Node Load()
 		{
-			isblTest.Node rootRefNode = null;
+			Node rootRefNode = null;
 			if(this.checkTableExist("MBVidAn"))
 			{
 				SqlCommand command = new SqlCommand();
@@ -209,7 +209,7 @@ namespace isblTest
 				SqlDataReader reader = command.ExecuteReader();
 				if(reader.HasRows)
 				{
-					rootRefNode = new isblTest.Node();
+					rootRefNode = new Node();
 					rootRefNode.Name = "Тип справочника";
 					rootRefNode.Text = null;
 					rootRefNode.Parent = null;
@@ -217,9 +217,9 @@ namespace isblTest
 					
 					while(reader.Read())
 					{
-						isblTest.Node refNode = new isblTest.Node();
+						Node refNode = new Node();
 						refNode.Parent = rootRefNode;
-						refNode.Nodes = new List<isblTest.Node>();
+						refNode.Nodes = new List<Node>();
 						//ИД 
 						refNode.Id = reader.GetInt32(0);
 						//Имя (Код)
@@ -227,7 +227,7 @@ namespace isblTest
 						{
 							refNode.Name = reader.GetString(1).Trim() + " (" + reader.GetString(2).Trim() + ")";
 						}
-						refNode.Nodes = new List<isblTest.Node>();
+						refNode.Nodes = new List<Node>();
 						//Примечание к типу справочника
 						if(! reader.IsDBNull(3))
 						{
@@ -236,7 +236,7 @@ namespace isblTest
 						//События типа справочника
 						if(! reader.IsDBNull(4))
 						{
-							isblTest.Node refEventNode = new isblTest.Node();
+							Node refEventNode = new Node();
 							refEventNode.Name = "-=[ События ]=-";
 							refEventNode.Text = reader.GetString(4).Trim();
 							refEventNode.Parent = refNode;
@@ -247,7 +247,7 @@ namespace isblTest
 				}
 				reader.Close();
 
-				foreach(isblTest.Node refNode in rootRefNode.Nodes)
+				foreach(Node refNode in rootRefNode.Nodes)
 				{
 					LoadGroupRecv(refNode);
 				}

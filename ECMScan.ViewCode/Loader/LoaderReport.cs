@@ -7,7 +7,7 @@ using System.Data;
 using System.Data.SqlTypes;
 using System.Data.SqlClient;
 using System.Collections.Generic;
-namespace isblTest
+namespace ISBLScan.ViewCode
 {
 	/// <summary>
 	/// Отчёт (аналитический отчёт).
@@ -18,9 +18,9 @@ namespace isblTest
 		{
 		}
 
-		private List<isblTest.Node> LoadGroups(isblTest.Node rootNode)
+		private List<Node> LoadGroups(Node rootNode)
 		{
-			List<isblTest.Node> listGroups = new List<Node>();
+			List<Node> listGroups = new List<Node>();
 			if(this.checkTableExist("MBRegUnit"))
 			{
 				SqlCommand command = new SqlCommand();
@@ -31,14 +31,14 @@ namespace isblTest
 				{
 					while(reader.Read())
 					{
-						isblTest.Node node = new isblTest.Node();
+						Node node = new Node();
 						node.Parent = rootNode;
 						node.Id = reader.GetInt32(0);
 						if(! reader.IsDBNull(1))
 						{
 							node.Name = reader.GetString(1);
 						}
-						node.Nodes = new List<isblTest.Node>();
+						node.Nodes = new List<Node>();
 						rootNode.Nodes.Add(node);
 						listGroups.Add(node);
 					}
@@ -48,19 +48,19 @@ namespace isblTest
 			return listGroups;
 		}
 
-		public isblTest.Node Load()
+		public Node Load()
 		{
-			isblTest.Node listNode = null;
+			Node listNode = null;
 			if(this.checkTableExist("MBReports"))
 			{
-				listNode = new isblTest.Node();
+				listNode = new Node();
 				listNode.Name = "Аналитический отчёт";
 				listNode.Text = null;
 				listNode.Parent = null;
 				listNode.Nodes = new List<Node>();
 				
-				List<isblTest.Node> listGroups = LoadGroups(listNode);
-				foreach(isblTest.Node groupNode in listGroups)
+				List<Node> listGroups = LoadGroups(listNode);
+				foreach(Node groupNode in listGroups)
 				{
 					SqlCommand command = new SqlCommand();
 					command.Connection = connection;
@@ -74,7 +74,7 @@ namespace isblTest
 					{
 						while(reader.Read())
 						{
-							isblTest.Node reportNode = new isblTest.Node();
+							Node reportNode = new Node();
 							reportNode.Parent = groupNode;
 							//ИД отчёта
 							reportNode.Id = reader.GetInt32(0);
@@ -88,14 +88,14 @@ namespace isblTest
 							{
 								reportNode.Text = reader.GetString(2);
 							}
-							reportNode.Nodes = new List<isblTest.Node>();
+							reportNode.Nodes = new List<Node>();
 							//Шаблон отчёта
 							if(! reader.IsDBNull(4))
 							{
 								SqlBytes sqlbytes = reader.GetSqlBytes(4);
 								System.Text.Encoding win1251 = System.Text.Encoding.GetEncoding(1251);
 								string scriptText = win1251.GetString(sqlbytes.Value);
-								isblTest.Node reportTextNode = new isblTest.Node();
+								Node reportTextNode = new Node();
 								reportTextNode.Name = "-=[ Шаблон ]=-";
 								reportTextNode.Text = scriptText;
 								reportTextNode.Parent = reportNode;
@@ -105,7 +105,7 @@ namespace isblTest
 							if(! reader.IsDBNull(3))
 							{
 								string templateText = reader.GetString(3);
-								isblTest.Node reportTemplateNode = new isblTest.Node();
+								Node reportTemplateNode = new Node();
 								reportTemplateNode.Name = "-=[ Расчёт ]=-";
 								reportTemplateNode.Text = templateText;
 								reportTemplateNode.Parent = reportNode;

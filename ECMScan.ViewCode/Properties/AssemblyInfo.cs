@@ -9,12 +9,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("isblTest")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("ISBLScan ViewCode")]
+[assembly: AssemblyDescription("Tool for view source code of ECM systems based on IS-Builder 7 (DIRECTUM, Orienge Conterra) and CPM systems based on IS-Builder 5 (Prestima).")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("isblTest")]
-[assembly: AssemblyCopyright("Copyright 2012")]
+[assembly: AssemblyProduct("ISBLScan ViewCode")]
+[assembly: AssemblyCopyright("Copyright 2012-2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -28,4 +28,4 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can use the default the Revision and 
 // Build Numbers by using the '*' as shown below:
-[assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("0.0.7.*")]

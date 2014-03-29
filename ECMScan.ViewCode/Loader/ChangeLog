@@ -1,5 +1,22 @@
 2014-03-29  polarnik  <owasp@ya.ru>
 
+	* LoaderAll.cs:
+	* LoaderRoute.cs:
+	* LoaderReport.cs:
+	* LoaderWizard.cs:
+	* LoaderScript.cs:
+	* LoaderCommon.cs:
+	* LoaderFunction.cs:
+	* LoaderEDocType.cs:
+	* LoaderReference.cs:
+	* LoaderUserScript.cs:
+	* LoaderUserSearch.cs:
+	* LoaderRouteBlock.cs:
+	* LoaderReportIntegrate.cs:
+	* LoaderPerfomanceIndicator.cs: 
+
+2014-03-29  polarnik  <owasp@ya.ru>
+
 	* ChangeLog:
 	* LoaderAll.cs:
 	* LoaderRoute.cs:

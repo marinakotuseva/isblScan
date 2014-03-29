@@ -8,7 +8,7 @@ using System.Data.SqlTypes;
 using System.Data.SqlClient;
 using System.Collections.Generic;
 
-namespace isblTest
+namespace ISBLScan.ViewCode
 {
 	/// <summary>
 	/// Функция.
@@ -19,9 +19,9 @@ namespace isblTest
 		{
 		}
 		
-		private List<isblTest.Node> LoadGroups(isblTest.Node rootNode, char charSysFunc)
+		private List<Node> LoadGroups(Node rootNode, char charSysFunc)
 		{
-			List<isblTest.Node> listGroups = new List<Node>();
+			List<Node> listGroups = new List<Node>();
 			if(this.checkTableExist("MBRegUnit"))
 			{
 				SqlCommand command = new SqlCommand();
@@ -37,14 +37,14 @@ namespace isblTest
 				{
 					while(reader.Read())
 					{
-						isblTest.Node node = new isblTest.Node();
+						Node node = new Node();
 						node.Parent = rootNode;
 						node.Id = reader.GetInt32(0);
 						if(! reader.IsDBNull(1))
 						{
 							node.Name = reader.GetString(1);
 						}
-						node.Nodes = new List<isblTest.Node>();
+						node.Nodes = new List<Node>();
 						rootNode.Nodes.Add(node);
 						listGroups.Add(node);
 					}
@@ -104,9 +104,9 @@ namespace isblTest
 		/// </summary>
 		/// <param name="rootNode">
 		/// Узел дерева элементов, соотвествующий функции.
-		/// A <see cref="isblTest.Node"/>
+		/// A <see cref="Node"/>
 		/// </param>
-		private void LoadRecvisites (isblTest.Node rootNode)
+		private void LoadRecvisites (Node rootNode)
 		{
 			if (this.checkTableExist ("MBFuncRecv"))
 			{
@@ -120,7 +120,7 @@ namespace isblTest
 				SqlDataReader reader = command.ExecuteReader ();
 				if (reader.HasRows)
 				{
-					isblTest.Node funcRecvNode = new isblTest.Node ();
+					Node funcRecvNode = new Node ();
 					funcRecvNode.Name = "-=[ Параметры функции ]=-";
 					funcRecvNode.Parent = rootNode;
 					rootNode.Nodes.Add (funcRecvNode);
@@ -149,12 +149,12 @@ namespace isblTest
 				reader.Close();
 			}
 		}
-		public isblTest.Node Load()
+		public Node Load()
 		{
-			isblTest.Node listNode = null;
+			Node listNode = null;
 			if(this.checkTableExist("MBFunc"))
 			{
-				listNode = new isblTest.Node();
+				listNode = new Node();
 				listNode.Name = "Функция";
 				listNode.Text = null;
 				listNode.Parent = null;
@@ -162,7 +162,7 @@ namespace isblTest
 				char[] charsSysUserFunc = {'P', 'S'};
 				foreach(char charSysFunc in charsSysUserFunc)
 				{
-					isblTest.Node systemFuncNode = new isblTest.Node();
+					Node systemFuncNode = new Node();
 					if(charSysFunc == 'P')
 					{
 						systemFuncNode.Name = "Пользовательская";
@@ -176,8 +176,8 @@ namespace isblTest
 					systemFuncNode.Nodes = new List<Node>();
 					listNode.Nodes.Add(systemFuncNode);
 					
-					List<isblTest.Node> listGroups = LoadGroups(systemFuncNode, charSysFunc);
-					foreach(isblTest.Node groupNode in listGroups)
+					List<Node> listGroups = LoadGroups(systemFuncNode, charSysFunc);
+					foreach(Node groupNode in listGroups)
 					{
 						SqlCommand command = new SqlCommand();
 						command.Connection = connection;
@@ -195,8 +195,8 @@ namespace isblTest
 						{
 							while(reader.Read())
 							{
-								isblTest.Node functionNode = new isblTest.Node();
-								functionNode.Nodes = new List<isblTest.Node>();
+								Node functionNode = new Node();
+								functionNode.Nodes = new List<Node>();
 								functionNode.Parent = groupNode;
 								//ИД
 								functionNode.Id = reader.GetInt32(0);
@@ -208,7 +208,7 @@ namespace isblTest
 								//Комментарий к функции
 								if(! reader.IsDBNull(2))
 								{
-									isblTest.Node funcDescriptionNode = new isblTest.Node();
+									Node funcDescriptionNode = new Node();
 									funcDescriptionNode.Name = "-=[ Описание функции ]=-";
 									funcDescriptionNode.Text = reader.GetString(2);
 									funcDescriptionNode.Parent = functionNode;
@@ -218,7 +218,7 @@ namespace isblTest
 								/*
 								if(! reader.IsDBNull(3))
 								{
-									isblTest.Node funcHelpNode = new isblTest.Node();
+									Node funcHelpNode = new Node();
 									funcHelpNode.name = "Справка по функции";
 									funcHelpNode.text = reader.GetString(3);;
 									funcHelpNode.parent = functionNode;
@@ -228,7 +228,7 @@ namespace isblTest
 								//Текст функции
 								if(! reader.IsDBNull(4))
 								{
-									isblTest.Node funcTextNode = new isblTest.Node();
+									Node funcTextNode = new Node();
 									funcTextNode.Name = "-=[ Текст функции ]=-";
 									funcTextNode.Text = reader.GetString(4);
 									funcTextNode.Parent = functionNode;
@@ -240,7 +240,7 @@ namespace isblTest
 						}
 						reader.Close();
 						//Загрузка параметров функций для функций текущей группы
-						foreach(isblTest.Node funcNode in groupNode.Nodes)
+						foreach(Node funcNode in groupNode.Nodes)
 						{
 							this.LoadRecvisites(funcNode);
 						}

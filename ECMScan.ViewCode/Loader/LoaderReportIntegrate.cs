@@ -7,7 +7,7 @@ using System.Data;
 using System.Data.SqlTypes;
 using System.Data.SqlClient;
 using System.Collections.Generic;
-namespace isblTest
+namespace ISBLScan.ViewCode
 {
 	/// <summary>
 	/// Отчёт (аналитический отчёт).
@@ -18,12 +18,12 @@ namespace isblTest
 		{
 		}
 
-		public isblTest.Node Load()
+		public Node Load()
 		{
-			isblTest.Node listNode = null;
+			Node listNode = null;
 			if(this.checkTableExist("MBReports"))
 			{
-				listNode = new isblTest.Node();
+				listNode = new Node();
 				listNode.Name = "Интегрированный отчёт";
 				listNode.Text = null;
 				listNode.Parent = null;
@@ -38,7 +38,7 @@ namespace isblTest
 					{
 						while(reader.Read())
 						{
-							isblTest.Node reportNode = new isblTest.Node();
+							Node reportNode = new Node();
 							reportNode.Parent = listNode;
 							//ИД отчёта
 							reportNode.Id = reader.GetInt32(0);
@@ -52,14 +52,14 @@ namespace isblTest
 							{
 								reportNode.Text = reader.GetString(2);
 							}
-							reportNode.Nodes = new List<isblTest.Node>();
+							reportNode.Nodes = new List<Node>();
 							//Шаблон отчёта
 							if(! reader.IsDBNull(4))
 							{
 								SqlBytes sqlbytes = reader.GetSqlBytes(4);
 								System.Text.Encoding win1251 = System.Text.Encoding.GetEncoding(1251);
 								string scriptText = win1251.GetString(sqlbytes.Value);
-								isblTest.Node reportTextNode = new isblTest.Node();
+								Node reportTextNode = new Node();
 								reportTextNode.Name = "-=[ Шаблон ]=-";
 								reportTextNode.Text = scriptText;
 								reportTextNode.Parent = reportNode;
@@ -69,7 +69,7 @@ namespace isblTest
 							if(! reader.IsDBNull(3))
 							{
 								string templateText = reader.GetString(3);
-								isblTest.Node reportTemplateNode = new isblTest.Node();
+								Node reportTemplateNode = new Node();
 								reportTemplateNode.Name = "-=[ Расчёт ]=-";
 								reportTemplateNode.Text = templateText;
 								reportTemplateNode.Parent = reportNode;

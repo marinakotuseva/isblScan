@@ -1,4 +1,4 @@
-namespace isblTest
+namespace ISBLScan.ViewCode
 {
     using System;
     using System.Collections.Generic;
@@ -34,7 +34,7 @@ namespace isblTest
         public bool Flag { get; set; }
 	
 	/// <summary>
-	/// Gets or sets a value indicating whether this <see cref="isblTest.Node"/> is visible.
+	/// Gets or sets a value indicating whether this <see cref="Node"/> is visible.
 	/// </summary>
 	/// <value>
 	/// <c>true</c> if visible; otherwise, <c>false</c>.

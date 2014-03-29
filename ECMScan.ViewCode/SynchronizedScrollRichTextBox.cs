@@ -6,7 +6,7 @@ using System.Windows.Forms;
  * https://gist.github.com/593809
  * bhttp://stackoverflow.com/questions/3322741/synchronizing-multiline-textbox-positions-in-c-sharp
  */
-namespace isblTest
+namespace ISBLScan.ViewCode
 {
 	public class SynchronizedScrollRichTextBox : System.Windows.Forms.RichTextBox
 	{

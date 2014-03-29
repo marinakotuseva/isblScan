@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Data.SqlTypes;
 
-namespace isblTest
+namespace ISBLScan.ViewCode
 {
 	/// <summary>
 	/// Загрузчик прикладной разработки. Устанавливает соединение с системой и вызывает загрузчики конкретных компонент.
@@ -20,18 +20,18 @@ namespace isblTest
 		
 		private SqlConnection connection;
 
-		public isblTest.EDocType			loaderEDocType;
-		public isblTest.Function			loaderFunction;
-		public isblTest.PerfomanceIndicator	loaderPerfomanceIndicator;
-		public isblTest.Reference			loaderReference;
-		public isblTest.Report				loaderReport;
-		public isblTest.ReportIntegrate		loaderReportInt;
-		public isblTest.Route				loaderRoute;
-		public isblTest.RouteBlock			loaderRouteBlock;
-		public isblTest.Script				loaderScript;
-		public isblTest.UserScript			loaderUserScript;
-		public isblTest.UserSearch			loaderUserSearch;
-		public isblTest.Wizard				loaderWizard;
+		public EDocType			loaderEDocType;
+		public Function			loaderFunction;
+		public PerfomanceIndicator	loaderPerfomanceIndicator;
+		public Reference			loaderReference;
+		public Report				loaderReport;
+		public ReportIntegrate		loaderReportInt;
+		public Route				loaderRoute;
+		public RouteBlock			loaderRouteBlock;
+		public Script				loaderScript;
+		public UserScript			loaderUserScript;
+		public UserSearch			loaderUserSearch;
+		public Wizard				loaderWizard;
 		
 		public string errorText;
 		
@@ -49,7 +49,7 @@ namespace isblTest
 			connBuilder.DataSource = server;
 			connBuilder.Pooling = false;
 			connBuilder.InitialCatalog = dataBase;
-			connBuilder.ApplicationName = "isblTest";
+			connBuilder.ApplicationName = "ECMScan CodeView";
 			connBuilder.UserID = login;
 			connBuilder.Password = password;
 
@@ -76,23 +76,23 @@ namespace isblTest
 		///Зарузка списка узлов, для их отображения в дереве элементов 
 		/// </summary>
 		/// <returns>Список узлов</returns>
-		public List<isblTest.Node> Load()
+		public List<Node> Load()
 		{
-			List<isblTest.Node> isblList = new List<isblTest.Node>();
-			isblTest.Node isblNode;
+			List<Node> isblList = new List<Node>();
+			Node isblNode;
 			
-			loaderEDocType				= new isblTest.EDocType(this.connection);
-			loaderFunction				= new isblTest.Function(this.connection);
-			loaderPerfomanceIndicator	= new isblTest.PerfomanceIndicator(this.connection);
-			loaderReference				= new isblTest.Reference(this.connection);
-			loaderReport				= new isblTest.Report(this.connection);
-			loaderReportInt				= new isblTest.ReportIntegrate(this.connection);
-			loaderRoute					= new isblTest.Route(this.connection);
-			loaderRouteBlock			= new isblTest.RouteBlock(this.connection);
-			loaderScript				= new isblTest.Script(this.connection);
-			loaderUserScript			= new isblTest.UserScript(this.connection);
-			loaderUserSearch			= new isblTest.UserSearch(this.connection);
-			loaderWizard				= new isblTest.Wizard(this.connection);
+			loaderEDocType				= new EDocType(this.connection);
+			loaderFunction				= new Function(this.connection);
+			loaderPerfomanceIndicator		= new PerfomanceIndicator(this.connection);
+			loaderReference				= new Reference(this.connection);
+			loaderReport				= new Report(this.connection);
+			loaderReportInt				= new ReportIntegrate(this.connection);
+			loaderRoute				= new Route(this.connection);
+			loaderRouteBlock			= new RouteBlock(this.connection);
+			loaderScript				= new Script(this.connection);
+			loaderUserScript			= new UserScript(this.connection);
+			loaderUserSearch			= new UserSearch(this.connection);
+			loaderWizard				= new Wizard(this.connection);
 			
 			
 			//Загрузка типов карточке электронных документов

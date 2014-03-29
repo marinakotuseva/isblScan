@@ -1,4 +1,4 @@
-namespace isblTest
+namespace ISBLScan.ViewCode
 {
 	partial class MainForm
 	{
@@ -46,8 +46,8 @@ namespace isblTest
 			this.panelFilterTree = new System.Windows.Forms.Panel();
 			this.textBoxFilter = new System.Windows.Forms.TextBox();
 			this.panelISBLResult = new System.Windows.Forms.Panel();
-			this.richTextBoxResult = new isblTest.SynchronizedScrollRichTextBox();
-			this.richTextBoxLineNumbers = new isblTest.SynchronizedScrollRichTextBox();
+			this.richTextBoxResult = new SynchronizedScrollRichTextBox();
+			this.richTextBoxLineNumbers = new SynchronizedScrollRichTextBox();
 			this.panelISBLLineNumber = new System.Windows.Forms.Panel();
 			this.labelDebug = new System.Windows.Forms.Label();
 			this.panelOptions.SuspendLayout();
@@ -332,7 +332,7 @@ namespace isblTest
 			this.Controls.Add(this.panelOptions);
 			this.HelpButton = true;
 			this.Name = "MainForm";
-			this.Text = "isblTest";
+			this.Text = ApplicationInfo.Title;
 			this.panelOptions.ResumeLayout(false);
 			this.groupBoxSearch.ResumeLayout(false);
 			this.groupBoxSearch.PerformLayout();
@@ -360,7 +360,7 @@ namespace isblTest
 		private System.Windows.Forms.Panel panelOptions;
 		private System.Windows.Forms.Button buttonSearch;
 		private System.Windows.Forms.GroupBox groupBoxActions;
-		private isblTest.SynchronizedScrollRichTextBox richTextBoxResult;
+		private SynchronizedScrollRichTextBox richTextBoxResult;
 		private System.Windows.Forms.TreeView treeViewResults;
 		private System.Windows.Forms.SplitContainer splitContainerResults;
 		private System.Windows.Forms.GroupBox groupBoxResults;
@@ -371,7 +371,7 @@ namespace isblTest
 		private System.Windows.Forms.GroupBox groupBoxConnect;
 		private System.Windows.Forms.TextBox textBoxSearch;
 		private System.Windows.Forms.GroupBox groupBoxSearch;
-		private isblTest.SynchronizedScrollRichTextBox richTextBoxLineNumbers;
+		private SynchronizedScrollRichTextBox richTextBoxLineNumbers;
 		private System.Windows.Forms.Panel panelISBLResult;
 		private System.Windows.Forms.Panel panelISBLLineNumber;
 		//Main menu

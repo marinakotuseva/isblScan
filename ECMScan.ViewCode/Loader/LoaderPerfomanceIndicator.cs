@@ -8,7 +8,7 @@ using System.Data.SqlTypes;
 using System.Data.SqlClient;
 using System.Collections.Generic;
 
-namespace isblTest
+namespace ISBLScan.ViewCode
 {
 	/// <summary>
 	/// Description of LoaderPerfomanceIndicator.
@@ -18,7 +18,7 @@ namespace isblTest
 		public PerfomanceIndicator(SqlConnection sqlConnect) : base(sqlConnect)
 		{
 		}
-		public isblTest.Node Load()
+		public Node Load()
 		{
 			return null;
 		}

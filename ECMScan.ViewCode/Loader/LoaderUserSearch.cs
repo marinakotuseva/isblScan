@@ -7,7 +7,7 @@ using System.Data;
 using System.Data.SqlTypes;
 using System.Data.SqlClient;
 using System.Collections.Generic;
-namespace isblTest
+namespace ISBLScan.ViewCode
 {
 	/// <summary>
 	/// Пользовательский поиск.
@@ -19,7 +19,7 @@ namespace isblTest
 		{
 		}
 		
-		private void LoadText(isblTest.Node userSeachNode)
+		private void LoadText(Node userSeachNode)
 		{
 			if(checkTableExist("MBText"))
 			{
@@ -39,7 +39,7 @@ namespace isblTest
 						{
 							SqlBytes sqlbytes = reader.GetSqlBytes(0);
 							
-							isblTest.Node userSearchSearchConditionNode = new isblTest.Node();
+							Node userSearchSearchConditionNode = new Node();
 							userSearchSearchConditionNode.Name = "-=[ Критерии поиска ]=-";
 							userSearchSearchConditionNode.Parent = userSeachNode;
 							userSeachNode.Nodes.Add(userSearchSearchConditionNode);
@@ -51,7 +51,7 @@ namespace isblTest
 						{
 							SqlBytes sqlbytes = reader.GetSqlBytes(1);
 							
-							isblTest.Node userSearchBeforeSearchNode = new isblTest.Node();
+							Node userSearchBeforeSearchNode = new Node();
 							userSearchBeforeSearchNode.Name = "-=[ Обработчик события \"До поиска\" ]=-";
 							userSearchBeforeSearchNode.Parent = userSeachNode;
 							userSeachNode.Nodes.Add(userSearchBeforeSearchNode);
@@ -63,7 +63,7 @@ namespace isblTest
 						{
 							SqlBytes sqlbytes = reader.GetSqlBytes(2);
 							
-							isblTest.Node userSearchTextNode = new isblTest.Node();
+							Node userSearchTextNode = new Node();
 							userSearchTextNode.Name = "-=[ Текст ]=-";
 							userSearchTextNode.Parent = userSeachNode;
 							userSeachNode.Nodes.Add(userSearchTextNode);
@@ -76,13 +76,13 @@ namespace isblTest
 				reader.Close();
 			}
 		}
-		public isblTest.Node Load()
+		public Node Load()
 		{
-			isblTest.Node listNode = null;
+			Node listNode = null;
 			Int32 vidAnalitID = getVidAnalitID("ПСК");
 			if(vidAnalitID >= 0)
 			{
-				listNode = new isblTest.Node();
+				listNode = new Node();
 				listNode.Name = "Пользовательский поиск";
 				listNode.Text = null;
 				listNode.Id = vidAnalitID;
@@ -102,9 +102,9 @@ namespace isblTest
 					{
 						while(reader.Read())
 						{
-							isblTest.Node userSearchNode = new isblTest.Node();
+							Node userSearchNode = new Node();
 							userSearchNode.Parent = listNode;
-							userSearchNode.Nodes = new List<isblTest.Node>();
+							userSearchNode.Nodes = new List<Node>();
 							userSearchNode.Id = reader.GetInt32(0);
 							if(! reader.IsDBNull(1))
 							{
@@ -118,7 +118,7 @@ namespace isblTest
 						}
 					}
 					reader.Close();
-					foreach(isblTest.Node userScriptNode in listNode.Nodes)
+					foreach(Node userScriptNode in listNode.Nodes)
 					{
 						LoadText(userScriptNode);
 					}

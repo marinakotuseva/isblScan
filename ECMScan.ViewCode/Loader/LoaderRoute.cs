@@ -4,7 +4,7 @@
  */
 using System;
 using System.Data.SqlClient;
-namespace isblTest
+namespace ISBLScan.ViewCode
 {
 	/// <summary>
 	/// Типовой маршрут.
@@ -15,7 +15,7 @@ namespace isblTest
 		{
 		}
 
-		public isblTest.Node Load()
+		public Node Load()
 		{
 			return null;
 		}

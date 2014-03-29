@@ -1,5 +1,16 @@
 2014-03-29  polarnik  <owasp@ya.ru>
 
+	* Program.cs:
+	* MainForm.cs:
+	* isblTest.csproj:
+	* Configuration.cs:
+	* ApplicationInfo.cs:
+	* MainForm.Designer.cs:
+	* ISBLScan.ViewCode.csproj:
+	* SynchronizedScrollRichTextBox.cs: 
+
+2014-03-29  polarnik  <owasp@ya.ru>
+
 	* README.md:
 	* ChangeLog:
 	* Program.cs:

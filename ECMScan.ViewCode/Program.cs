@@ -5,7 +5,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace isblTest
+namespace ISBLScan.ViewCode
 {
 	/// <summary>
 	/// Class with program entry point.

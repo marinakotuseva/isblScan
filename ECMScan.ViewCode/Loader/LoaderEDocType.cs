@@ -8,7 +8,7 @@ using System.Data.SqlTypes;
 using System.Data.SqlClient;
 using System.Collections.Generic;
 
-namespace isblTest
+namespace ISBLScan.ViewCode
 {
 	/// <summary>
 	/// Загрузчик прикладной разработки для типов карточек электронных документов (события и вычисления карточки и реквизитов документов)
@@ -19,9 +19,9 @@ namespace isblTest
 		{
 		}
 		
-		private List<isblTest.Node> LoadGroupRecvisite(isblTest.Node eDocTypeNode)
+		private List<Node> LoadGroupRecvisite(Node eDocTypeNode)
 		{
-			List<isblTest.Node> listGroups = new List<isblTest.Node>();
+			List<Node> listGroups = new List<Node>();
 			
 			SqlCommand command = new SqlCommand();
 			command.CommandType = CommandType.Text;
@@ -38,9 +38,9 @@ namespace isblTest
 				{
 					if(! reader.IsDBNull(0))
 					{
-						isblTest.Node groupNode = new isblTest.Node();
+						Node groupNode = new Node();
 						groupNode.Parent = eDocTypeNode;
-						groupNode.Nodes = new List<isblTest.Node>();
+						groupNode.Nodes = new List<Node>();
 						string recvRazdel = reader.GetString(0);
 						groupNode.Text = recvRazdel;
 						switch (recvRazdel)
@@ -81,12 +81,12 @@ namespace isblTest
 			reader.Close();
 			return listGroups;
 		}
-		private void LoadRecvisite(isblTest.Node eDocTypeNode)
+		private void LoadRecvisite(Node eDocTypeNode)
 		{
 			if(this.checkTableExist("MBEDocTypeRecv"))
 			{
-				List<isblTest.Node> listGroups = LoadGroupRecvisite(eDocTypeNode);
-				foreach(isblTest.Node groupNode in listGroups)
+				List<Node> listGroups = LoadGroupRecvisite(eDocTypeNode);
+				foreach(Node groupNode in listGroups)
 				{
 					char charGroup = groupNode.Text.ToCharArray()[0];
 					groupNode.Text = null;
@@ -107,7 +107,7 @@ namespace isblTest
 					{
 						while(reader.Read())
 						{
-							isblTest.Node eDocRecvNode = new isblTest.Node();
+							Node eDocRecvNode = new Node();
 							eDocRecvNode.Parent = groupNode;
 							eDocRecvNode.Nodes = new List<Node>();
 							//ИД
@@ -126,7 +126,7 @@ namespace isblTest
 							//Вычисление для реквизита и действия
 							if(!reader.IsDBNull(3))
 							{
-								isblTest.Node exprnEDocRecvNode = new isblTest.Node();
+								Node exprnEDocRecvNode = new Node();
 								exprnEDocRecvNode.Name = "-=[ Вычисление ]=-";
 								exprnEDocRecvNode.Text = reader.GetString(3);
 								exprnEDocRecvNode.Parent = eDocRecvNode;
@@ -135,7 +135,7 @@ namespace isblTest
 							//Выбор из справочника для реквизита типа "справочник" или "строка"
 							if(!reader.IsDBNull(4))
 							{
-								isblTest.Node eventEDocRecvNode = new isblTest.Node();
+								Node eventEDocRecvNode = new Node();
 								eventEDocRecvNode.Name = "-=[ Выбор из справочника ]=-";
 								eventEDocRecvNode.Text = reader.GetString(4);
 								eventEDocRecvNode.Parent = eDocRecvNode;
@@ -219,9 +219,9 @@ namespace isblTest
 			return parseResult;
 		}
 		
-		public isblTest.Node Load()
+		public Node Load()
 		{
-			isblTest.Node listNode = null;
+			Node listNode = null;
 			if(this.checkTableExist("MBEDocType"))
 			{
 				SqlCommand command = new SqlCommand();
@@ -230,7 +230,7 @@ namespace isblTest
 				SqlDataReader reader = command.ExecuteReader();
 				if(reader.HasRows)
 				{
-					listNode = new isblTest.Node();
+					listNode = new Node();
 					listNode.Name = "Тип карточки электронного документа";
 					listNode.Text = null;
 					listNode.Parent = null;
@@ -238,7 +238,7 @@ namespace isblTest
 					
 					while(reader.Read())
 					{
-						isblTest.Node eDocNode = new isblTest.Node();
+						Node eDocNode = new Node();
 						eDocNode.Parent = listNode;
 						//ИД 
 						eDocNode.Id = reader.GetInt32(0);
@@ -247,7 +247,7 @@ namespace isblTest
 						{
 							eDocNode.Name = reader.GetString(1);
 						}
-						eDocNode.Nodes = new List<isblTest.Node>();
+						eDocNode.Nodes = new List<Node>();
 						//Текст событий
 						if(! reader.IsDBNull(2))
 						{
@@ -257,7 +257,7 @@ namespace isblTest
 					}
 				}
 				reader.Close();
-				foreach(isblTest.Node eDocNode in listNode.Nodes)
+				foreach(Node eDocNode in listNode.Nodes)
 				{
 					LoadRecvisite(eDocNode);
 				}

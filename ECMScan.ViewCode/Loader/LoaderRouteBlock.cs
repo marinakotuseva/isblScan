@@ -8,7 +8,7 @@ using System.Data.SqlTypes;
 using System.Data.SqlClient;
 using System.Collections.Generic;
 
-namespace isblTest
+namespace ISBLScan.ViewCode
 {
 	/// <summary>
 	/// Блок типового маршрута.
@@ -19,9 +19,9 @@ namespace isblTest
 		{
 		}
 
-		private List<isblTest.Node> LoadGroups(isblTest.Node rootNode)
+		private List<Node> LoadGroups(Node rootNode)
 		{
-			List<isblTest.Node> listGroups = new List<Node>();
+			List<Node> listGroups = new List<Node>();
 			if(this.checkTableExist("SBRouteBlockGroup"))
 			{
 				SqlCommand command = new SqlCommand();
@@ -32,14 +32,14 @@ namespace isblTest
 				{
 					while(reader.Read())
 					{
-						isblTest.Node node = new isblTest.Node();
+						Node node = new Node();
 						node.Parent = rootNode;
 						node.Id = reader.GetInt32(0);
 						if(! reader.IsDBNull(1))
 						{
 							node.Name = reader.GetString(1);
 						}
-						node.Nodes = new List<isblTest.Node>();
+						node.Nodes = new List<Node>();
 						rootNode.Nodes.Add(node);
 						listGroups.Add(node);
 					}
@@ -49,19 +49,19 @@ namespace isblTest
 			return listGroups;
 		}
 
-		public isblTest.Node Load()
+		public Node Load()
 		{
-			isblTest.Node listNode = null;
+			Node listNode = null;
 			if(this.checkTableExist("SBRouteBlock"))
 			{
-				listNode = new isblTest.Node();
+				listNode = new Node();
 				listNode.Name = "Блок типового маршрута";
 				listNode.Text = null;
 				listNode.Parent = null;
 				listNode.Nodes = new List<Node>();
 				
-				List<isblTest.Node> listGroups = LoadGroups(listNode);
-				foreach(isblTest.Node groupNode in listGroups)
+				List<Node> listGroups = LoadGroups(listNode);
+				foreach(Node groupNode in listGroups)
 				{
 					SqlCommand command = new SqlCommand();
 					command.Connection = connection;
@@ -75,7 +75,7 @@ namespace isblTest
 					{
 						while(reader.Read())
 						{
-							isblTest.Node routeBlockNode = new isblTest.Node();
+							Node routeBlockNode = new Node();
 							routeBlockNode.Parent = groupNode;
 							//ИД
 							routeBlockNode.Id = reader.GetInt32(0);
@@ -89,14 +89,14 @@ namespace isblTest
 							{
 								routeBlockNode.Text = reader.GetString(2);
 							}
-							routeBlockNode.Nodes = new List<isblTest.Node>();
+							routeBlockNode.Nodes = new List<Node>();
 							//Свойства
 							if(! reader.IsDBNull(3))
 							{
 								SqlBytes sqlbytes = reader.GetSqlBytes(3);
 								System.Text.Encoding win1251 = System.Text.Encoding.GetEncoding(1251);
 								string routeBlockProperties = win1251.GetString(sqlbytes.Value);
-								isblTest.Node routeBlockPropNode = new isblTest.Node();
+								Node routeBlockPropNode = new Node();
 								routeBlockPropNode.Name = "Свойства";
 								routeBlockPropNode.Text = routeBlockProperties;
 								routeBlockPropNode.Parent = routeBlockNode;
