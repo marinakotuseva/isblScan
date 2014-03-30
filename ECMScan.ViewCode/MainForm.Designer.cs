@@ -286,6 +286,7 @@ namespace ISBLScan.ViewCode
 			this.textBoxFilter.Name = "textBoxFilter";
 			this.textBoxFilter.Size = new System.Drawing.Size(207, 20);
 			this.textBoxFilter.TabIndex = 2111;
+			this.textBoxFilter.TextChanged += new System.EventHandler(this.TextBoxFilter_TextChanged);
 			// 
 			// panelISBLResult
 			// 

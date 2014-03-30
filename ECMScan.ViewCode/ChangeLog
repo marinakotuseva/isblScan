@@ -1,5 +1,10 @@
 2014-03-30  polarnik  <owasp@ya.ru>
 
+	* MainForm.resources:
+	* MainForm.Designer.cs: 
+
+2014-03-30  polarnik  <owasp@ya.ru>
+
 	* MainForm.cs: 1. Fix error: add clear text markers before add
 	  new text markers.
 
