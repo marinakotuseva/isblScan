@@ -49,9 +49,7 @@ namespace ISBLScan.ViewCode
 			this.panelFilterTree = new System.Windows.Forms.Panel();
 			this.textBoxFilter = new System.Windows.Forms.TextBox();
 			this.panelISBLResult = new System.Windows.Forms.Panel();
-			this.richTextBoxResult = new ISBLScan.ViewCode.SynchronizedScrollRichTextBox();
-			this.panelISBLLineNumber = new System.Windows.Forms.Panel();
-			this.richTextBoxLineNumbers = new ISBLScan.ViewCode.SynchronizedScrollRichTextBox();
+			this.textEditorControlISBL = new ICSharpCode.TextEditor.TextEditorControl();
 			this.panelOptions.SuspendLayout();
 			this.groupBoxSearch.SuspendLayout();
 			this.groupBoxConnect.SuspendLayout();
@@ -63,7 +61,6 @@ namespace ISBLScan.ViewCode
 			this.panelTree.SuspendLayout();
 			this.panelFilterTree.SuspendLayout();
 			this.panelISBLResult.SuspendLayout();
-			this.panelISBLLineNumber.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// panelOptions
@@ -249,7 +246,6 @@ namespace ISBLScan.ViewCode
 			// splitContainerResults.Panel2
 			// 
 			this.splitContainerResults.Panel2.Controls.Add(this.panelISBLResult);
-			this.splitContainerResults.Panel2.Controls.Add(this.panelISBLLineNumber);
 			this.splitContainerResults.Size = new System.Drawing.Size(626, 232);
 			this.splitContainerResults.SplitterDistance = 207;
 			this.splitContainerResults.TabIndex = 0;
@@ -294,51 +290,26 @@ namespace ISBLScan.ViewCode
 			// panelISBLResult
 			// 
 			this.panelISBLResult.BackColor = System.Drawing.SystemColors.ControlDark;
-			this.panelISBLResult.Controls.Add(this.richTextBoxResult);
+			this.panelISBLResult.Controls.Add(this.textEditorControlISBL);
 			this.panelISBLResult.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.panelISBLResult.Location = new System.Drawing.Point(45, 0);
+			this.panelISBLResult.Location = new System.Drawing.Point(0, 0);
 			this.panelISBLResult.Name = "panelISBLResult";
-			this.panelISBLResult.Size = new System.Drawing.Size(370, 232);
+			this.panelISBLResult.Size = new System.Drawing.Size(415, 232);
 			this.panelISBLResult.TabIndex = 220;
 			// 
-			// richTextBoxResult
+			// textEditorControlISBL
 			// 
-			this.richTextBoxResult.AutoWordSelection = true;
-			this.richTextBoxResult.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.richTextBoxResult.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-			this.richTextBoxResult.Location = new System.Drawing.Point(0, 0);
-			this.richTextBoxResult.Name = "richTextBoxResult";
-			this.richTextBoxResult.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedBoth;
-			this.richTextBoxResult.Size = new System.Drawing.Size(370, 232);
-			this.richTextBoxResult.TabIndex = 2212;
-			this.richTextBoxResult.Text = "";
-			this.richTextBoxResult.WordWrap = false;
-			this.richTextBoxResult.VScroll += new System.EventHandler(this.RichTextBoxResultVScroll);
-			// 
-			// panelISBLLineNumber
-			// 
-			this.panelISBLLineNumber.BackColor = System.Drawing.SystemColors.Highlight;
-			this.panelISBLLineNumber.Controls.Add(this.richTextBoxLineNumbers);
-			this.panelISBLLineNumber.Dock = System.Windows.Forms.DockStyle.Left;
-			this.panelISBLLineNumber.Location = new System.Drawing.Point(0, 0);
-			this.panelISBLLineNumber.Name = "panelISBLLineNumber";
-			this.panelISBLLineNumber.Size = new System.Drawing.Size(45, 232);
-			this.panelISBLLineNumber.TabIndex = 221;
-			// 
-			// richTextBoxLineNumbers
-			// 
-			this.richTextBoxLineNumbers.DetectUrls = false;
-			this.richTextBoxLineNumbers.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.richTextBoxLineNumbers.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-			this.richTextBoxLineNumbers.Location = new System.Drawing.Point(0, 0);
-			this.richTextBoxLineNumbers.Name = "richTextBoxLineNumbers";
-			this.richTextBoxLineNumbers.ReadOnly = true;
-			this.richTextBoxLineNumbers.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-			this.richTextBoxLineNumbers.Size = new System.Drawing.Size(45, 232);
-			this.richTextBoxLineNumbers.TabIndex = 2212;
-			this.richTextBoxLineNumbers.TabStop = false;
-			this.richTextBoxLineNumbers.Text = "";
-			this.richTextBoxLineNumbers.WordWrap = false;
+			this.textEditorControlISBL.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.textEditorControlISBL.IsReadOnly = false;
+			this.textEditorControlISBL.LineViewerStyle = ICSharpCode.TextEditor.Document.LineViewerStyle.FullRow;
+			this.textEditorControlISBL.Location = new System.Drawing.Point(0, 0);
+			this.textEditorControlISBL.Name = "textEditorControlISBL";
+			this.textEditorControlISBL.ShowEOLMarkers = true;
+			this.textEditorControlISBL.ShowSpaces = true;
+			this.textEditorControlISBL.ShowTabs = true;
+			this.textEditorControlISBL.ShowVRuler = false;
+			this.textEditorControlISBL.Size = new System.Drawing.Size(415, 232);
+			this.textEditorControlISBL.TabIndex = 0;
 			// 
 			// MainForm
 			// 
@@ -364,9 +335,9 @@ namespace ISBLScan.ViewCode
 			this.panelFilterTree.ResumeLayout(false);
 			this.panelFilterTree.PerformLayout();
 			this.panelISBLResult.ResumeLayout(false);
-			this.panelISBLLineNumber.ResumeLayout(false);
 			this.ResumeLayout(false);
 		}
+		private ICSharpCode.TextEditor.TextEditorControl textEditorControlISBL;
 		private System.Windows.Forms.CheckBox checkBoxWinAuth;
 		private System.Windows.Forms.Button buttonConnect;
 		private System.Windows.Forms.Button buttonRefresh;
@@ -377,7 +348,6 @@ namespace ISBLScan.ViewCode
 		private System.Windows.Forms.Panel panelResults;
 		private System.Windows.Forms.Panel panelOptions;
 		private System.Windows.Forms.Button buttonSearch;
-		private ISBLScan.ViewCode.SynchronizedScrollRichTextBox richTextBoxResult;
 		private System.Windows.Forms.TreeView treeViewResults;
 		private System.Windows.Forms.SplitContainer splitContainerResults;
 		private System.Windows.Forms.GroupBox groupBoxResults;
@@ -388,9 +358,7 @@ namespace ISBLScan.ViewCode
 		private System.Windows.Forms.GroupBox groupBoxConnect;
 		private System.Windows.Forms.TextBox textBoxSearch;
 		private System.Windows.Forms.GroupBox groupBoxSearch;
-		private ISBLScan.ViewCode.SynchronizedScrollRichTextBox richTextBoxLineNumbers;
 		private System.Windows.Forms.Panel panelISBLResult;
-		private System.Windows.Forms.Panel panelISBLLineNumber;
 		//Main menu
 
 		

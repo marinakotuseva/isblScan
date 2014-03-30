@@ -38,16 +38,12 @@
                 <End>*/</End>
             </Span>
             
-            <Span name = "String" bold = "false" italic = "false" color = "Blue" stopateol = "true" escapecharacter="\">
+            <Span name = "String" bold = "false" italic = "false" rule = "SQLTemplate" color = "Blue" bgcolor = "AliceBlue" stopateol = "false" escapecharacter="\">
                 <Begin>"</Begin>
                 <End>"</End>
             </Span>
             
-            <Span name = "MultiLineString" bold = "false" italic = "false" color = "Blue" stopateol = "false" escapecharacter='"'>
-                <Begin>@@"</Begin>
-                <End>"</End>
-            </Span>
-            
+          
             <Span name = "Char" bold = "false" italic = "false" color = "Magenta" stopateol = "true" escapecharacter="\">
                 <Begin>&apos;</Begin>
                 <End>&apos;</End>
@@ -81,161 +77,63 @@
                 <Key word = "&amp;" />
             </KeyWords>
             
-            <KeyWords name = "AccessKeywords" bold="true" italic="false" color="Black">
-                <Key word = "this" />
-                <Key word = "base" />
+            <KeyWords name = "VariableCommon" bold="true" italic="false" color="Black">
+                <Key word = "Application" />
+                <Key word = "ComponentTokens" />
+                <Key word = "EDocuments" />
+                <Key word = "Folders" />
+                <Key word = "Jobs" />
+                <Key word = "Object" />
+                <Key word = "References" />
+                <Key word = "Reports" />
+                <Key word = "Scripts" />
+                <Key word = "Searches" />
+                <Key word = "ServiceFactory" />
+                <Key word = "SystemDialogs" />
+                <Key word = "Tasks" />
+                <Key word = "Wizards" />
             </KeyWords>
             
             <KeyWords name = "OperatorKeywords" bold="true" italic="false" color="DarkCyan">
-                <Key word = "as" />
-                <Key word = "is" />
-                <Key word = "new" />
-                <Key word = "sizeof" />
-                <Key word = "typeof" />
                 <Key word = "true" />
                 <Key word = "false" />
-                <Key word = "stackalloc" />
             </KeyWords>
             
             
             <KeyWords name = "SelectionStatements" bold="true" italic="false" color="Blue">
-                <Key word = "else" />
                 <Key word = "if" />
-                <Key word = "switch" />
-                <Key word = "case" />
-                <Key word = "default" />
+                <Key word = "else" />
+                <Key word = "endif" />
+                <Key word = "если" />
+                <Key word = "иначе" />
+                <Key word = "конецесли" />
             </KeyWords>
             
             <KeyWords name = "IterationStatements" bold="true" italic="false" color="Blue">
-                <Key word = "do" />
-                <Key word = "for" />
                 <Key word = "foreach" />
                 <Key word = "in" />
+                <Key word = "endforeach" />
+                <Key word = "все" />
+                <Key word = "в" />
+                <Key word = "конецвсе" />
                 <Key word = "while" />
+                <Key word = "endwhile" />
+                <Key word = "пока" />
+                <Key word = "конецпока" />
             </KeyWords>
             
-            <KeyWords name = "JumpStatements" bold="false" italic="false" color="Navy">
-                <Key word = "break" />
-                <Key word = "continue" />
-                <Key word = "goto" />
-                <Key word = "return" />
-            </KeyWords>
-            
-            <KeyWords name = "ContextKeywords" bold="false" italic="false" color="Navy">
-                <Key word = "yield" />
-                <Key word = "partial" />
-                <Key word = "global" />
-                <Key word = "where" />
-                <Key word = "select" />
-                <Key word = "group" />
-                <Key word = "by" />
-                <Key word = "into" />
-                <Key word = "from" />
-                <Key word = "ascending" />
-                <Key word = "descending" />
-                <Key word = "orderby" />
-                <Key word = "let" />
-                <Key word = "join" />
-                <Key word = "on" />
-                <Key word = "equals" />
-                <Key word = "var" />
-            </KeyWords>
-            
+          
+           
             <KeyWords name = "ExceptionHandlingStatements" bold="true" italic="false" color="Teal">
                 <Key word = "try" />
-                <Key word = "throw" />
-                <Key word = "catch" />
                 <Key word = "finally" />
+                <Key word = "except" />
+                <Key word = "endfinally" />
+                <Key word = "endexcept" />
             </KeyWords>
             
-            <KeyWords name = "CheckedUncheckedStatements" bold="true" italic="false" color="DarkGray">
-                <Key word = "checked" />
-                <Key word = "unchecked" />
-            </KeyWords>
             
-            <KeyWords name = "UnsafeFixedStatements" bold="false" italic="false" color="Olive">
-                <Key word = "fixed" />
-                <Key word = "unsafe" />
-            </KeyWords>
-            
-            <KeyWords name = "ValueTypes" bold="true" italic="false" color="Red">
-                <Key word = "bool" />
-                <Key word = "byte" />
-                <Key word = "char" />
-                <Key word = "decimal" />
-                <Key word = "double" />
-                <Key word = "enum" />
-                <Key word = "float" />
-                <Key word = "int" />
-                <Key word = "long" />
-                <Key word = "sbyte" />
-                <Key word = "short" />
-                <Key word = "struct" />
-                <Key word = "uint" />
-                <Key word = "ushort" />
-                <Key word = "ulong" />
-            </KeyWords>
-            
-            <KeyWords name = "ReferenceTypes" bold="false" italic="false" color="Red">
-                <Key word = "class" />
-                <Key word = "interface" />
-                <Key word = "delegate" />
-                <Key word = "object" />
-                <Key word = "string" />
-            </KeyWords>
-            
-            <KeyWords name = "Void" bold="false" italic="false" color="Red">
-                <Key word = "void" />
-            </KeyWords>
-            
-            <KeyWords name = "ConversionKeyWords" bold="true" italic="false" color="Pink">
-                <Key word = "explicit" />
-                <Key word = "implicit" />
-                <Key word = "operator" />
-            </KeyWords>
-            
-            <KeyWords name = "MethodParameters" bold="true" italic="false" color="DeepPink">
-                <Key word = "params" />
-                <Key word = "ref" />
-                <Key word = "out" />
-            </KeyWords>
-            
-            <KeyWords name = "Modifiers" bold="false" italic="false" color="Brown">
-                <Key word = "abstract" />
-                <Key word = "const" />
-                <Key word = "event" />
-                <Key word = "extern" />
-                <Key word = "override" />
-                <Key word = "readonly" />
-                <Key word = "sealed" />
-                <Key word = "static" />
-                <Key word = "virtual" />
-                <Key word = "volatile" />
-            </KeyWords>
-            
-            <KeyWords name = "AccessModifiers" bold="true" italic="false" color="Blue">
-                <Key word = "public" />
-                <Key word = "protected" />
-                <Key word = "private" />
-                <Key word = "internal" />
-            </KeyWords>
-            
-            <KeyWords name = "NameSpaces" bold="true" italic="false" color="Green">
-                <Key word = "namespace" />
-                <Key word = "using" />
-            </KeyWords>
-            
-            <KeyWords name = "LockKeyWord" bold="false" italic="false" color="DarkViolet">
-                <Key word = "lock" />
-            </KeyWords>
-            
-            <KeyWords name = "GetSet" bold="false" italic="false" color="SaddleBrown">
-                <Key word = "get" />
-                <Key word = "set" />
-                <Key word = "add" />
-                <Key word = "remove" />
-            </KeyWords>
-            
+          
             <KeyWords name = "Literals" bold="true" italic="false" color="Black">
                 <Key word = "null" />
                 <Key word = "value" />
@@ -298,8 +196,7 @@
             <Span name = "String" bold = "true" italic = "false" color = "Silver" stopateol = "true">
                 <Begin>"</Begin>
                 <End>"</End>
-            </Span>
-            
+            </Span>            
             
             <KeyWords name = "Punctuation" bold = "true" italic = "false" color = "Gray">
                 <Key word = "/" />
@@ -333,6 +230,603 @@
                 <Key word = "listheader" />
             </KeyWords>
         </RuleSet>
+        
+        <RuleSet name = "SQLTemplate" ignorecase = "true">
+        <!--
+        source: http://diary.3dn.ru/load/fajly_dlja_stati_quot_icsharpcode_texteditor_podsvetka_sql_sintaksisa_quot/3-1-0-28
+        description: http://diary.3dn.ru/news/icsharpcode_texteditor_podsvetka_sql_sintaksisa/2011-02-12-32
+        -->
+            <Delimiters>&lt;&gt;~!@%^*()-+=|\#/{}[]:;"' ,   .?</Delimiters>
+            
+            <Span name = "String" bold = "true" italic = "false" color = "DimGray" bgcolor = "AliceBlue" stopateol = "true">
+                <Begin>'</Begin>
+                <End>'</End>
+            </Span>            
+            
+      <Span name = "LineComment"  bold = "false" italic = "false" color = "Red" bgcolor = "AliceBlue" stopateol = "true">
+        <Begin>--</Begin>
+        <End>"</End>
+      </Span>
+
+      <Span name = "BlockComment" bold = "false" italic = "false" color = "Red" bgcolor = "AliceBlue" stopateol = "false">
+        <Begin>/*</Begin>
+        <End>*/</End>
+      </Span>
+
+      <KeyWords name = "OperatorKeywords" bold="true" italic="false" color="DarkCyan" bgcolor = "AliceBlue" >
+                <Key word = "abs" />
+                <Key word = "absolute" />
+                <Key word = "access" />
+                <Key word = "acos" />
+                <Key word = "add" />
+                <Key word = "add_months" />
+                <Key word = "adddate" />
+                <Key word = "admin" />
+                <Key word = "after" />
+                <Key word = "aggregate" />
+                <Key word = "all" />
+                <Key word = "allocate" />
+                <Key word = "alter" />
+                <Key word = "and" />
+                <Key word = "any" />
+                <Key word = "app_name" />
+                <Key word = "are" />
+                <Key word = "array" />
+                <Key word = "as" />
+                <Key word = "asc" />
+                <Key word = "ascii" />
+                <Key word = "asin" />
+                <Key word = "assertion" />
+                <Key word = "at" />
+                <Key word = "atan" />
+                <Key word = "atn2" />
+                <Key word = "audit" />
+                <Key word = "authid" />
+                <Key word = "authorization" />
+                <Key word = "autonomous_transaction" />
+                <Key word = "avg" />
+                <Key word = "before" />
+                <Key word = "begin" />
+                <Key word = "benchmark" />
+                <Key word = "between" />
+                <Key word = "bfilename" />
+                <Key word = "bin" />
+                <Key word = "binary" />
+                <Key word = "binary_checksum" />
+                <Key word = "binary_integer" />
+                <Key word = "bit" />
+                <Key word = "bit_count" />
+                <Key word = "bit_and" />
+                <Key word = "bit_or" />
+                <Key word = "blob" />
+                <Key word = "body" />
+                <Key word = "boolean" />
+                <Key word = "both" />
+                <Key word = "breadth" />
+                <Key word = "bulk" />
+                <Key word = "by" />
+                <Key word = "call" />
+                <Key word = "cascade" />
+                <Key word = "cascaded" />
+                <Key word = "case" />
+                <Key word = "cast" />
+                <Key word = "catalog" />
+                <Key word = "ceil" />
+                <Key word = "ceiling" />
+                <Key word = "char" />
+                <Key word = "char_base" />
+                <Key word = "character" />
+                <Key word = "charindex" />
+                <Key word = "chartorowid" />
+                <Key word = "check" />
+                <Key word = "checksum" />
+                <Key word = "checksum_agg" />
+                <Key word = "chr" />
+                <Key word = "class" />
+                <Key word = "clob" />
+                <Key word = "close" />
+                <Key word = "cluster" />
+                <Key word = "coalesce" />
+                <Key word = "col_length" />
+                <Key word = "col_name" />
+                <Key word = "collate" />
+                <Key word = "collation" />
+                <Key word = "collect" />
+                <Key word = "column" />
+                <Key word = "comment" />
+                <Key word = "commit" />
+                <Key word = "completion" />
+                <Key word = "compress" />
+                <Key word = "concat" />
+                <Key word = "concat_ws" />
+                <Key word = "connect" />
+                <Key word = "connection" />
+                <Key word = "constant" />
+                <Key word = "constraint" />
+                <Key word = "constraints" />
+                <Key word = "constructorcreate" />
+                <Key word = "contains" />
+                <Key word = "containsable" />
+                <Key word = "continue" />
+                <Key word = "conv" />
+                <Key word = "convert" />
+                <Key word = "corr" />
+                <Key word = "corresponding" />
+                <Key word = "cos" />
+                <Key word = "cot" />
+                <Key word = "count" />
+                <Key word = "count_big" />
+                <Key word = "covar_pop" />
+                <Key word = "covar_samp" />
+                <Key word = "create" />
+                <Key word = "cross" />
+                <Key word = "cube" />
+                <Key word = "cume_dist" />
+                <Key word = "current" />
+                <Key word = "current_date" />
+                <Key word = "current_path" />
+                <Key word = "current_role" />
+                <Key word = "current_time" />
+                <Key word = "current_timestamp" />
+                <Key word = "current_user" />
+                <Key word = "currval" />
+                <Key word = "cursor" />
+                <Key word = "cycle" />
+                <Key word = "data" />
+                <Key word = "datalength" />
+                <Key word = "databasepropertyex" />
+                <Key word = "date" />
+                <Key word = "date_add" />
+                <Key word = "date_format" />
+                <Key word = "date_sub" />
+                <Key word = "dateadd" />
+                <Key word = "datediff" />
+                <Key word = "datename" />
+                <Key word = "datepart" />
+                <Key word = "day" />
+                <Key word = "db_id" />
+                <Key word = "db_name" />
+                <Key word = "deallocate" />
+                <Key word = "dec" />
+                <Key word = "declare" />
+                <Key word = "decimal" />
+                <Key word = "decode" />
+                <Key word = "default" />
+                <Key word = "deferrable" />
+                <Key word = "deferred" />
+                <Key word = "degrees" />
+                <Key word = "delete" />
+                <Key word = "dense_rank" />
+                <Key word = "depth" />
+                <Key word = "deref" />
+                <Key word = "desc" />
+                <Key word = "describe" />
+                <Key word = "descriptor" />
+                <Key word = "destroy" />
+                <Key word = "destructor" />
+                <Key word = "deterministic" />
+                <Key word = "diagnostics" />
+                <Key word = "dictionary" />
+                <Key word = "disconnect" />
+                <Key word = "difference" />
+                <Key word = "distinct" />
+                <Key word = "do" />
+                <Key word = "domain" />
+                <Key word = "double" />
+                <Key word = "drop" />
+                <Key word = "dump" />
+                <Key word = "dynamic" />
+                <Key word = "each" />
+                <Key word = "else" />
+                <Key word = "elsif" />
+                <Key word = "empth" />
+                <Key word = "encode" />
+                <Key word = "encrypt" />
+                <Key word = "end" />
+                <Key word = "end-exec" />
+                <Key word = "equals" />
+                <Key word = "escape" />
+                <Key word = "every" />
+                <Key word = "except" />
+                <Key word = "exception" />
+                <Key word = "exclusive" />
+                <Key word = "exec" />
+                <Key word = "execute" />
+                <Key word = "exists" />
+                <Key word = "exit" />
+                <Key word = "exp" />
+                <Key word = "export_set" />
+                <Key word = "extends" />
+                <Key word = "external" />
+                <Key word = "extract" />
+                <Key word = "false" />
+                <Key word = "fetch" />
+                <Key word = "first" />
+                <Key word = "first_value" />
+                <Key word = "file" />
+                <Key word = "float" />
+                <Key word = "floor" />
+                <Key word = "file_id" />
+                <Key word = "file_name" />
+                <Key word = "filegroup_id" />
+                <Key word = "filegroup_name" />
+                <Key word = "filegroupproperty" />
+                <Key word = "fileproperty" />
+                <Key word = "for" />
+                <Key word = "forall" />
+                <Key word = "foreign" />
+                <Key word = "format" />
+                <Key word = "formatmessage" />
+                <Key word = "found" />
+                <Key word = "freetexttable" />
+                <Key word = "from" />
+                <Key word = "from_days" />
+                <Key word = "fulltextcatalog" />
+                <Key word = "fulltextservice" />
+                <Key word = "function" />
+                <Key word = "general" />
+                <Key word = "get" />
+                <Key word = "get_lock" />
+                <Key word = "getdate" />
+                <Key word = "getansinull" />
+                <Key word = "getutcdate" />
+                <Key word = "global" />
+                <Key word = "go" />
+                <Key word = "goto" />
+                <Key word = "grant" />
+                <Key word = "greatest" />
+                <Key word = "group" />
+                <Key word = "grouping" />
+                <Key word = "having" />
+                <Key word = "heap" />
+                <Key word = "hex" />
+                <Key word = "hextoraw" />
+                <Key word = "host" />
+                <Key word = "host_id" />
+                <Key word = "host_name" />
+                <Key word = "hour" />
+                <Key word = "ident_incr" />
+                <Key word = "ident_seed" />
+                <Key word = "ident_current" />
+                <Key word = "identified" />
+                <Key word = "identity" />
+                <Key word = "if" />
+                <Key word = "ifnull" />
+                <Key word = "ignore" />
+                <Key word = "immediate" />
+                <Key word = "in" />
+                <Key word = "increment" />
+                <Key word = "index" />
+                <Key word = "index_col" />
+                <Key word = "indexproperty" />
+                <Key word = "indicator" />
+                <Key word = "initcap" />
+                <Key word = "initial" />
+                <Key word = "initialize" />
+                <Key word = "initially" />
+                <Key word = "inner" />
+                <Key word = "inout" />
+                <Key word = "input" />
+                <Key word = "insert" />
+                <Key word = "instr" />
+                <Key word = "instrb" />
+                <Key word = "int" />
+                <Key word = "integer" />
+                <Key word = "interface" />
+                <Key word = "intersect" />
+                <Key word = "interval" />
+                <Key word = "into" />
+                <Key word = "is" />
+                <Key word = "is_member" />
+                <Key word = "is_srvrolemember" />
+                <Key word = "is_null" />
+                <Key word = "is_numeric" />
+                <Key word = "isdate" />
+                <Key word = "isnull" />
+                <Key word = "isolation" />
+                <Key word = "iterate" />
+                <Key word = "java" />
+                <Key word = "join" />
+                <Key word = "key" />
+                <Key word = "lag" />
+                <Key word = "language" />
+                <Key word = "large" />
+                <Key word = "last" />
+                <Key word = "last_day" />
+                <Key word = "last_value" />
+                <Key word = "lateral" />
+                <Key word = "lcase" />
+                <Key word = "lead" />
+                <Key word = "leading" />
+                <Key word = "least" />
+                <Key word = "left" />
+                <Key word = "len" />
+                <Key word = "length" />
+                <Key word = "lengthb" />
+                <Key word = "less" />
+                <Key word = "level" />
+                <Key word = "like" />
+                <Key word = "limit" />
+                <Key word = "limited" />
+                <Key word = "ln" />
+                <Key word = "lpad" />
+                <Key word = "local" />
+                <Key word = "localtime" />
+                <Key word = "localtimestamp" />
+                <Key word = "locator" />
+                <Key word = "lock" />
+                <Key word = "log" />
+                <Key word = "log10" />
+                <Key word = "long" />
+                <Key word = "loop" />
+                <Key word = "lower" />
+                <Key word = "ltrim" />
+                <Key word = "make_ref" />
+                <Key word = "map" />
+                <Key word = "match" />
+                <Key word = "max" />
+                <Key word = "maxextents" />
+                <Key word = "mid" />
+                <Key word = "min" />
+                <Key word = "minus" />
+                <Key word = "minute" />
+                <Key word = "mlslabel" />
+                <Key word = "mod" />
+                <Key word = "mode" />
+                <Key word = "modifies" />
+                <Key word = "modify" />
+                <Key word = "module" />
+                <Key word = "month" />
+                <Key word = "months_between" />
+                <Key word = "names" />
+                <Key word = "national" />
+                <Key word = "natural" />
+                <Key word = "naturaln" />
+                <Key word = "nchar" />
+                <Key word = "nclob" />
+                <Key word = "new" />
+                <Key word = "new_time" />
+                <Key word = "newid" />
+                <Key word = "next" />
+                <Key word = "next_day" />
+                <Key word = "nextval" />
+                <Key word = "no" />
+                <Key word = "noaudit" />
+                <Key word = "nocompress" />
+                <Key word = "nocopy" />
+                <Key word = "none" />
+                <Key word = "not" />
+                <Key word = "nowait" />
+                <Key word = "null" />
+                <Key word = "nullif" />
+                <Key word = "number" />
+                <Key word = "number_base" />
+                <Key word = "numeric" />
+                <Key word = "nvl" />
+                <Key word = "nvl2" />
+                <Key word = "object" />
+                <Key word = "object_id" />
+                <Key word = "object_name" />
+                <Key word = "object_property" />
+                <Key word = "ocirowid" />
+                <Key word = "oct" />
+                <Key word = "of" />
+                <Key word = "off" />
+                <Key word = "offline" />
+                <Key word = "old" />
+                <Key word = "on" />
+                <Key word = "online" />
+                <Key word = "only" />
+                <Key word = "opaque" />
+                <Key word = "open" />
+                <Key word = "operator" />
+                <Key word = "operation" />
+                <Key word = "option" />
+                <Key word = "or" />
+                <Key word = "ord" />
+                <Key word = "order" />
+                <Key word = "ordinalityorganization" />
+                <Key word = "others" />
+                <Key word = "out" />
+                <Key word = "outer" />
+                <Key word = "output" />
+                <Key word = "package" />
+                <Key word = "pad" />
+                <Key word = "parameter" />
+                <Key word = "parameters" />
+                <Key word = "partial" />
+                <Key word = "partition" />
+                <Key word = "path" />
+                <Key word = "pctfree" />
+                <Key word = "percent_rank" />
+                <Key word = "pi" />
+                <Key word = "pls_integer" />
+                <Key word = "positive" />
+                <Key word = "positiven" />
+                <Key word = "postfix" />
+                <Key word = "pow" />
+                <Key word = "power" />
+                <Key word = "pragma" />
+                <Key word = "precision" />
+                <Key word = "prefix" />
+                <Key word = "preorder" />
+                <Key word = "prepare" />
+                <Key word = "preserve" />
+                <Key word = "primary" />
+                <Key word = "prior" />
+                <Key word = "private" />
+                <Key word = "privileges" />
+                <Key word = "procedure" />
+                <Key word = "public" />
+                <Key word = "radians" />
+                <Key word = "raise" />
+                <Key word = "rand" />
+                <Key word = "range" />
+                <Key word = "rank" />
+                <Key word = "ratio_to_export" />
+                <Key word = "raw" />
+                <Key word = "rawtohex" />
+                <Key word = "read" />
+                <Key word = "reads" />
+                <Key word = "real" />
+                <Key word = "record" />
+                <Key word = "recursive" />
+                <Key word = "ref" />
+                <Key word = "references" />
+                <Key word = "referencing" />
+                <Key word = "reftohex" />
+                <Key word = "relative" />
+                <Key word = "release" />
+                <Key word = "release_lock" />
+                <Key word = "rename" />
+                <Key word = "repeat" />
+                <Key word = "replace" />
+                <Key word = "resource" />
+                <Key word = "restrict" />
+                <Key word = "result" />
+                <Key word = "return" />
+                <Key word = "returns" />
+                <Key word = "reverse" />
+                <Key word = "revoke" />
+                <Key word = "right" />
+                <Key word = "rollback" />
+                <Key word = "rollup" />
+                <Key word = "round" />
+                <Key word = "routine" />
+                <Key word = "row" />
+                <Key word = "row_number" />
+                <Key word = "rowid" />
+                <Key word = "rowidtochar" />
+                <Key word = "rowlabel" />
+                <Key word = "rownum" />
+                <Key word = "rows" />
+                <Key word = "rowtype" />
+                <Key word = "rpad" />
+                <Key word = "rtrim" />
+                <Key word = "savepoint" />
+                <Key word = "schema" />
+                <Key word = "scroll" />
+                <Key word = "scope" />
+                <Key word = "search" />
+                <Key word = "second" />
+                <Key word = "section" />
+                <Key word = "seddev_samp" />
+                <Key word = "select" />
+                <Key word = "separate" />
+                <Key word = "sequence" />
+                <Key word = "session" />
+                <Key word = "session_user" />
+                <Key word = "set" />
+                <Key word = "sets" />
+                <Key word = "share" />
+                <Key word = "sign" />
+                <Key word = "sin" />
+                <Key word = "sinh" />
+                <Key word = "size" />
+                <Key word = "smallint" />
+                <Key word = "some" />
+                <Key word = "soundex" />
+                <Key word = "space" />
+                <Key word = "specific" />
+                <Key word = "specifictype" />
+                <Key word = "sql" />
+                <Key word = "sqlcode" />
+                <Key word = "sqlerrm" />
+                <Key word = "sqlexception" />
+                <Key word = "sqlstate" />
+                <Key word = "sqlwarning" />
+                <Key word = "sqrt" />
+                <Key word = "start" />
+                <Key word = "state" />
+                <Key word = "statement" />
+                <Key word = "static" />
+                <Key word = "std" />
+                <Key word = "stddev" />
+                <Key word = "stdev_pop" />
+                <Key word = "strcmp" />
+                <Key word = "structure" />
+                <Key word = "subdate" />
+                <Key word = "substr" />
+                <Key word = "substrb" />
+                <Key word = "substring" />
+                <Key word = "substring_index" />
+                <Key word = "subtype" />
+                <Key word = "successful" />
+                <Key word = "sum" />
+                <Key word = "synonym" />
+                <Key word = "sys_context" />
+                <Key word = "sys_guid" />
+                <Key word = "sysdate" />
+                <Key word = "system_user" />
+                <Key word = "table" />
+                <Key word = "tan" />
+                <Key word = "tanh" />
+                <Key word = "temporary" />
+                <Key word = "terminate" />
+                <Key word = "than" />
+                <Key word = "then" />
+                <Key word = "time" />
+                <Key word = "timestamp" />
+                <Key word = "timezone_abbr" />
+                <Key word = "timezone_minute" />
+                <Key word = "timezone_hour" />
+                <Key word = "timezone_region" />
+                <Key word = "to" />
+                <Key word = "to_char" />
+                <Key word = "to_date" />
+                <Key word = "to_days" />
+                <Key word = "to_number" />
+                <Key word = "to_single_byte" />
+                <Key word = "trailing" />
+                <Key word = "transaction" />
+                <Key word = "translate" />
+                <Key word = "translation" />
+                <Key word = "treat" />
+                <Key word = "trigger" />
+                <Key word = "trim" />
+                <Key word = "true" />
+                <Key word = "trunc" />
+                <Key word = "truncate" />
+                <Key word = "type" />
+                <Key word = "ucase" />
+                <Key word = "uid" />
+                <Key word = "under" />
+                <Key word = "union" />
+                <Key word = "unique" />
+                <Key word = "unknown" />
+                <Key word = "unnest" />
+                <Key word = "update" />
+                <Key word = "upper" />
+                <Key word = "usage" />
+                <Key word = "use" />
+                <Key word = "user" />
+                <Key word = "userenv" />
+                <Key word = "using" />
+                <Key word = "validate" />
+                <Key word = "value" />
+                <Key word = "values" />
+                <Key word = "var_pop" />
+                <Key word = "var_samp" />
+                <Key word = "varchar" />
+                <Key word = "varchar2" />
+                <Key word = "variable" />
+                <Key word = "variance" />
+                <Key word = "varying" />
+                <Key word = "view" />
+                <Key word = "vsize" />
+                <Key word = "when" />
+                <Key word = "whenever" />
+                <Key word = "where" />
+                <Key word = "with" />
+                <Key word = "without" />
+                <Key word = "while" />
+                <Key word = "with" />
+                <Key word = "work" />
+                <Key word = "write" />
+                <Key word = "year" />
+                <Key word = "zone" />
+            </KeyWords>
+        </RuleSet>        
     </RuleSets>
 </SyntaxDefinition>
 

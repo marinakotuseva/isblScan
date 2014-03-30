@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build" ToolsVersion="4.0">
   <PropertyGroup>
     <ProjectGuid>{E0002903-9176-4E38-9F6E-35428BE789AE}</ProjectGuid>
@@ -74,13 +74,14 @@
   <ItemGroup>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+      <LogicalName>test</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Loader\WizardTextSample.txt" />
     <None Include="ChangeLog" />
-    <None Include="MainForm.resources" />
+    <EmbeddedResource Include="MainForm.resources" />
     <None Include="README.md" />
     <None Include="Resources.resources" />
     <None Include="Collections\ChangeLog" />

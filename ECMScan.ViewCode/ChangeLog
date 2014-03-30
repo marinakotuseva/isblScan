@@ -1,3 +1,15 @@
+2014-03-30  polarnik  <owasp@ya.ru>
+
+	* MainForm.Designer.cs: 1. Remove RichTextBox.
+
+	* MainForm.cs: 1. Add sample ISBL Text.
+	2. Remove default search key word == Control.
+	3. Use ICSharpCode.TextEditor, remove RichTextBox
+
+	* MainForm.resx:
+	* MainForm.resources:
+	* ISBLScan.ViewCode.csproj: 1. Try work with resources.
+
 2014-03-29  polarnik  <owasp@ya.ru>
 
 	* ApplicationInfo.cs: ApplicationInfo class change as non
