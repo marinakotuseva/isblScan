@@ -249,6 +249,7 @@ namespace ISBLScan.ViewCode
 				textEditorControlISBL.IsReadOnly = true;
 				textEditorControlISBL.Document.TextContent = e.Node.Tag.ToString();
 				textEditorControlISBL.Enabled = true;
+				MarkSearchStrings(textBoxSearch.Text);
 
 			}
 			else
@@ -344,15 +345,12 @@ namespace ISBLScan.ViewCode
 
 		public void MarkSearchStrings (string searchStr)
 		{
+			textEditorControlISBL.Document.MarkerStrategy.RemoveAll((marker) => { return true; });
 			//Подсветка искомого текста
 			if(searchStr != "")
 			{
 				String text = textEditorControlISBL.Document.TextContent.Replace("\r", "\n");
-				string strDelimeters = "%^&*()-=+\\/;:<>.,?[]{}\n\t ";
 
-				this.fontBold = new Font(textEditorControlISBL.Document.TextEditorProperties.Font, FontStyle.Bold);
-				this.fontBoldUnderline = new Font(textEditorControlISBL.Document.TextEditorProperties.Font, FontStyle.Bold | FontStyle.Underline);
-				
 				//Подстветка строк
 				int posEnd = 0;
 				int posStart = 0;
