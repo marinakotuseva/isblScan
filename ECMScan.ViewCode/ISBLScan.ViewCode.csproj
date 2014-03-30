@@ -99,6 +99,7 @@
     <None Include="Images\isblTest.128.png" />
     <None Include="Images\path2826.png" />
     <None Include="Loader\ChangeLog" />
+    <None Include="License.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
