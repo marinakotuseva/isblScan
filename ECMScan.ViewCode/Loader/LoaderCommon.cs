@@ -102,5 +102,19 @@ namespace ISBLScan.ViewCode
 			}
 			return vidAnalitID;
 		}
+
+        public string commentStrings(string comment)
+        {
+            string[] delimeters = { "\n\r" };
+            string[] commentArray = comment.Split(delimeters, StringSplitOptions.None);
+            string result = "";
+            foreach (string commentStr in commentArray)
+            {
+                if (!string.IsNullOrEmpty(result))
+                    result += "\n\r";
+                result += "/// " + commentStr;
+            }
+            return result;
+        }
 	}
 }
