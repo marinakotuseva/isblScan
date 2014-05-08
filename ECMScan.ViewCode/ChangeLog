@@ -1,5 +1,9 @@
 2014-05-09  polarnik  <owasp@ya.ru>
 
+	* ISBLScan.ViewCode.csproj: 
+
+2014-05-09  polarnik  <owasp@ya.ru>
+
 	* License.ISBLScan.ViewCode.txt: Rename license file.
 
 	* ISBLFoldingStrategy.cs:

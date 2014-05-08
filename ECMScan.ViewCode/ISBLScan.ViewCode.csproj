@@ -35,10 +35,6 @@
     <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>
-    </ApplicationIcon>
-  </PropertyGroup>
-  <PropertyGroup>
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
   <ItemGroup>
@@ -85,6 +81,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="SynchronizedScrollRichTextBox.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Loader\WizardTextSample.txt" />
@@ -106,6 +103,13 @@
     <None Include="Images\path2826.png" />
     <None Include="Loader\ChangeLog" />
     <None Include="License.txt" />
+    <None Include="License.ISBLScan.ViewCode.txt" />
+    <None Include="MainForm.resources" />
+    <None Include="Resources.resources" />
+    <None Include="Resources.resx" />
+    <None Include="test.txt" />
+    <None Include="Properties\ChangeLog" />
+    <None Include="Properties\Resources.resources" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
