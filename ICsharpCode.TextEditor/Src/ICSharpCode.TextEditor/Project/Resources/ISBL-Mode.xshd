@@ -15,14 +15,11 @@
     <Digits name = "Digits" bold = "false" italic = "false" color = "DarkBlue"/>
     
     <RuleSets>
-        <RuleSet ignorecase="false">
-            <Delimiters>&amp;&lt;&gt;~!%^*()-+=|\#/{}[]:;"' ,   .?</Delimiters>
+        <RuleSet ignorecase="true">
+            <Delimiters>&amp;&lt;&gt;~%^*()-+=|\#/{}[]:;"' ,   .?</Delimiters>
             
           
-            <Span name = "DocLineComment" rule = "DocCommentSet" bold = "false" italic = "false" color = "Green" stopateol = "true" noescapesequences="true">
-                <Begin bold = "false" italic = "false" color = "Gray">///@!/@</Begin>
-            </Span>
-            
+         
             <Span name = "LineComment" rule = "CommentMarkerSet" bold = "false" italic = "false" color = "Green" stopateol = "true">
                 <Begin>//@!/@</Begin>
             </Span>
@@ -35,19 +32,20 @@
                 <End>*/</End>
             </Span>
             
-            <Span name = "String" bold = "false" italic = "false" rule = "SQLTemplate" color = "Blue" bgcolor = "AliceBlue" stopateol = "false" escapecharacter="\">
+            <Span name = "String" bold = "false" italic = "false" rule = "SQLTemplate" color = "Blue" bgcolor = "#ddeeff" stopateol = "false" >
                 <Begin>"</Begin>
                 <End>"</End>
             </Span>
             
           
-            <Span name = "Char" bold = "false" italic = "false" rule = "SQLTemplate2" color = "Blue" bgcolor = "AliceBlue" stopateol = "false"  escapecharacter="\">
+            <Span name = "Char" bold = "false" italic = "false" rule = "SQLTemplate2" color = "Blue" bgcolor = "#ddeeff" stopateol = "false"  >
                 <Begin>&apos;</Begin>
                 <End>&apos;</End>
             </Span>
             
+			<!-- Выделение имён функций синим - всё, что перед "(" - имя функции -->
             <MarkPrevious bold = "true" italic = "false" color = "MidnightBlue">(</MarkPrevious>
-            
+			
             <KeyWords name = "Punctuation" bold = "false" italic = "false" color = "DarkGreen">
                 <Key word = "?" />
                 <Key word = "," />
@@ -69,7 +67,7 @@
                 <Key word = "^" />
                 <Key word = "=" />
                 <Key word = "~" />
-                <Key word = "!" />
+                <!--<Key word = "!" />-->
                 <Key word = "|" />
                 <Key word = "&amp;" />
             </KeyWords>
@@ -178,23 +176,8 @@
                 <Key word = "HACK" />
                 <Key word = "UNDONE" />
             </KeyWords>
-        </RuleSet>
-        
-        <RuleSet name = "DocCommentSet" ignorecase = "false">
-            <Delimiters>&lt;&gt;~!@%^*()-+=|\#/{}[]:;"' ,   .?</Delimiters>
-            
-           
-            <KeyWords name = "ErrorWords" bold="true" italic="false" color="Red">
-                <Key word = "TODO" />
-                <Key word = "FIXME" />
-            </KeyWords>
-            
-            <KeyWords name = "WarningWords" bold="true" italic="false" color="#EEE0E000">
-                <Key word = "HACK" />
-                <Key word = "UNDONE" />
-            </KeyWords>
-        </RuleSet>
-        
+        </RuleSet>  
+      
         
         
         <RuleSet name = "SQLTemplate" ignorecase = "true">
@@ -205,22 +188,43 @@
             <Delimiters>&lt;&gt;~!@%^*()-+=|\#/{}[]:;"' ,   .?</Delimiters>
 
 
-            <Span name = "LineComment"  bold = "false" italic = "false" color = "Red" bgcolor = "AliceBlue" stopateol = "true">
+            <Span name = "LineComment"  bold = "false" italic = "false" color = "Red" bgcolor = "#ddeeff" stopateol = "true">
                 <Begin>--</Begin>
                 <End>"</End>
             </Span>
 
-            <Span name = "BlockComment" bold = "false" italic = "false" color = "Red" bgcolor = "AliceBlue" stopateol = "false">
+		
+			<!-- Подсветка строковых констант SQL внутри строки не работает -->
+			<!--
+			<Span name = "StringConstant1"  bold = "false" italic = "false" color = "Red" bgcolor = "#ddeeff" stopateol = "false">
+				<Begin>N'</Begin>
+				<End>'</End>
+			</Span>
+			<Span name = "StringConstant2"  bold = "false" italic = "false" color = "Red" bgcolor = "#ddeeff" stopateol = "false">
+				<Begin>N'</Begin>
+				<End>"</End>
+			</Span>
+			<Span name = "StringConstant3"  bold = "false" italic = "false" color = "Red" bgcolor = "#ddeeff" stopateol = "false">
+				<Begin>'</Begin>
+				<End>'</End>
+			</Span>
+			<Span name = "StringConstant4"  bold = "false" italic = "false" color = "Red" bgcolor = "#ddeeff" stopateol = "false">
+				<Begin>'</Begin>
+				<End>"</End>
+			</Span>
+
+			<Span name = "BlockComment" bold = "false" italic = "false" color = "Red" bgcolor = "#ddeeff" stopateol = "false">
                 <Begin>/*</Begin>
                 <End>"</End>
             </Span>
-
-            <Span name = "BlockComment2" bold = "false" italic = "false" color = "Red" bgcolor = "AliceBlue" stopateol = "false">
+			-->
+			
+            <Span name = "BlockComment2" bold = "false" italic = "false" color = "Red" bgcolor = "#ddeeff" stopateol = "false">
                 <Begin>/*</Begin>
                 <End>*/</End>
             </Span>
 
-           <KeyWords name = "OperatorKeywords" bold="true" italic="false" color="DarkCyan" bgcolor = "AliceBlue" >
+           <KeyWords name = "OperatorKeywords" bold="true" italic="false" color="DarkCyan" bgcolor = "#ddeeff" >
                 <Key word = "abs" />
                 <Key word = "absolute" />
                 <Key word = "access" />
@@ -802,22 +806,22 @@
         -->
             <Delimiters>&lt;&gt;~!@%^*()-+=|\#/{}[]:;"' ,   .?</Delimiters>
 
-            <Span name = "LineComment"  bold = "false" italic = "false" color = "Red" bgcolor = "AliceBlue" stopateol = "true">
+            <Span name = "LineComment"  bold = "false" italic = "false" color = "Red" bgcolor = "#ddeeff" stopateol = "true">
                 <Begin>--</Begin>
                 <End>'</End>
             </Span>
 
-            <Span name = "BlockComment" bold = "false" italic = "false" color = "Red" bgcolor = "AliceBlue" stopateol = "false">
+            <Span name = "BlockComment" bold = "false" italic = "false" color = "Red" bgcolor = "#ddeeff" stopateol = "false">
                 <Begin>/*</Begin>
                 <End>'</End>
             </Span>
 
-            <Span name = "BlockComment2" bold = "false" italic = "false" color = "Red" bgcolor = "AliceBlue" stopateol = "false">
+            <Span name = "BlockComment2" bold = "false" italic = "false" color = "Red" bgcolor = "#ddeeff" stopateol = "false">
                 <Begin>/*</Begin>
                 <End>*/</End>
             </Span>
 
-            <KeyWords name = "OperatorKeywords" bold="true" italic="false" color="DarkCyan" bgcolor = "AliceBlue" >
+            <KeyWords name = "OperatorKeywords" bold="true" italic="false" color="DarkCyan" bgcolor = "#ddeeff" >
                 <Key word = "abs" />
                 <Key word = "absolute" />
                 <Key word = "access" />
