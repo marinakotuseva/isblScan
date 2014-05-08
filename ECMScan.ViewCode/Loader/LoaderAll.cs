@@ -36,7 +36,7 @@ namespace ISBLScan.ViewCode
 		public string errorText;
 		
 		/// <summary>
-		///Установка соединения с системой 
+		/// Установка соединения с системой 
 		/// </summary>
 		/// <param name="server">Имя SQL Server</param>
 		/// <param name="dataBase">Имя базы данных</param>
@@ -49,7 +49,7 @@ namespace ISBLScan.ViewCode
 			connBuilder.DataSource = server;
 			connBuilder.Pooling = false;
 			connBuilder.InitialCatalog = dataBase;
-			connBuilder.ApplicationName = "ECMScan CodeView";
+			connBuilder.ApplicationName = "ISBLScan.ViewCode";
 			if(isWinAuth)
 			{
 				connBuilder.IntegratedSecurity = true;
@@ -62,14 +62,40 @@ namespace ISBLScan.ViewCode
 			try {
 				this.connection = new SqlConnection(connBuilder.ConnectionString);
 				this.connection.Open();
-				this.errorText = this.connection.ConnectionString;
+				this.errorText = null;
+                //tryLoadAndExecuteDebugSQLScript(connection);
 				return true;
 			} catch (Exception e) {
 				this.errorText = e.Message;
 				return false;
 			}
 		}
-		
+
+        /// <summary>
+        /// Отладочный метод. Вариант того, как вывести SQL-скрипты из тела утилиты в SQL-файлы, которые проще править и поддерживать.
+        /// TODO: отладить такой способ выполнения скриптов, перевести работу с SQL на такой вариант выполнения или отказаться, выпилить метод.
+        /// </summary>
+        /// <param name="sqlConnection"></param>
+        //void tryLoadAndExecuteDebugSQLScript(SqlConnection sqlConnection)
+        //{
+        //    try
+        //    {
+        //        string debugSQLScript = System.IO.File.ReadAllText(string.Format("ISBLScan.ViewCode.DebugScript.{0}.sql", sqlConnection.Database));
+        //        SqlCommand command = new SqlCommand();
+        //        command.Connection = sqlConnection;
+        //        command.CommandText = debugSQLScript;
+        //        command.ExecuteNonQuery();
+        //    }
+        //    catch (SqlException ex)
+        //    {
+        //        //TODO: добавить обработку исключений
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        //TODO: добавить обработку исключений
+        //    }
+        //}
+
 		/// <summary>
 		///Отключиться от базы данных 
 		/// </summary>
@@ -126,12 +152,12 @@ namespace ISBLScan.ViewCode
 			isblList.Add(isblNode);
 
 			//Загрузка типовых маршрутов (событий маршрутов)
-			isblNode = loaderRoute.Load();
-			isblList.Add(isblNode);
+			//isblNode = loaderRoute.Load();
+			//isblList.Add(isblNode);
 
 			//Загрузка вычислений блоков типовых маршрутов
-			isblNode = loaderRouteBlock.Load();
-			isblList.Add(isblNode);
+			//isblNode = loaderRouteBlock.Load();
+			//isblList.Add(isblNode);
 
 			//Загрузка текстов расчётов (сценариев)
 			isblNode = loaderScript.Load();
