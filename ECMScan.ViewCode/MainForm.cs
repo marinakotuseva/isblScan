@@ -10,6 +10,7 @@ using System.Configuration;
 using System.Collections.Specialized;
 using System.Reflection;
 using ICSharpCode.TextEditor.Document;
+using System.ComponentModel;
 
 namespace ISBLScan.ViewCode
 {
@@ -22,7 +23,37 @@ namespace ISBLScan.ViewCode
 		Font fontBold;
 		Font fontBoldUnderline;
 
+        /// <summary>
+        /// Список корневых узлов элементов разработки (узлы могут быть пустыми, null)
+        /// </summary>
 		List<Node> ISBLNodes { get; set; }
+        
+        /// <summary>
+        /// Полное количество узлов в дереве
+        /// </summary>
+        int CountOfISBLNodes { get; set; }
+
+        /// <summary>
+        /// Количество узлов, обработанных в процессе поиска, служебная глобальная переменная
+        /// </summary>
+        int CountOfProcessedISBLNodes { get; set; }
+
+        /// <summary>
+        /// Список поисковых фраз по которым выполняется поиск, служебная глобальная переменная
+        /// </summary>
+        string[] searchStrs;
+
+        /// <summary>
+        /// Редактор текста с критериями поиска, активный в текущий момент
+        /// </summary>
+        ICSharpCode.TextEditor.TextEditorControl ActiveSearchStringControl { get; set; }
+
+        /// <summary>
+        /// Словарь поисковых фраз и соотвествующих регулярных выражений
+        /// </summary>
+        Dictionary<string, Regex> dictRegEx = new Dictionary<string, Regex>();
+
+        int LastISBLRefreshPercentage { get; set; }
 
 		public MainForm()
 		{
@@ -30,6 +61,7 @@ namespace ISBLScan.ViewCode
 			// The InitializeComponent() call is required for Windows Forms designer support.
 			//
 			InitializeComponent();
+			groupBoxSearch_Resize(null, null);
 			isblLoader = new Loader();
 			
 			string sqlServer;
@@ -55,24 +87,27 @@ namespace ISBLScan.ViewCode
 			//
 			string[] defaultSearchStrings = 
 			{
-				"AddWhere     AddFrom",
-				"AddOrderBy",
-				"SQL(         CSQL",
-				"Выполнить    Execute  Exec",
-				"Login        Логин",
-				"Pass         Пароль",
-				"Secret       Секрет",
-				"Admin        Админ",
-				"drop         xp_",
-				"AccessRights Grant    Control",
-				"Encrypt      Decrypt  Шифр",
-				"CreateObject ActiveX",
+				"AddWhere      AddFrom  AddOrderBy  AddSelect     SQL(     CSQL   drop    xp_",
+				"Выполнить     Execute  Exec        CreateObject",
+				"Login         Логин    Pass        Пароль        Admin    Админ",				
+				"AccessRights  Grant    Control     Encrypt       Decrypt  Шифр   Secret  Секрет",
 				""
 			};
 			foreach(string searchString in defaultSearchStrings)
 			{
-				this.textBoxSearch.Text += (searchString + System.Environment.NewLine);
+                		this.textEditorControlSearchText.Document.TextContent += (searchString + this.textEditorControlSearchText.Document.TextEditorProperties.LineTerminator);
 			}
+			string[] defaultRegExp = 
+			{
+				"index.*=",
+				".*= *СценарийПарам *[(]",
+				"Incorrect RegEx Sample: .*((("
+			};
+			foreach(string searchString in defaultRegExp)
+			{
+                		this.textEditorControlRegExp.Document.TextContent += (searchString + this.textEditorControlRegExp.Document.TextEditorProperties.LineTerminator);
+			}
+
 			//
 			// TODO: Добавить хорошую стправку на начальной странице
 			//
@@ -126,24 +161,38 @@ namespace ISBLScan.ViewCode
 					"GN0YLQsNC/0YMuIgogICAgIVJlc3VsdCA9IExvYWRTdHJpbmcoIkRJUjQxQkIxRUU5Xzk3NTNfNDExQl85NDVFXzNDMEIwQTFDMjE4NyI7ICJDT01NT04iKQogIGVuZGlmCiAgaWYgIUZpbGxlZCA9IDAKICAg" +
 					"Ly8gItCd0Lgg0L/QviDQvtC00L3QvtC80YMg0Y3RgtCw0L/RgyDRhNCw0LrRgiDQvdC1INCx0YvQuyDQt9Cw0L/QvtC70L3QtdC9LiIKICAgICFSZXN1bHQgPSBMb2FkU3RyaW5nKCJESVJGOUREQjlERF80QU" +
 					"M5XzRGNzRfQTgzQl8yODM0Q0M1NzU4NzkiOyAiQ09NTU9OIikgICAgCiAgZW5kaWYg";
+            ActiveSearchStringControl = this.textEditorControlSearchText;
+
 			byte[] data = System.Convert.FromBase64String(str);
 			System.Text.Encoding win1251 = System.Text.Encoding.UTF8;
 			string scriptText = win1251.GetString(data);
 			textEditorControlISBL.Document.TextContent = scriptText;
 			textEditorControlISBL.Document.HighlightingStrategy = 
 				HighlightingStrategyFactory.CreateHighlightingStrategy("ISBL");
-			MarkSearchStrings(textBoxSearch.Text);
+            textEditorControlISBL.Document.FoldingManager.FoldingStrategy =
+                new IndentFoldingStrategy();
+
+            ITextEditorProperties prop = textEditorControlISBL.Document.TextEditorProperties;
+            prop.AllowCaretBeyondEOL = prop.AllowCaretBeyondEOL;
+            prop.IsIconBarVisible = true;
+            textEditorControlISBL.Document.TextEditorProperties = prop;
+            textEditorControlISBL.Document.ReadOnly = true;
+            MarkSearchStrings();
 		}
 		
+        /// <summary>
+        /// Загрузка добавление узла разработки в список узлов дерева.
+        /// А также рекурсивный вызов для подузлов.
+        /// </summary>
+        /// <param name="treeNodes">Список узлов TreeVeiew, в который добавляется узел.</param>
+        /// <param name="isblNode">Добавляемый элемент разработки.</param>
 		void LoadSubNodes(TreeNodeCollection treeNodes, Node isblNode)
 		{
 			if(isblNode != null && isblNode.Visible)
 			{
 				TreeNode treeNode = treeNodes.Add(isblNode.Name);
-				if(isblNode.Text != null)
-				{
-					treeNode.Tag = isblNode.Text;
-				}
+                treeNode.Tag = isblNode;
+                isblNode.Tag = treeNode;
 				if(isblNode.Nodes != null)
 				{
 					foreach(Node isblSubNode in isblNode.Nodes)
@@ -153,8 +202,60 @@ namespace ISBLScan.ViewCode
 				}
 			}
 		}
-		
-		bool Conenct()
+
+        void ClearSearchStatus(List<Node> isblNodes)
+        {
+            if (isblNodes != null)
+            {
+                foreach (Node node in isblNodes)
+                {
+                    if (node != null)
+                    {
+                        node.IsMatch = false;
+                        node.IsContainsMatchedNode = false;
+                        ClearSearchStatus(node.Nodes);
+                    }
+                }
+            }
+        }
+
+        void RefreshTreeView(List<Node> isblNodes)
+        {
+            if (isblNodes != null)
+            {
+                foreach (Node node in isblNodes)
+                {
+                    if (node != null)
+                    {
+                        TreeNode treeNode = node.Tag as TreeNode;
+                        if (node.IsMatch)
+                        {
+                            treeNode.Checked = true;
+                            treeNode.ForeColor = Color.Black;
+                        }
+                        else
+                        {
+                            treeNode.Checked = false;
+                            if (node.IsContainsMatchedNode)
+                            {
+                                treeNode.ForeColor = Color.Black;
+                            }
+                            else
+                            {
+                                treeNode.ForeColor = Color.Gray;
+                            }
+                        }
+                        RefreshTreeView(node.Nodes);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Установка соединения с базой данных SQL Server
+        /// </summary>
+        /// <returns></returns>
+		bool Connect()
 		{
 			bool connect;
 			if(checkBoxWinAuth.Checked)
@@ -181,26 +282,69 @@ namespace ISBLScan.ViewCode
 			return connect;
 		}
 		
+        /// <summary>
+        /// Загрузка элементов разработки из базы данных
+        /// </summary>
 		void GetISBL()
 		{
 			ISBLNodes = isblLoader.Load();
-			treeViewResults.Nodes.Clear();
-			foreach(Node isblNode in ISBLNodes)
-			{
-				LoadSubNodes(this.treeViewResults.Nodes, isblNode);
-			}
+            CountOfISBLNodes = 0;
+            int countNotNullNodes = 0;
+            foreach (Node node in ISBLNodes)
+            {
+                if (node != null)
+                {
+                    countNotNullNodes++;
+                    CountOfISBLNodes++;
+                    CountOfISBLNodes += node.ChildCount;
+                }
+            }
+            if (countNotNullNodes == 0)
+            {
+                string loginSQLUser = this.textBoxLogin.Text;
+                if (this.checkBoxWinAuth.Checked)
+                {
+                    loginSQLUser = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                }
+                else
+                {
+                    loginSQLUser = this.textBoxLogin.Text;
+                }
+                string text = string.Format(
+@"В выбранной базе данных ""{0}"" сервера ""{1}"" отсутствуют таблицы разработки.
+Или у пользователя с логином ""{2}"" нет прав на просмотр содержимого таблиц разработки в указанной базе данных."
+                , this.textBoxDB.Text
+                , this.textBoxSQLServer.Text
+                , loginSQLUser
+);
+                string caption = "Разработка не загружена";
+                MessageBoxButtons buttons = MessageBoxButtons.OK;
+                MessageBoxIcon icon = MessageBoxIcon.Information;
+                //MessageBoxDefaultButton defaultButton = MessageBoxDefaultButton.Button1;
+                MessageBox.Show(text, caption, buttons, icon);
+            }
+            else
+            {
+                treeViewResults.Nodes.Clear();
+                foreach (Node isblNode in ISBLNodes)
+                {
+                    LoadSubNodes(this.treeViewResults.Nodes, isblNode);
+                }
+            }
 		}
 		
+        /// <summary>
+        /// Соединение с SQL Server и загрузка элементов разработки из базы данных
+        /// </summary>
 		void ConnectAndGetISBL()
 		{
 				if((textBoxSQLServer.Text.Trim() != "")&&(textBoxDB.Text.Trim() != "")&&
 			   		(checkBoxWinAuth.Checked || (!checkBoxWinAuth.Checked && textBoxLogin.Text.Trim() != ""))
 			  	)
 				{
-					if(Conenct())
+					if(Connect())
 					{
 						GetISBL();
-						buttonRefresh.Enabled = true;
 						buttonSearch.Enabled = true;
 					}
 					else
@@ -236,31 +380,175 @@ namespace ISBLScan.ViewCode
 					}
 				}			
 		}
+
+        /// <summary>
+        /// Нажатие кнопки "Conact and Load ISBL"
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
 		void ButtonConnectClick(object sender, EventArgs e)
 		{
 			 ConnectAndGetISBL();
 		}
 		
+        /// <summary>
+        /// Выбор узла в дереве разработки
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
 		void TreeViewResultsAfterSelect(object sender, TreeViewEventArgs e)
 		{
 			if(e.Node.Tag != null)
 			{				
-				textEditorControlISBL.Enabled = false;
 				textEditorControlISBL.IsReadOnly = true;
-				textEditorControlISBL.Document.TextContent = e.Node.Tag.ToString();
-				textEditorControlISBL.Enabled = true;
-				MarkSearchStrings(textBoxSearch.Text);
-
+                Node node = e.Node.Tag as Node;
+                textEditorControlISBL.Document.TextContent = node.Text;
+                MarkSearchStrings();
+                if (node.LastUpdate != null)
+                {
+                    toolStripStatusLabelLastUpd.Text = node.LastUpdate.Value.ToString("dd.MM.yyyy hh:mm:ss");
+                }
+                else
+                {
+                    toolStripStatusLabelLastUpd.Text = "00.00.0000 00:00:00";
+                }
+                toolStripStatusLabelSelectedElement.Text = node.Name;
 			}
 			else
 			{
 				textEditorControlISBL.Document.TextContent = "";
-				textEditorControlISBL.Enabled = false;
 			}
 		}
-		
+
+        /// <summary>
+        /// Проверка списка регулярных выражений на корректность и возфрат списка строк корректных регулярных выражений
+        /// </summary>
+        /// <returns></returns>
+        string[] checkRegExpFormat()
+        {
+            string[] searchStrs = ActiveSearchStringControl.Text.Split(
+                new string[] { ActiveSearchStringControl.TextEditorProperties.LineTerminator }
+                , StringSplitOptions.RemoveEmptyEntries
+                );
+            List<string> regExpResultList = new List<string>();
+            ActiveSearchStringControl.Document.MarkerStrategy.RemoveAll((marker) => { return true; });
+            ActiveSearchStringControl.Document.BookmarkManager.RemoveMarks((bookmark) => { return true; });
+            bool errorExist = false;
+            for (int indexRegExpCandidate = 0; indexRegExpCandidate < ActiveSearchStringControl.Document.TotalNumberOfLines; indexRegExpCandidate++)
+            {
+                LineSegment segment = ActiveSearchStringControl.Document.GetLineSegment(indexRegExpCandidate);
+                string regExpCandidateString = ActiveSearchStringControl.Document.GetText(segment);
+                try
+                {
+                    if (!String.IsNullOrEmpty(regExpCandidateString.Trim()))
+                    {
+                        Regex regEx = new Regex(regExpCandidateString, RegexOptions.Compiled);
+                        regExpResultList.Add(regExpCandidateString);
+                    }
+                }
+                catch (System.ArgumentException ex)
+                {
+                    TextMarker marker = new TextMarker(
+                        segment.Offset
+                        , segment.Length
+                        , TextMarkerType.WaveLine
+                        , Color.Red
+                        , Color.DarkRed
+                        );
+                    marker.ToolTip = ex.Message;
+                    ActiveSearchStringControl.Document.MarkerStrategy.AddMarker(marker);
+
+                    Bookmark mark = new Bookmark(
+                        ActiveSearchStringControl.Document
+                        , ActiveSearchStringControl.Document.OffsetToPosition(segment.Offset)
+                        , true);
+                    ActiveSearchStringControl.Document.BookmarkManager.AddMark(mark);
+                    errorExist = true;
+                }
+            }
+            if (errorExist)
+            {
+                ActiveSearchStringControl.Refresh();
+            }
+            return regExpResultList.ToArray();
+        }
+
+
+
+        /// <summary>
+        /// Рекурсивный поиск по дереву разработки
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="searchStrArray"></param>
+        /// <param name="caseSensitive"></param>
+        /// <param name="regExp"></param>
+        /// <returns></returns>
+        bool FilterNode(Node node, string[] searchStrArray, bool caseSensitive, bool regExp)
+        {
+            bool isFound = false;
+            //Сначала выделим текущий элемент так, как будто в нём ничего не найдено
+            node.IsMatch = false;
+            if (node.Nodes != null)
+            {
+                foreach (Node subNode in node.Nodes)
+                {
+                    if (FilterNode(subNode, searchStrArray, caseSensitive, regExp))
+                    {
+                        node.IsContainsMatchedNode = true;
+                        isFound = true;
+                    }
+                }
+            }
+            {
+                string isblText = node.Text;
+                string nodeName = node.Name;
+                if (regExp)
+                {
+                    RegexOptions regExpOptions = caseSensitive ? RegexOptions.Compiled : RegexOptions.Compiled | RegexOptions.IgnoreCase;
+                    foreach (string searchPhrase in searchStrArray)
+                    {
+                        Regex regEx = null;
+                        if (dictRegEx.ContainsKey(searchPhrase))
+                        {
+                            regEx = dictRegEx[searchPhrase];
+                        }
+                        else
+                        {
+                            regEx = new Regex(searchPhrase, regExpOptions);
+                            dictRegEx.Add(searchPhrase, regEx);
+                        }
+                        if ( (isblText != null && regEx.IsMatch(isblText)) || regEx.IsMatch(nodeName))
+                        {
+                            node.IsMatch = true;
+                            isFound = true;
+                        }
+                    }
+                }
+                else
+                {
+                    StringComparison comparation = caseSensitive ? StringComparison.CurrentCulture : StringComparison.CurrentCultureIgnoreCase;
+                    foreach (string searchPhrase in searchStrArray)
+                    {
+                        //Пропуск пустых поисковых строк
+                        if (
+                            (isblText != null && isblText.IndexOf(searchPhrase, 0, comparation) > 0) ||
+                            (nodeName != null && nodeName.IndexOf(searchPhrase, 0, comparation) > 0)
+                            )
+                        {
+                            node.IsMatch = true;
+                            isFound = true;
+                        }
+                    }
+                }
+            }
+            CountOfProcessedISBLNodes++;
+            int procent = (100 * CountOfProcessedISBLNodes) / CountOfISBLNodes;
+            backgroundWorkerFind.ReportProgress(procent);
+            return isFound;
+        }
+
 		//Рекурсивный поиск по дереву разработки
-		bool FilterNode(TreeNode node, string searchStrs)
+		bool FilterNode(TreeNode node, string[] searchStrArray, bool caseSensitive, bool regExp)
 		{
 			bool isFound = false;
 			//Сначала выделим текущий элемент так, как будто в нём ничего не найдено
@@ -270,512 +558,237 @@ namespace ISBLScan.ViewCode
 			{
 				foreach(TreeNode subNode in node.Nodes)
 				{
-					if(FilterNode(subNode, searchStrs))
+                    if (FilterNode(subNode, searchStrArray, caseSensitive, regExp))
 					{
 						node.ForeColor = Color.Black;
 						isFound = true;
 					}
 				}
 			}
-			if(node.Tag != null)
+			//if(node.Tag != null)
 			{
 				//RegexOptions ro = RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase;
 				//Разделение поисковых фраз по строкам
-				char[] arrDelimeters = {'\n', '\t', ' ', '\r'};
-				string[] searchPhrases = searchStrs.ToUpper().Split(arrDelimeters);
-				string isblText = node.Tag.ToString().ToUpper();
-				string nodeName = node.Name;
-				foreach(string searchPhrase in searchPhrases)
-				{
-					//Пропуск пустых поисковых строк
-					if(searchPhrase.Trim() != "")
-					{
-						if(
-						   (isblText.Contains(searchPhrase.Trim()) ) ||
-						   (nodeName.Contains(searchPhrase.Trim()) ) )
-						{
-							node.ForeColor = Color.Black;
-							node.Checked = true;
-							isFound = true;
-						}				
-					}
-				}
+                string isblText = node.Tag != null ? node.Tag.ToString() : "";
+                string nodeName = node.Name;
+                if (regExp)
+                {
+                    RegexOptions regExpOptions = caseSensitive ? RegexOptions.Compiled : RegexOptions.Compiled | RegexOptions.IgnoreCase;
+                    foreach (string searchPhrase in searchStrArray)
+                    {
+                        Regex regEx = null;
+                        if (dictRegEx.ContainsKey(searchPhrase))
+                        {
+                            regEx = dictRegEx[searchPhrase];
+                        }
+                        else
+                        {
+                            regEx = new Regex(searchPhrase, regExpOptions);
+                            dictRegEx.Add(searchPhrase, regEx);
+                        }
+                        if(regEx.IsMatch(isblText) || regEx.IsMatch(nodeName))
+                        {
+                            node.ForeColor = Color.Black;
+                            node.Checked = true;
+                            isFound = true;
+                        }
+                    }
+                }
+                else
+                {
+                    StringComparison comparation = caseSensitive ? StringComparison.CurrentCulture : StringComparison.CurrentCultureIgnoreCase;
+                    foreach (string searchPhrase in searchStrArray)
+                    {
+                        //Пропуск пустых поисковых строк
+                        if (
+                            (isblText.IndexOf(searchPhrase, 0, comparation) > 0) ||
+                            (nodeName.IndexOf(searchPhrase, 0, comparation) > 0)
+                            )
+                        {
+                            node.ForeColor = Color.Black;
+                            node.Checked = true;
+                            isFound = true;
+                        }
+                    }
+                }
 			}
+            CountOfProcessedISBLNodes++;
+            backgroundWorkerFind.ReportProgress((100 * CountOfProcessedISBLNodes) % CountOfISBLNodes);
 			return isFound;
 		}
-		
+
+        /// <summary>
+        /// Возврат всех слов из текста реактора поискового запроса, 
+        /// разделителями слов в тексте выступают пробельные символы.
+        /// </summary>
+        /// <returns></returns>
+        string[] GetSearchStrArray()
+        {
+            string[] searchStrs;
+            if (checkBoxFindRegExp.Checked)
+            {
+                searchStrs = checkRegExpFormat();
+            }
+            else
+            {
+                ActiveSearchStringControl.Document.MarkerStrategy.RemoveAll((marker) => { return true; });
+                ActiveSearchStringControl.Document.BookmarkManager.RemoveMarks((bookmark) => { return true; });
+                ActiveSearchStringControl.Refresh();
+                string[] searchLineStrs = ActiveSearchStringControl.Text.Split(
+                new string[] { ActiveSearchStringControl.TextEditorProperties.LineTerminator }
+                , StringSplitOptions.RemoveEmptyEntries
+                );
+                char[] delimeters = { ' ', '\t', '\n', '\r' };
+                List<string> searchWords = new List<string>();
+                foreach (string searchLine in searchLineStrs)
+                {
+                    foreach (string searchWord in searchLine.Split(delimeters, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        searchWords.Add(searchWord.Trim());
+                    }
+                }
+                searchStrs = searchWords.ToArray();
+            }
+            return searchStrs;
+        }
+
+        /// <summary>
+        /// Нажатие кнопки "Find"
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
 		void ButtonFilterClick(object sender, EventArgs e)
 		{
-			textBoxSearch.Enabled = false;
-			buttonSearch.Enabled = false;
-			foreach(TreeNode node in treeViewResults.Nodes)
-			{
-				FilterNode(node, textBoxSearch.Text);
-			}
-			buttonSearch.Enabled = true;
-			textBoxSearch.Enabled = true;
+            if (backgroundWorkerFind.IsBusy != true)
+            {
+                CountOfProcessedISBLNodes = 0; 
+                buttonSearch.Enabled = false;
+                searchStrs = GetSearchStrArray();
+                ClearSearchStatus(ISBLNodes);
+                RefreshTreeView(ISBLNodes);
+                backgroundWorkerFind.RunWorkerAsync();
+            }
 		}
 		
-		
-//		/// <summary>
-//		///Подстветка специальных конструкций в тексте 
-//		/// </summary>
-//		private void HighLightSpecialConstruction(ref int posStart, ref int posEnd)
-//		{
-//			//Если текущая позиция в начале строки
-//			if((posStart == 0)||((posStart > 0)&&(richTextBoxResult.Text.Substring(posStart-1, 1)==System.Environment.NewLine)))
-//			{
-//				/********************************************************************
-//				 * Подсветка специальных конструкций (заголовков, вставленных программой)
-//				 ********************************************************************/
-//				if((posStart+4<richTextBoxResult.Text.Length)&&(richTextBoxResult.Text.Substring(posStart, 4)=="-=[ "))
-//				{
-//					posEnd = richTextBoxResult.Text.IndexOf(" ]=-", posStart+1);
-//					if(posEnd > posStart)
-//					{
-//						posEnd = posEnd+4;
-//						richTextBoxResult.Select(posStart, posEnd-posStart);
-//						richTextBoxResult.SelectionFont = this.fontBoldUnderline;
-//						richTextBoxResult.SelectionBackColor = Color.LightGray;
-//						posStart = posEnd;
-//					}
-//				}
-//			}
-//		}
 
-		public void MarkSearchStrings (string searchStr)
-		{
-			textEditorControlISBL.Document.MarkerStrategy.RemoveAll((marker) => { return true; });
+        /// <summary>
+        /// Подсветка строк поиска в текущем тексте разработки
+        /// </summary>
+        public void MarkSearchStrings()
+        {
+            string[] searchStrs = GetSearchStrArray();
+            textEditorControlISBL.Document.MarkerStrategy.RemoveAll((marker) => { return true; });
+            textEditorControlISBL.Document.BookmarkManager.RemoveMarks((bookmark) => { return true; });
+
+            if (checkBoxFindRegExp.Checked)
+            {
+                MarkSearchStringsRegExp(searchStrs, checkBoxFindCaseSensitive.Checked);
+            }
+            else
+            {
+                MarkSearchStrings(searchStrs, checkBoxFindCaseSensitive.Checked);
+            }
+            textEditorControlISBL.Refresh();
+        }
+
+        public void MarkSearchStringsRegExp(string[] regExpArray, bool caseSensitive)
+        {
+            RegexOptions regExpOptions = caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
+
 			//Подсветка искомого текста
-			if(searchStr != "")
-			{
-				String text = textEditorControlISBL.Document.TextContent.Replace("\r", "\n");
+            if (regExpArray.Length > 0)
+            {
+                String text = textEditorControlISBL.Document.TextContent;
+                for (int indexRegExpStrings = 0; indexRegExpStrings < regExpArray.Length; indexRegExpStrings++)
+                {
+                    string hlStr = regExpArray[indexRegExpStrings];
+                    if(hlStr != "")
+                    {
+                        Regex regExp = new Regex(hlStr, regExpOptions);
+                        MatchCollection regExpFindResults = regExp.Matches(text);
+                        foreach(Match match in regExpFindResults)
+                        {
+                            TextMarker marker = new TextMarker(
+                                match.Index
+                                , match.Length
+                                , TextMarkerType.SolidBlock
+                                , Color.FromArgb(255, 156, 255, 156) // светло-зелёный
+                                , Color.FromArgb(255, 18, 10, 143) // ультрамарин
+                                );
+                            marker.ToolTip = hlStr;
+							textEditorControlISBL.Document.MarkerStrategy.AddMarker(marker);
 
-				//Подстветка строк
-				int posEnd = 0;
-				int posStart = 0;
+                            Bookmark mark = new Bookmark(
+                                textEditorControlISBL.Document
+                                , textEditorControlISBL.Document.OffsetToPosition(match.Index)
+                                , false);
+                            textEditorControlISBL.Document.BookmarkManager.AddMark(mark);
+                        }
+                    }
+                }
+            }
 
-				char[] charsDelimeters = {'\n', '\t', ' ', '\r'};
-				string[] strs = searchStr.Split(charsDelimeters);
-				int minumumPosStart = 0;
-				int indexStrs = 0;
-				for(indexStrs = 0; indexStrs < strs.Length; indexStrs++)
-				{
-					string hlStr = strs[indexStrs].Trim();
-					if(hlStr != "")
-					{
-						posEnd = 0;
-						posStart = text.IndexOf(hlStr, 0, StringComparison.OrdinalIgnoreCase);
-						while(posStart >= 0)
-						{
-							if((minumumPosStart == 0) || (minumumPosStart > posStart))
-							{
-								minumumPosStart = posStart;
-							}
-							posEnd = posStart + hlStr.Length-1;
-							if(posEnd >= 0)
-							{
-								TextMarker marker = new TextMarker(
-									posStart
-									, posEnd-posStart+1
-									, TextMarkerType.SolidBlock
-									, Color.DarkGoldenrod
-									, Color.Yellow);
-								textEditorControlISBL.Document.MarkerStrategy.AddMarker(marker);
-								posStart = text.IndexOf(hlStr, posEnd+1,  StringComparison.OrdinalIgnoreCase);
-							}
-							else
-							{
-								posStart = -1;
-							}
-						}
-					}
-				}
-			}
+        }
+
+        public void MarkSearchStrings(string[] findArray, bool caseSensitive)
+		{
+            StringComparison comparation = caseSensitive ? StringComparison.CurrentCulture : StringComparison.CurrentCultureIgnoreCase;
+
+			//Подсветка искомого текста
+            if (findArray.Length > 0)
+            {
+                String text = textEditorControlISBL.Document.TextContent;
+
+                foreach (string findStr in findArray)
+                {
+                    //Подстветка строк
+                    int posEnd = 0;
+                    int posStart = 0;
+
+                    char[] charsDelimeters = { '\n', '\t', ' ', '\r' };
+                    string[] strs = findStr.Split(charsDelimeters, StringSplitOptions.RemoveEmptyEntries);
+
+                    foreach (string str in strs)
+                    {
+                        string hlStr = str.Trim();
+                        if (hlStr != "")
+                        {
+                            posEnd = 0;
+                            posStart = text.IndexOf(hlStr, 0, comparation);
+                            while (posStart >= 0)
+                            {
+                                posEnd = posStart + hlStr.Length - 1;
+                                if (posEnd >= 0)
+                                {
+                                    TextMarker marker = new TextMarker(
+                                        posStart
+                                        , posEnd - posStart + 1
+                                        , TextMarkerType.SolidBlock
+                                        , Color.FromArgb(255, 156, 255, 156) // светло-зелёный
+                                        , Color.FromArgb(255, 18, 10, 143) // ультрамарин
+                                        );
+                                    marker.ToolTip = hlStr;
+                                    textEditorControlISBL.Document.MarkerStrategy.AddMarker(marker);
+
+                                    Bookmark mark = new Bookmark(
+                                        textEditorControlISBL.Document
+                                        , textEditorControlISBL.Document.OffsetToPosition(posStart)
+                                        , false);
+                                    textEditorControlISBL.Document.BookmarkManager.AddMark(mark);
+
+                                    posStart = text.IndexOf(hlStr, posEnd + 1, comparation);
+                                }
+                                else
+                                {
+                                    posStart = -1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 		}
 		
-//		/// <summary>
-//		///Подсветка синтаксиса 
-//		/// </summary>
-//		/// <param name="searchStr">
-//		/// A <see cref="System.String"/>
-//		/// </param>
-//		/// <param name="treeNode">
-//		/// A <see cref="TreeNode"/>
-//		/// </param>
-//		public void HighLight(string searchStr,  TreeNode treeNode)
-//		{
-//			String text = richTextBoxResult.Text.Replace("\r", "\n");
-//			string strDelimeters = "%^&*()-=+\\/;:<>.,?[]{}\n\t ";
-//
-//			this.fontBold = new Font(richTextBoxResult.SelectionFont, FontStyle.Bold);
-//			this.fontBoldUnderline = new Font(richTextBoxResult.SelectionFont, FontStyle.Bold | FontStyle.Underline);
-//			
-//			//Подстветка строк
-//			int posEnd = 0;
-//			int posStart = 0;
-//			
-//			string[] keywords = {"if", "endif", "если", "конецесли", "else", "иначе",
-//				"while", "endwhile", "пока", "конецпока",
-//				"try", "catch", "endtry",
-//				"foreach", "endforeach", "in", "все", "конецвсе", "в"
-//			};
-//			string[] operators = {"or", "или", 
-//				"and", "и",
-//				"not", "не"
-//			};
-//			string[] constants = {
-//				//Основные константы
-//				"true", "false",
-//				"cr", "tab",
-//				"YES_VALUE", "NO_VALUE",
-//				"null", "nil",
-//				//Запуск внешних приложений
-//				"smHidden", "smMaximized", "smMinimized", "smNormal", "wmNo", "wmYes",
-//				//Работа с диалоговыми окнами
-//				"cbsCommandLinks", "cbsDefault", "mrCancel", "mrOk", "ATTENTION_CAPTION", "CONFIRMATION_CAPTION", "ERROR_CAPTION", "INFORMATION_CAPTION",
-//				//Работа с ISBL-редактором
-//				"ISBL_SYNTAX", "NO_SYNTAX",
-//				//Работа с электронными документами
-//				"EDOC_VERSION_ACTIVE_STAGE_CODE", "EDOC_VERSION_DESIGN_STAGE_CODE", "EDOC_VERSION_OBSOLETE_STAGE_CODE",
-//				//Работа с ЭЦП и шифрованием
-//				"cpDataEnciphermentEnabled", "cpDigitalSignatureEnabled", "cpID", "cpIssuer", "cpSerial", "cpSubjectName", "cpSubjSimpleName", "cpValidFromDate", "cpValidToDate",
-//				//События объектов
-//				"dseBeforeOpen", "dseAfterOpen", "dseBeforeClose", "dseAfterClose", "dseOnValidDelete", "dseBeforeDelete", "dseAfterDelete", "dseAfterDeleteOutOfTransaction", "dseOnDeleteError", "dseBeforeInsert", "dseAfterInsert", "dseOnValidUpdate", "dseBeforeUpdate", "dseOnUpdateRatifiedRecord", "dseAfterUpdate", "dseAfterUpdateOutOfTransaction", "dseOnUpdateError", "dseAfterScroll", "dseOnOpenRecord", "dseOnCloseRecord", "dseBeforeCancel", "dseAfterCancel", "reOnChange",
-//				//Идентификаторы правил
-//				"AUTO_NUMERATION_RULE_ID", "CANT_CHANGE_ID_REQUISITE_RULE_ID", "CANT_CHANGE_OURFIRM_REQUISITE_RULE_ID", "CHECK_CHANGING_REFERENCE_RECORD_USE_RULE_ID", "CHECK_CODE_REQUISITE_RULE_ID", "CHECK_DELETING_REFERENCE_RECORD_USE_RULE_ID", "CHECK_FILTRATER_CHANGES_RULE_ID", "CHECK_REFERENCE_INTERVAL_RULE_ID", "CHECK_REQUIRED_REQUISITES_FULLNESS_RULE_ID", "MAKE_RECORD_UNRATIFIED_RULE_ID", "RESTORE_AUTO_NUMERATION_RULE_ID", "SET_DEFAULT_FIRM_CONTEXT_RULE_ID", "SET_DEPARTMENT_SECTION_BOUNDS_RULE_ID", "SET_FIRM_CONTEXT_FROM_RECORD_RULE_ID", "SET_FIRST_RECORD_IN_LIST_FORM_RULE_ID", "SET_IDSPS_VALUE_RULE_ID", "SET_NEXT_CODE_VALUE_RULE_ID", "SET_OURFIRM_BOUNDS_RULE_ID", "SET_OURFIRM_REQUISITE_RULE_ID",
-//				//Параметры объектов
-//				"SHOW_RECORD_PROPERTIES_FORM", "PREVIOUS_CARD_TYPE_NAME",
-//				//Типы объектов системы в таблице связей
-//				"EDOCUMENT_LINK_KIND", "FOLDER_LINK_KIND", "TASK_LINK_KIND", "JOB_LINK_KIND", "DOCUMENT_LINK_KIND", "REFERENCE_LINK_KIND",
-//				//Дополнительные типы блокируемых объектов
-//				"EDOCUMENT_VERSION_LOCK_TYPE", "COMPONENT_TOKEN_LOCK_TYPE",
-//				//Прочие константы
-//				"ISBSYSDEV", "USER_NAME_FORMAT",  "MEMORY_DATASET_DESRIPTIONS_FILENAME",  "FILTER_OPERANDS_DELIMITER",  "FILTER_OPERATIONS_DELIMITER", 
-//				//Реквизиты справочников
-//				"SYSREQ_ID", "SYSREQ_STATE", "SYSREQ_NAME", "SYSREQ_NAME_LOCALIZE_ID", "SYSREQ_DESCRIPTION", "SYSREQ_DESCRIPTION_LOCALIZE_ID", "SYSREQ_NOTE", "SYSREQ_CONTENTS", "SYSREQ_CODE", "SYSREQ_TYPE", "SYSREQ_LAST_UPDATE", "SYSREQ_OUR_FIRM", "SYSREQ_LEADER_REFERENCE", "SYSREQ_ORIGINAL_RECORD", "SYSREQ_DOUBLE", "SYSREQ_RECORD_STATUS", "SYSREQ_UNIT", "SYSREQ_UNIT_ID", "SYSREQ_MAIN_RECORD_ID", "SYSREQ_LINE_NUMBER",
-//				//Предопределенные реквизиты электронных документов
-//				"SYSREQ_EDOC_AUTHOR", "SYSREQ_EDOC_CREATED", "SYSREQ_EDOC_EDITOR", "SYSREQ_EDOC_ENCODE_TYPE", "SYSREQ_EDOC_ENCRYPTION_PLUGIN_NAME", "SYSREQ_EDOC_EXPORTER", "SYSREQ_EDOC_EXPORT_DATE", "SYSREQ_EDOC_KIND", "SYSREQ_EDOC_LIFE_STAGE_NAME", "SYSREQ_EDOC_LOCKED_FOR_SERVER_CODE", "SYSREQ_EDOC_MODIFIED", "SYSREQ_EDOC_NAME", "SYSREQ_EDOC_NOTE", "SYSREQ_EDOC_SIGNATURE_TYPE", "SYSREQ_EDOC_SIGNED", "SYSREQ_EDOC_STORAGE", "SYSREQ_EDOC_TEXT_MODIFIED", "SYSREQ_EDOC_ACCESS_TYPE", "SYSREQ_EDOC_QUALIFIED_ID", "SYSREQ_EDOC_SESSION_KEY", "SYSREQ_EDOC_SESSION_KEY_ENCRYPTION_PLUGIN_NAME", "SYSREQ_EDOC_VERSION_AUTHOR", "SYSREQ_EDOC_VERSION_CRC", "SYSREQ_EDOC_VERSION_DATA", "SYSREQ_EDOC_VERSION_EDITOR", "SYSREQ_EDOC_VERSION_EXPORT_DATE", "SYSREQ_EDOC_VERSION_HIDDEN", "SYSREQ_EDOC_VERSION_LIFE_STAGE", "SYSREQ_EDOC_VERSION_LOCKED_FOR_SERVER_CODE", "SYSREQ_EDOC_VERSION_MODIFIED", "SYSREQ_EDOC_VERSION_NOTE", "SYSREQ_EDOC_VERSION_SIGNATURE_TYPE", "SYSREQ_EDOC_VERSION_SIGNED", "SYSREQ_EDOC_VERSION_SIZE", "SYSREQ_EDOC_VERSION_SOURCE", "SYSREQ_EDOC_VERSION_TEXT_MODIFIED",
-//
-//				"SYSREQ_CODE", "SYSREQ_CONTENTS", "SYSREQ_EDOC_NAME", "SYSREQ_ID", "SYSREQ_EDOC_KIND", "SYSRES_SBDATA",
-//				"References", "EDocuments", "Application",
-//				"Object", "Sender", 
-//				};
-//
-//			while(posStart < text.Length)
-//			{
-//				HighLightSpecialConstruction(ref posStart, ref posEnd);
-//				/*
-//				//Если текущая позиция в начале строки
-//				if((posStart == 0)||((posStart > 0)&&(text.Substring(posStart-1, 1)==System.Environment.NewLine)))
-//				{
-//					// ----------------------------------------------------------------------
-//					// Подсветка специальных конструкций (заголовков, вставленных программой)
-//					// ----------------------------------------------------------------------
-//					if((posStart+4<text.Length)&&(text.Substring(posStart, 4)=="-=[ "))
-//					{
-//						posEnd = text.IndexOf(" ]=-", posStart+1);
-//						if(posEnd > posStart)
-//						{
-//							posEnd = posEnd+4;
-//							richTextBoxResult.Select(posStart, posEnd-posStart);
-//							richTextBoxResult.SelectionFont = fontBoldUnderline;
-//							richTextBoxResult.SelectionBackColor = Color.LightGray;
-//							posStart = posEnd;
-//						}
-//					}
-//				}
-//				*/
-//				/********************************************************************
-//				 * Подсветка ключевых слов
-//				 ********************************************************************/
-//				foreach(string keyword in keywords)
-//				{
-//					if(posStart+keyword.Length <= text.Length)
-//					{
-//						string testStr = text.Substring(posStart, keyword.Length).ToLower();
-//						if(testStr == keyword.ToLower())
-//						{
-//							bool isKeyword = true;
-//							
-//							if(posStart > 0)
-//							{
-//								string prevChar = text.Substring(posStart-1, 1);
-//								if(!(strDelimeters.Contains(prevChar)))
-//								{
-//									isKeyword = false;
-//								}
-//							}
-//							
-//							if(posStart+keyword.Length < text.Length-1)
-//							{
-//								string postChar = text.Substring(posStart+keyword.Length, 1);
-//								if(!(strDelimeters.Contains(postChar)))
-//								{
-//									isKeyword = false;
-//								}
-//							}
-//							if(isKeyword)
-//							{
-//								posEnd = posStart+keyword.Length;
-//								richTextBoxResult.Select(posStart, posEnd-posStart);
-//								richTextBoxResult.SelectionFont = fontBold;
-//								posStart = posEnd;
-//							}
-//						}
-//					}
-//				}
-//				/********************************************************************
-//				 * Подсветка операций
-//				 ********************************************************************/
-//				foreach(string keyword in operators)
-//				{
-//					if(posStart+keyword.Length <= text.Length)
-//					{
-//						string testStr = text.Substring(posStart, keyword.Length).ToLower();
-//						if(testStr == keyword.ToLower())
-//						{
-//							bool isKeyword = true;
-//							
-//							if(posStart > 0)
-//							{
-//								string prevChar = text.Substring(posStart-1, 1);
-//								if(!(strDelimeters.Contains(prevChar)))
-//								{
-//									isKeyword = false;
-//								}
-//							}
-//							
-//							if(posStart+keyword.Length < text.Length-1)
-//							{
-//								string postChar = text.Substring(posStart+keyword.Length, 1);
-//								if(!(strDelimeters.Contains(postChar)))
-//								{
-//									isKeyword = false;
-//								}
-//							}
-//							if(isKeyword)
-//							{
-//								posEnd = posStart+keyword.Length;
-//								richTextBoxResult.Select(posStart, posEnd-posStart);
-//								richTextBoxResult.SelectionFont = fontBold;
-//								richTextBoxResult.SelectionColor = Color.LightSeaGreen;
-//								posStart = posEnd;
-//							}
-//						}
-//					}
-//				}
-//				/********************************************************************
-//				 * Подсветка констант
-//				 ********************************************************************/
-//				foreach(string keyword in constants)
-//				{
-//					if(posStart+keyword.Length <= text.Length)
-//					{
-//						string testStr = text.Substring(posStart, keyword.Length).ToLower();
-//						if(testStr == keyword.ToLower())
-//						{
-//							bool isKeyword = true;
-//							
-//							if(posStart > 0)
-//							{
-//								string prevChar = text.Substring(posStart-1, 1);
-//								if(!(strDelimeters.Contains(prevChar)))
-//								{
-//									isKeyword = false;
-//								}
-//							}
-//							
-//							if(posStart+keyword.Length < text.Length-1)
-//							{
-//								string postChar = text.Substring(posStart+keyword.Length, 1);
-//								if(!(strDelimeters.Contains(postChar)))
-//								{
-//									isKeyword = false;
-//								}
-//							}
-//							if(isKeyword)
-//							{
-//								posEnd = posStart+keyword.Length;
-//								richTextBoxResult.Select(posStart, posEnd-posStart);
-//								richTextBoxResult.SelectionFont = fontBold;
-//								richTextBoxResult.SelectionColor = Color.DarkBlue;
-//								posStart = posEnd;
-//							}
-//						}
-//					}
-//				}
-//				
-//				if(posStart == text.Length)
-//				{
-//					break;
-//				}
-//				switch (text.Substring(posStart, 1))
-//				{
-//					case ";":
-//							posEnd = posStart;
-//							richTextBoxResult.Select(posStart, 1);
-//							richTextBoxResult.SelectionColor = Color.SeaGreen;
-//						break;
-//					case "&":
-//					case "+":
-//					case "-":
-//					case "*":
-//							posEnd = posStart;
-//							richTextBoxResult.Select(posStart, 1);
-//							richTextBoxResult.SelectionFont = fontBold;
-//						break;
-//					case "=":
-//					case "<":
-//					case ">":
-//							posEnd = posStart;
-//							richTextBoxResult.Select(posStart, 1);
-//							richTextBoxResult.SelectionColor = Color.SteelBlue;
-//						break;
-//					case "(":
-//					case ")":
-//					case "[":
-//					case "]":
-//							posEnd = posStart;
-//							richTextBoxResult.Select(posStart, 1);
-//							richTextBoxResult.SelectionFont = fontBold;
-//						break;
-//					case "0":
-//					case "1":
-//					case "2":
-//					case "3":
-//					case "4":
-//					case "5":
-//					case "6":
-//					case "7":
-//					case "8":
-//					case "9":
-//						bool isNum = false;
-//						if(posStart == 0)
-//						{
-//							isNum = true;
-//						}
-//						else
-//						{
-//							string prevChar = text.Substring(posStart-1, 1);
-//							if(strDelimeters.Contains(prevChar))
-//							{
-//								isNum = true;
-//							}
-//						}
-//						if(isNum)
-//						{
-//							string strDigits = "0123456789";
-//							posEnd = posStart;
-//							while((posEnd < text.Length) && strDigits.Contains(text.Substring(posEnd, 1)))
-//							{
-//								posEnd = posEnd + 1;
-//							}
-//							if(!strDigits.Contains(text.Substring(posEnd, 1)))
-//							{
-//								posEnd = posEnd - 1;
-//							}
-//							richTextBoxResult.Select(posStart, posEnd-posStart+1);
-//							richTextBoxResult.SelectionColor = Color.DarkRed;
-//							posStart = posEnd;
-//						}
-//						break;
-//					case "'":
-//						posEnd = text.IndexOf("'", posStart+1);
-//						if(posEnd > posStart)
-//						{
-//							richTextBoxResult.Select(posStart, posEnd-posStart+1);
-//							richTextBoxResult.SelectionColor = Color.Blue;
-//							posStart = posEnd;
-//						}
-//						break;
-//					case "\"":
-//						posEnd = text.IndexOf("\"", posStart+1);
-//						if(posEnd > posStart)
-//						{
-//							richTextBoxResult.Select(posStart, posEnd-posStart+1);
-//							richTextBoxResult.SelectionColor = Color.Blue;
-//							posStart = posEnd;
-//						}
-//						break;
-//					case "/":
-//						switch(text.Substring(posStart, 2))
-//						{
-//							case "/*":
-//								posEnd = text.IndexOf("*/", posStart+2);
-//								if(posEnd > posStart)
-//								{
-//									richTextBoxResult.Select(posStart, posEnd-posStart+2);
-//									richTextBoxResult.SelectionColor = Color.Green;
-//									posStart = posEnd+1;
-//								}
-//								break;
-//							case "//":
-//								posEnd = text.IndexOf("\n", posStart+1);
-//								if(posEnd >= posStart)
-//								{
-//								}
-//								else
-//								{
-//									posEnd = text.Length;
-//								}
-//								richTextBoxResult.Select(posStart, posEnd-posStart+1);
-//								richTextBoxResult.SelectionColor = Color.Green;
-//								posStart = posEnd;
-//								break;
-//						}
-//						break;
-//				}
-//				
-//				posStart = posStart + 1;
-//			}
-//			
-//			//Подсветка искомого текста
-//			if(searchStr != "")
-//			{
-//				char[] charsDelimeters = {'\n', '\t', ' ', '\r'};
-//				string[] strs = searchStr.Split(charsDelimeters);
-//				int minumumPosStart = 0;
-//				int indexStrs = 0;
-//				for(indexStrs = 0; indexStrs < strs.Length; indexStrs++)
-//				{
-//					string hlStr = strs[indexStrs].Trim();
-//					if(hlStr != "")
-//					{
-//						posEnd = 0;
-//						posStart = text.IndexOf(hlStr, 0, StringComparison.OrdinalIgnoreCase);
-//						while(posStart >= 0)
-//						{
-//							if((minumumPosStart == 0) || (minumumPosStart > posStart))
-//							{
-//								minumumPosStart = posStart;
-//							}
-//							posEnd = posStart + hlStr.Length-1;
-//							if(posEnd >= 0)
-//							{
-//								richTextBoxResult.SelectionStart = posStart;
-//								richTextBoxResult.Select(posStart, posEnd-posStart+1);
-//								richTextBoxResult.SelectionBackColor = Color.Yellow;
-//								richTextBoxResult.SelectionColor = Color.DarkGoldenrod;
-//								richTextBoxResult.SelectionFont = fontBoldUnderline;
-//								posStart = text.IndexOf(hlStr, posEnd+1,  StringComparison.OrdinalIgnoreCase);
-//							}
-//							else
-//							{
-//								posStart = -1;
-//							}
-//						}
-//					}
-//				}
-//				richTextBoxResult.Location = new Point(0,0);
-//				richTextBoxResult.ScrollToCaret();
-//				richTextBoxResult.Location = richTextBoxResult.GetPositionFromCharIndex(minumumPosStart);
-//				richTextBoxResult.ScrollToCaret();
-//			}
-//		}
-//		
-
-
 
 		/// <summary>
 		/// Обработка нажатия клавиши в форме аутентификации на SQL Server
@@ -795,48 +808,11 @@ namespace ISBLScan.ViewCode
 		void TextBoxLoginFormTextChanged(object sender, EventArgs e)
 		{
 			(sender as TextBox).Font = new Font((sender as TextBox).Font, FontStyle.Regular);
-			(sender as TextBox).BackColor = this.textBoxSearch.BackColor;
-			(sender as TextBox).ForeColor = this.textBoxSearch.ForeColor;
+			(sender as TextBox).BackColor = this.textBoxFilter.BackColor;
+            (sender as TextBox).ForeColor = this.textBoxFilter.ForeColor;
 		}
 		
-		void RichTextBoxResultHScroll(object sender, EventArgs e)
-		{
-			
-		}
-		
-		void RichTextBoxResultVScroll(object sender, EventArgs e)
-		{
-			
-		}
-		
-//		void RichTextBoxResult_TextChanged(object sender, System.EventArgs e)
-//		{
-//			if(this.richTextBoxResult.Lines.Length > this.richTextBoxLineNumbers.Lines.Length)
-//			{
-//				for(int index = this.richTextBoxLineNumbers.Lines.Length + 1; index <= this.richTextBoxResult.Lines.Length; index++)
-//				{
-//					this.richTextBoxLineNumbers.AppendText(index.ToString("0000") + System.Environment.NewLine);
-//				}
-//			}
-//			if(this.richTextBoxResult.Lines.Length < this.richTextBoxLineNumbers.Lines.Length)
-//			{
-//				int indexForRemove = this.richTextBoxResult.Lines.Length*(4+System.Environment.NewLine.Length)-1;
-//				if (indexForRemove > 0)
-//				{
-//					//this.richTextBoxLineNumbers.Text.Remove(indexForRemove);
-//				}
-//				else
-//				{
-//					this.richTextBoxLineNumbers.Clear();
-//				}
-//			}
-//			
-//			//Получить координаты первого символа
-//			int indexFirstChar = this.richTextBoxResult.GetCharIndexFromPosition(new System.Drawing.Point(0, 0));
-//			int indexFirstLine = this.richTextBoxResult.GetLineFromCharIndex(indexFirstChar);
-//			//Получить координаты последнего символа
-//			
-//		}
+
 
 		//Рекурсивный поиск по дереву разработки
 		bool FilterNodeByName (Node node, string nameFilter)
@@ -921,6 +897,121 @@ namespace ISBLScan.ViewCode
 			textBoxLogin.Enabled = !checkBoxWinAuth.Checked;
 			textBoxPassword.Enabled = textBoxLogin.Enabled;
 		}
-		
+
+        private void textEditorControlRegExp_TextChanged(object sender, EventArgs e)
+        {
+            timerRegExpFind.Enabled = false;
+            timerRegExpFind.Enabled = true;
+        }
+
+        private void timerRegExpFind_Tick(object sender, EventArgs e)
+        {
+            timerRegExpFind.Enabled = false;
+            MarkSearchStrings();            
+        }
+
+        private void buttonCloseCurrentTab_Click(object sender, EventArgs e)
+        {
+            if (tabControlSarchText.TabCount > 1)
+            {
+                TabPage tabPageForClose = tabControlSarchText.SelectedTab;
+                tabControlSarchText.SelectedIndex = tabControlSarchText.SelectedIndex > 0 ?
+                    tabControlSarchText.SelectedIndex - 1 : 0;
+                tabControlSarchText.Controls.Remove(tabPageForClose);
+            }
+        }
+
+        private void buttonAddNewTab_Click(object sender, EventArgs e)
+        {
+            TabPage tabPageSearchNew = new TabPage(string.Format("Search {0}", tabControlSarchText.TabCount+1));
+
+            ICSharpCode.TextEditor.TextEditorControl textEditor = new ICSharpCode.TextEditor.TextEditorControl();
+            textEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            textEditor.IsReadOnly = false;
+            textEditor.Location = new System.Drawing.Point(3, 3);
+            textEditor.ShowEOLMarkers = true;
+            textEditor.ShowSpaces = true;
+            textEditor.ShowTabs = true;
+            textEditor.Size = new System.Drawing.Size(626, 72);
+            textEditor.TabIndex = 1;
+            textEditor.TextChanged += new System.EventHandler(textEditorControlRegExp_TextChanged);
+
+            tabPageSearchNew.Tag = textEditor;
+            tabPageSearchNew.Controls.Add(textEditor);
+
+            tabControlSarchText.Controls.Add(tabPageSearchNew);
+            tabControlSarchText.SelectedTab = tabPageSearchNew;
+        }
+
+        private void tabControlSarchText_Selecting(object sender, TabControlCancelEventArgs e)
+        {
+            ActiveSearchStringControl = (ICSharpCode.TextEditor.TextEditorControl)tabControlSarchText.SelectedTab.Tag;            
+        }
+
+        private void checkBoxFindRegExp_CheckedChanged(object sender, EventArgs e)
+        {
+            MarkSearchStrings();
+        }
+
+        private void tabControlSarchText_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ActiveSearchStringControl = (ICSharpCode.TextEditor.TextEditorControl)tabControlSarchText.SelectedTab.Tag;
+            MarkSearchStrings();
+        }
+
+        private void checkBoxFindCaseSensitive_CheckedChanged(object sender, EventArgs e)
+        {
+            MarkSearchStrings();
+        }
+
+        private void backgroundWorkerFind_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            BackgroundWorker worker = sender as BackgroundWorker;
+            LastISBLRefreshPercentage = 0;
+
+            foreach (Node node in ISBLNodes)
+            {
+                if (worker.CancellationPending == true)
+                {
+                    e.Cancel = true;
+                    break;
+                }
+                else
+                {
+                    if (node != null)
+                    {
+                        // Perform a time consuming operation and report progress.
+                        FilterNode(node, searchStrs, checkBoxFindCaseSensitive.Checked, checkBoxFindRegExp.Checked);
+                    }
+                }
+            }
+        }
+
+        private void backgroundWorkerFind_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            buttonSearch.Enabled = true;
+            buttonSearch.Text = "Find";
+            RefreshTreeView(ISBLNodes);
+            LastISBLRefreshPercentage = 0;
+        }
+
+        private void backgroundWorkerFind_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            buttonSearch.Text = e.ProgressPercentage.ToString() + "%";
+            if (e.ProgressPercentage > LastISBLRefreshPercentage)
+            {
+                RefreshTreeView(ISBLNodes);
+                LastISBLRefreshPercentage = e.ProgressPercentage;
+            }
+        }
+	
+	
+	void groupBoxSearch_Resize (object sender, System.EventArgs e)
+	{
+		this.buttonAddNewTab.Left = groupBoxSearch.Width - 36;
+		this.buttonCloseCurrentTab.Left = groupBoxSearch.Width - 19;
+
 	}
+	
+    }
 }

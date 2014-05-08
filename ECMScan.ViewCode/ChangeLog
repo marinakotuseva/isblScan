@@ -1,3 +1,25 @@
+2014-05-09  polarnik  <owasp@ya.ru>
+
+	* License.ISBLScan.ViewCode.txt: Rename license file.
+
+	* ISBLFoldingStrategy.cs:
+	* ISBLScan.ViewCode.csproj: 
+
+	* MainForm.Designer.cs: Add buttons for add and close
+	  SearchTabs. Add checkBoxes for Search options.
+
+	* MainForm.cs: Fix search - search in ISBLNodes (not in
+	  TreeView.Nodes).
+	Add Regular Expression search.
+	Add link ISBLNode -> TreeViewNode (field Tag).
+	Add check for RegularExpression correction.
+	Add multiply search tabs support.
+	Remove old code.
+
+	* isbTest.ico:
+	* MainForm.resx:
+	* MainForm.resources: Add icon.
+
 2014-03-30  polarnik  <owasp@ya.ru>
 
 	* License.txt:
