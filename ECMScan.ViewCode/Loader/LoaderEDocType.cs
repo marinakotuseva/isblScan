@@ -226,7 +226,7 @@ namespace ISBLScan.ViewCode
 			{
 				SqlCommand command = new SqlCommand();
 				command.Connection = connection;
-				command.CommandText = "select TypeID, Name, Exprn from MBEDocType order by Name ASC";
+				command.CommandText = "select TypeID, Name, Exprn, LastUpd from MBEDocType order by Name ASC";
 				SqlDataReader reader = command.ExecuteReader();
 				if(reader.HasRows)
 				{
@@ -239,6 +239,7 @@ namespace ISBLScan.ViewCode
 					while(reader.Read())
 					{
 						Node eDocNode = new Node();
+						eDocNode.Nodes = new List<Node>();
 						eDocNode.Parent = listNode;
 						//ИД 
 						eDocNode.Id = reader.GetInt32(0);
@@ -247,12 +248,17 @@ namespace ISBLScan.ViewCode
 						{
 							eDocNode.Name = reader.GetString(1);
 						}
-						eDocNode.Nodes = new List<Node>();
 						//Текст событий
 						if(! reader.IsDBNull(2))
 						{
 							eDocNode.Text = parseEventText(reader.GetString(2));
 						}
+						//Дата последнего изменения
+						if(!reader.IsDBNull(3))
+						{
+							eDocNode.LastUpdate = reader.GetDateTime(3);
+						}
+
 						listNode.Nodes.Add(eDocNode);
 					}
 				}
