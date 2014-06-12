@@ -87,8 +87,6 @@
     <None Include="Loader\WizardTextSample.txt" />
     <None Include="ChangeLog" />
     <None Include="README.md" />
-    <None Include="Collections\ChangeLog" />
-    <None Include="Images\ChangeLog" />
     <None Include="Images\Filter.16.png" />
     <None Include="Images\Logo.svg" />
     <None Include="Images\isbTest.16.ico" />
@@ -101,14 +99,11 @@
     <None Include="Images\isblTest.128.ico" />
     <None Include="Images\isblTest.128.png" />
     <None Include="Images\path2826.png" />
-    <None Include="Loader\ChangeLog" />
-    <None Include="License.txt" />
     <None Include="License.ISBLScan.ViewCode.txt" />
     <None Include="MainForm.resources" />
     <None Include="Resources.resources" />
     <None Include="Resources.resx" />
     <None Include="test.txt" />
-    <None Include="Properties\ChangeLog" />
     <None Include="Properties\Resources.resources" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -117,8 +112,12 @@
       <Properties>
         <Policies>
           <TextStylePolicy inheritsSet="Mono" inheritsScope="text/plain" scope="text/plain" />
-          <VersionControlPolicy inheritsSet="Mono" />
-          <ChangeLogPolicy inheritsSet="Mono" />
+          <VersionControlPolicy inheritsSet="Mono">
+            <CommitMessageStyle Header="ISBLScan.ViewCode&#xA;&#xA;" LastFilePostfix=":&#xA;  " IncludeDirectoryPaths="True" />
+          </VersionControlPolicy>
+          <ChangeLogPolicy UpdateMode="ProjectRoot" inheritsSet="Mono">
+            <MessageStyle Header="${Date:yyyy-MM-dd hh:mm}  ${AuthorName}  &lt;${AuthorEmail}&gt;&#xA;&#xA;" LastFilePostfix=":&#xA;  " IncludeDirectoryPaths="True" />
+          </ChangeLogPolicy>
           <NameConventionPolicy>
             <Rules>
               <NamingRule Name="Namespaces" AffectedEntity="Namespace" VisibilityMask="VisibilityMask" NamingStyle="PascalCase" IncludeInstanceMembers="True" IncludeStaticEntities="True" />

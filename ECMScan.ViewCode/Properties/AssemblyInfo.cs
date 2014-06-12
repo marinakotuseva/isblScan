@@ -10,11 +10,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("ISBLScan ViewCode")]
-[assembly: AssemblyDescription("Tool for view source code of ECM systems based on IS-Builder 7 (DIRECTUM, Orienge Conterra) and CPM systems based on IS-Builder 5 (Prestima).")]
+[assembly: AssemblyDescription("Tool for view source code of ECM systems based on IS-Builder 7 and CPM systems based on IS-Builder 5.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("ISBLScan ViewCode")]
-[assembly: AssemblyCopyright("Copyright 2012-2014")]
+[assembly: AssemblyCopyright("Copyright 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

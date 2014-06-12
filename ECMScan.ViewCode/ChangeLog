@@ -1,3 +1,25 @@
+2014-06-12 12:00  polarnik  <owasp@ya.ru>
+
+	* ChangeLog:
+	  This ChangeLog - main and single ChangeLog. Delete ChangeLog
+	  from subfolders.
+
+	* ISBLScan.ViewCode.csproj:
+	  Delete ChangeLog from subfolders.
+
+	* License.ISBLScan.ViewCode.txt:
+	  Add name and numbers.
+
+	* Properties/AssemblyInfo.cs:
+	  Removed some words from Description.
+
+	* License.txt:
+	* Loader/ChangeLog:
+	* Images/ChangeLog:
+	* Properties/ChangeLog:
+	* Collections/ChangeLog:
+	  
+
 2014-05-09  polarnik  <owasp@ya.ru>
 
 	* ISBLScan.ViewCode.csproj: 
@@ -51,6 +73,17 @@
 	* MainForm.resources:
 	* ISBLScan.ViewCode.csproj: 1. Try work with resources.
 
+2014-03-29  polarnik  <owasp@ya.ru>
+
+	* Loader/LoaderAll.cs: Suppport Windows Authentification. Добавлена
+	  поддержка Windows-аутентификации при загрузке ISBL-кода из
+	  базы данных.
+	  
+2014-03-29  polarnik  <owasp@ya.ru>
+
+	* Loader/LoaderEDocType.cs: загружаются только реквизиты с вычислениями, реквизиты без вычислений не загружаются.
+	* Loader/LoaderReference.cs: загружаются только реквизиты с вычислениями, реквизиты без вычислений не загружаются.
+		  
 2014-03-29  polarnik  <owasp@ya.ru>
 
 	* ApplicationInfo.cs: ApplicationInfo class change as non
@@ -110,6 +143,11 @@
 
 	* MainForm.Designer.cs: из формы убран отладочный текст.
 
+2014-03-25  polarnik  <owasp@ya.ru>
+
+	* Collections/Tree.cs: 
+	Добавлено свойство узла дерева isVisible, значение по умолчанию == true.
+	
 2014-03-25  polarnik  <owasp@ya.ru>
 
 	* README.md: изменил описание проекта на русский язык.
