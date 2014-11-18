@@ -118,14 +118,12 @@ namespace ISBLScan.ViewCode
             this.groupBoxSearch.TabIndex = 12;
             this.groupBoxSearch.TabStop = false;
             this.groupBoxSearch.Text = "Search Text";
-			this.groupBoxSearch.Resize += new System.EventHandler(this.groupBoxSearch_Resize);
-			this.groupBoxSearch.DoubleClick += new System.EventHandler(this.buttonAddNewTab_Click);
+            this.groupBoxSearch.DoubleClick += new System.EventHandler(this.buttonAddNewTab_Click);
+            this.groupBoxSearch.Resize += new System.EventHandler(this.groupBoxSearch_Resize);
             // 
             // buttonAddNewTab
             // 
-            this.buttonAddNewTab.Dock = System.Windows.Forms.DockStyle.None;
             this.buttonAddNewTab.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonAddNewTab.ImageAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.buttonAddNewTab.ImageIndex = 1;
             this.buttonAddNewTab.ImageList = this.imageList1;
             this.buttonAddNewTab.Location = new System.Drawing.Point(603, 0);
@@ -136,7 +134,6 @@ namespace ISBLScan.ViewCode
             this.buttonAddNewTab.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.buttonAddNewTab.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.buttonAddNewTab.UseVisualStyleBackColor = true;
-            this.buttonAddNewTab.AutoSize = false;
             this.buttonAddNewTab.Click += new System.EventHandler(this.buttonAddNewTab_Click);
             // 
             // imageList1
@@ -148,9 +145,7 @@ namespace ISBLScan.ViewCode
             // 
             // buttonCloseCurrentTab
             // 
-            this.buttonCloseCurrentTab.Dock = System.Windows.Forms.DockStyle.None;
             this.buttonCloseCurrentTab.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonCloseCurrentTab.ImageAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.buttonCloseCurrentTab.ImageIndex = 0;
             this.buttonCloseCurrentTab.ImageList = this.imageList1;
             this.buttonCloseCurrentTab.Location = new System.Drawing.Point(623, 0);
@@ -194,7 +189,7 @@ namespace ISBLScan.ViewCode
             this.tabPageSimpleSearchText.Size = new System.Drawing.Size(632, 78);
             this.tabPageSimpleSearchText.TabIndex = 0;
             this.tabPageSimpleSearchText.Tag = this.textEditorControlSearchText;
-            this.tabPageSimpleSearchText.Text = "Simple Search Text";
+            this.tabPageSimpleSearchText.Text = "Simple Search Text (sample)";
             this.tabPageSimpleSearchText.UseVisualStyleBackColor = true;
             // 
             // textEditorControlSearchText
@@ -219,7 +214,7 @@ namespace ISBLScan.ViewCode
             this.tabPageRegularExpression.Size = new System.Drawing.Size(632, 78);
             this.tabPageRegularExpression.TabIndex = 1;
             this.tabPageRegularExpression.Tag = this.textEditorControlRegExp;
-            this.tabPageRegularExpression.Text = "Regular Expression";
+            this.tabPageRegularExpression.Text = "Regular Expression (sample)";
             this.tabPageRegularExpression.UseVisualStyleBackColor = true;
             // 
             // textEditorControlRegExp
@@ -233,7 +228,6 @@ namespace ISBLScan.ViewCode
             this.textEditorControlRegExp.ShowTabs = true;
             this.textEditorControlRegExp.Size = new System.Drawing.Size(626, 72);
             this.textEditorControlRegExp.TabIndex = 0;
-            this.textEditorControlRegExp.Text = "";
             this.textEditorControlRegExp.TextChanged += new System.EventHandler(this.textEditorControlRegExp_TextChanged);
             // 
             // panelSearchButtons
@@ -276,9 +270,9 @@ namespace ISBLScan.ViewCode
             // 
             this.buttonSearch.Dock = System.Windows.Forms.DockStyle.Right;
             this.buttonSearch.Enabled = false;
-            this.buttonSearch.Location = new System.Drawing.Point(571, 0);
+            this.buttonSearch.Location = new System.Drawing.Point(500, 0);
             this.buttonSearch.Name = "buttonSearch";
-            this.buttonSearch.Size = new System.Drawing.Size(69, 23);
+            this.buttonSearch.Size = new System.Drawing.Size(140, 23);
             this.buttonSearch.TabIndex = 1223;
             this.buttonSearch.Text = "Find";
             this.buttonSearch.UseVisualStyleBackColor = true;
