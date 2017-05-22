@@ -20,8 +20,6 @@ namespace ISBLScan.ViewCode
 	public partial class MainForm : Form
 	{
 		Loader isblLoader;
-		Font fontBold;
-		Font fontBoldUnderline;
 
         /// <summary>
         /// Список корневых узлов элементов разработки (узлы могут быть пустыми, null)
@@ -193,7 +191,18 @@ namespace ISBLScan.ViewCode
 				TreeNode treeNode = treeNodes.Add(isblNode.Name);
                 treeNode.Tag = isblNode;
                 isblNode.Tag = treeNode;
-				if(isblNode.Nodes != null)
+                if (isblNode.IsMatch)
+                {
+                    treeNode.Checked = true;
+                    treeNode.ForeColor = Color.Black;
+                }
+                else
+                {
+                    treeNode.Checked = false;
+                    treeNode.ForeColor = Color.Gray;
+                }
+                
+                if (isblNode.Nodes != null)
 				{
 					foreach(Node isblSubNode in isblNode.Nodes)
 					{
@@ -202,6 +211,7 @@ namespace ISBLScan.ViewCode
 				}
 			}
 		}
+  
 
         void ClearSearchStatus(List<Node> isblNodes)
         {
@@ -223,30 +233,10 @@ namespace ISBLScan.ViewCode
         {
             if (isblNodes != null)
             {
-                foreach (Node node in isblNodes)
+                treeViewResults.Nodes.Clear();
+                foreach (Node isblNode in ISBLNodes)
                 {
-                    if (node != null)
-                    {
-                        TreeNode treeNode = node.Tag as TreeNode;
-                        if (node.IsMatch)
-                        {
-                            treeNode.Checked = true;
-                            treeNode.ForeColor = Color.Black;
-                        }
-                        else
-                        {
-                            treeNode.Checked = false;
-                            if (node.IsContainsMatchedNode)
-                            {
-                                treeNode.ForeColor = Color.Black;
-                            }
-                            else
-                            {
-                                treeNode.ForeColor = Color.Gray;
-                            }
-                        }
-                        RefreshTreeView(node.Nodes);
-                    }
+                    LoadSubNodes(this.treeViewResults.Nodes, isblNode);
                 }
             }
         }
@@ -483,63 +473,86 @@ namespace ISBLScan.ViewCode
         /// <param name="caseSensitive"></param>
         /// <param name="regExp"></param>
         /// <returns></returns>
-        bool FilterNode(Node node, string[] searchStrArray, bool caseSensitive, bool regExp)
+        bool FilterNode(Node node, string[] searchStrArray, bool caseSensitive, bool regExp, bool findAll)
         {
             bool isFound = false;
             //Сначала выделим текущий элемент так, как будто в нём ничего не найдено
             node.IsMatch = false;
+            node.Visible = false;
             if (node.Nodes != null)
             {
                 foreach (Node subNode in node.Nodes)
                 {
-                    if (FilterNode(subNode, searchStrArray, caseSensitive, regExp))
+                    if (FilterNode(subNode, searchStrArray, caseSensitive, regExp, findAll))
                     {
                         node.IsContainsMatchedNode = true;
+                        node.Visible = true;
                         isFound = true;
                     }
                 }
             }
+            string isblText = node.Text;
+            string nodeName = node.Name;
+            bool searchSatisfied = false;
+            if (regExp)
             {
-                string isblText = node.Text;
-                string nodeName = node.Name;
-                if (regExp)
+                RegexOptions regExpOptions = caseSensitive ? RegexOptions.Compiled : RegexOptions.Compiled | RegexOptions.IgnoreCase;
+                foreach (string searchPhrase in searchStrArray)
                 {
-                    RegexOptions regExpOptions = caseSensitive ? RegexOptions.Compiled : RegexOptions.Compiled | RegexOptions.IgnoreCase;
-                    foreach (string searchPhrase in searchStrArray)
+                    Regex regEx = null;
+                    if (dictRegEx.ContainsKey(searchPhrase))
                     {
-                        Regex regEx = null;
-                        if (dictRegEx.ContainsKey(searchPhrase))
+                        regEx = dictRegEx[searchPhrase];
+                    }
+                    else
+                    {
+                        regEx = new Regex(searchPhrase, regExpOptions);
+                        dictRegEx.Add(searchPhrase, regEx);
+                    }
+                    if ( (!String.IsNullOrEmpty(isblText) && regEx.IsMatch(isblText)) || regEx.IsMatch(nodeName))
+                    {
+                        searchSatisfied = true;
+                        if (!findAll) break;
+                    }
+                    else
+                    {
+                        if (findAll)
                         {
-                            regEx = dictRegEx[searchPhrase];
-                        }
-                        else
-                        {
-                            regEx = new Regex(searchPhrase, regExpOptions);
-                            dictRegEx.Add(searchPhrase, regEx);
-                        }
-                        if ( (isblText != null && regEx.IsMatch(isblText)) || regEx.IsMatch(nodeName))
-                        {
-                            node.IsMatch = true;
-                            isFound = true;
+                            searchSatisfied = false;
+                            break;
                         }
                     }
                 }
-                else
+            }
+            else
+            {
+                StringComparison comparation = caseSensitive ? StringComparison.CurrentCulture : StringComparison.CurrentCultureIgnoreCase;
+                
+                foreach (string searchPhrase in searchStrArray)
                 {
-                    StringComparison comparation = caseSensitive ? StringComparison.CurrentCulture : StringComparison.CurrentCultureIgnoreCase;
-                    foreach (string searchPhrase in searchStrArray)
+                    if (
+                        (!String.IsNullOrEmpty(isblText) && isblText.IndexOf(searchPhrase, 0, comparation) >= 0) ||
+                        (!String.IsNullOrEmpty(nodeName) && nodeName.IndexOf(searchPhrase, 0, comparation) >= 0)
+                        )
                     {
-                        //Пропуск пустых поисковых строк
-                        if (
-                            (isblText != null && isblText.IndexOf(searchPhrase, 0, comparation) > 0) ||
-                            (nodeName != null && nodeName.IndexOf(searchPhrase, 0, comparation) > 0)
-                            )
+                        searchSatisfied = true;
+                        if (!findAll) break;
+                    }
+                    else
+                    {
+                        if (findAll)
                         {
-                            node.IsMatch = true;
-                            isFound = true;
+                            searchSatisfied = false;
+                            break;
                         }
                     }
                 }
+            }
+            if (searchSatisfied)
+            {
+                node.IsMatch = true;
+                node.Visible = true;
+                isFound = true;
             }
             CountOfProcessedISBLNodes++;
             int procent = (100 * CountOfProcessedISBLNodes) / CountOfISBLNodes;
@@ -665,7 +678,6 @@ namespace ISBLScan.ViewCode
                 buttonSearch.Enabled = false;
                 searchStrs = GetSearchStrArray();
                 ClearSearchStatus(ISBLNodes);
-                RefreshTreeView(ISBLNodes);
                 backgroundWorkerFind.RunWorkerAsync();
             }
 		}
@@ -699,6 +711,8 @@ namespace ISBLScan.ViewCode
             if (regExpArray.Length > 0)
             {
                 String text = textEditorControlISBL.Document.TextContent;
+                bool isCentered = false;
+
                 for (int indexRegExpStrings = 0; indexRegExpStrings < regExpArray.Length; indexRegExpStrings++)
                 {
                     string hlStr = regExpArray[indexRegExpStrings];
@@ -706,6 +720,7 @@ namespace ISBLScan.ViewCode
                     {
                         Regex regExp = new Regex(hlStr, regExpOptions);
                         MatchCollection regExpFindResults = regExp.Matches(text);
+                     
                         foreach(Match match in regExpFindResults)
                         {
                             TextMarker marker = new TextMarker(
@@ -723,6 +738,13 @@ namespace ISBLScan.ViewCode
                                 , textEditorControlISBL.Document.OffsetToPosition(match.Index)
                                 , false);
                             textEditorControlISBL.Document.BookmarkManager.AddMark(mark);
+
+                            if (!isCentered)
+                            {
+                                var lineNumber = textEditorControlISBL.Document.GetLineNumberForOffset(match.Index);
+                                textEditorControlISBL.ActiveTextAreaControl.CenterViewOn(lineNumber, 0);
+                                isCentered = true;
+                            }
                         }
                     }
                 }
@@ -747,6 +769,7 @@ namespace ISBLScan.ViewCode
 
                     char[] charsDelimeters = { '\n', '\t', ' ', '\r' };
                     string[] strs = findStr.Split(charsDelimeters, StringSplitOptions.RemoveEmptyEntries);
+                    bool isCentered = false;
 
                     foreach (string str in strs)
                     {
@@ -775,6 +798,13 @@ namespace ISBLScan.ViewCode
                                         , textEditorControlISBL.Document.OffsetToPosition(posStart)
                                         , false);
                                     textEditorControlISBL.Document.BookmarkManager.AddMark(mark);
+
+                                    if (!isCentered)
+                                    {
+                                        var lineNumber = textEditorControlISBL.Document.GetLineNumberForOffset(posStart);
+                                        textEditorControlISBL.ActiveTextAreaControl.CenterViewOn(lineNumber, 0);
+                                        isCentered = true;
+                                    }
 
                                     posStart = text.IndexOf(hlStr, posEnd + 1, comparation);
                                 }
@@ -981,7 +1011,7 @@ namespace ISBLScan.ViewCode
                     if (node != null)
                     {
                         // Perform a time consuming operation and report progress.
-                        FilterNode(node, searchStrs, checkBoxFindCaseSensitive.Checked, checkBoxFindRegExp.Checked);
+                        FilterNode(node, searchStrs, checkBoxFindCaseSensitive.Checked, checkBoxFindRegExp.Checked, checkBoxFindAll.Checked);
                     }
                 }
             }
@@ -998,11 +1028,6 @@ namespace ISBLScan.ViewCode
         private void backgroundWorkerFind_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             buttonSearch.Text = e.ProgressPercentage.ToString() + "%";
-            if (e.ProgressPercentage > LastISBLRefreshPercentage)
-            {
-                RefreshTreeView(ISBLNodes);
-                LastISBLRefreshPercentage = e.ProgressPercentage;
-            }
         }
 	
 	
@@ -1012,6 +1037,13 @@ namespace ISBLScan.ViewCode
 		this.buttonCloseCurrentTab.Left = groupBoxSearch.Width - 19;
 
 	}
-	
+
+        private void buttonExpand_Click(object sender, EventArgs e)
+        {
+            foreach (TreeNode node in treeViewResults.Nodes)
+            {
+                node.ExpandAll();
+            }
+        }
     }
 }

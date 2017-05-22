@@ -20,20 +20,18 @@ namespace ISBLScan.ViewCode
 		
 		private SqlConnection connection;
 
-		public EDocType			loaderEDocType;
-		public Function			loaderFunction;
-		public PerfomanceIndicator	loaderPerfomanceIndicator;
+		public EDocType			    loaderEDocType;
+		public Function			    loaderFunction;
 		public Reference			loaderReference;
 		public Report				loaderReport;
 		public ReportIntegrate		loaderReportInt;
 		public Route				loaderRoute;
 		public RouteBlock			loaderRouteBlock;
 		public Script				loaderScript;
-		public UserScript			loaderUserScript;
-		public UserSearch			loaderUserSearch;
 		public Wizard				loaderWizard;
-		
-		public string errorText;
+        public CustomCalculations   loaderCustom;
+
+        public string errorText;
 		
 		/// <summary>
 		/// Установка соединения с системой 
@@ -115,67 +113,57 @@ namespace ISBLScan.ViewCode
 			
 			loaderEDocType				= new EDocType(this.connection);
 			loaderFunction				= new Function(this.connection);
-			loaderPerfomanceIndicator		= new PerfomanceIndicator(this.connection);
 			loaderReference				= new Reference(this.connection);
 			loaderReport				= new Report(this.connection);
 			loaderReportInt				= new ReportIntegrate(this.connection);
-			loaderRoute				= new Route(this.connection);
+			loaderRoute				    = new Route(this.connection);
 			loaderRouteBlock			= new RouteBlock(this.connection);
 			loaderScript				= new Script(this.connection);
-			loaderUserScript			= new UserScript(this.connection);
-			loaderUserSearch			= new UserSearch(this.connection);
 			loaderWizard				= new Wizard(this.connection);
-			
-			
-			//Загрузка типов карточке электронных документов
-			isblNode = loaderEDocType.Load();
-			isblList.Add(isblNode);
+            loaderCustom                = new CustomCalculations(this.connection);
 
-			//Загрузка текстов функций
-			isblNode = loaderFunction.Load();
-			isblList.Add(isblNode);
-			
-			//Загрузка показателей эффективности
-			isblNode = loaderPerfomanceIndicator.Load();
-			isblList.Add(isblNode);
-			
-			//Загрузка текстов событий справочников, вычислений реквизитов, расчётов на форме
-			isblNode = loaderReference.Load();
-			isblList.Add(isblNode);
 
-			//Загрузка отчётов (шаблонов и расчётов)
-			isblNode = loaderReport.Load();
-			isblList.Add(isblNode);
+            //Загрузка типов карточке электронных документов
+            isblNode = loaderEDocType.Load();
+            isblList.Add(isblNode);
 
-			//Загрузка интегрированных отчётов (шаблонов и расчётов)
-			isblNode = loaderReportInt.Load();
-			isblList.Add(isblNode);
+            //Загрузка текстов функций
+            isblNode = loaderFunction.Load();
+            isblList.Add(isblNode);
 
-			//Загрузка типовых маршрутов (событий маршрутов)
-			//isblNode = loaderRoute.Load();
-			//isblList.Add(isblNode);
+            //Загрузка текстов событий справочников, вычислений реквизитов, расчётов на форме
+            isblNode = loaderReference.Load();
+            isblList.Add(isblNode);
 
-			//Загрузка вычислений блоков типовых маршрутов
-			//isblNode = loaderRouteBlock.Load();
-			//isblList.Add(isblNode);
+            //Загрузка отчётов (шаблонов и расчётов)
+            isblNode = loaderReport.Load();
+            isblList.Add(isblNode);
 
-			//Загрузка текстов расчётов (сценариев)
-			isblNode = loaderScript.Load();
-			isblList.Add(isblNode);
-			
-			//Загрузка пользовательских расчётов
-			isblNode = loaderUserScript.Load();
-			isblList.Add(isblNode);
-			
-			//Загрузка пользовательских поисков
-			isblNode = loaderUserSearch.Load();
-			isblList.Add(isblNode);
+            //Загрузка интегрированных отчётов (шаблонов и расчётов)
+            isblNode = loaderReportInt.Load();
+            isblList.Add(isblNode);
 
-			//Загрузка вычислений мастеров действий
-			isblNode = loaderWizard.Load();
-			isblList.Add(isblNode);
+            //Загрузка типовых маршрутов(событий маршрутов)
+            isblNode = loaderRoute.Load();
+            isblList.Add(isblNode);
 
-			return isblList;
+            //Загрузка вычислений блоков типовых маршрутов
+            isblNode = loaderRouteBlock.Load();
+            isblList.Add(isblNode);
+
+            //Загрузка текстов расчётов (сценариев)
+            isblNode = loaderScript.Load();
+            isblList.Add(isblNode);
+
+            //Загрузка вычислений мастеров действий
+            isblNode = loaderWizard.Load();
+            isblList.Add(isblNode);
+
+            //Загрузка вычислений из справочников
+            isblNode = loaderCustom.Load();
+            isblList.Add(isblNode);
+
+            return isblList;
 		}
 	}
 }

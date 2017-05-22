@@ -1,0 +1,18 @@
+﻿{
+  "Calculations": [
+    {
+      "CalculationName": "Показатели эффективности",
+      "ReferenceName": "KeyPerfomanceIndicators",
+      "RequisiteName": "Tekst",
+      "TableName": "MBAnalit",
+      "IsTextRequisite": true
+    }, 
+    {
+      "CalculationName": "Пользовательские расчеты",
+      "ReferenceName": "РСЧ",
+      "RequisiteName": "Tekst",
+      "TableName": "MBAnalit",
+      "IsTextRequisite": true
+    }
+  ]
+}

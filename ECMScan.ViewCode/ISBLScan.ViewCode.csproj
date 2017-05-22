@@ -38,6 +38,10 @@
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net20\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -54,16 +58,14 @@
     <Compile Include="Loader\LoaderEDocType.cs" />
     <Compile Include="Loader\LoaderFunction.cs" />
     <Compile Include="Loader\LoaderAll.cs" />
-    <Compile Include="Loader\LoaderPerfomanceIndicator.cs" />
     <Compile Include="Loader\LoaderReference.cs" />
     <Compile Include="Loader\LoaderReport.cs" />
     <Compile Include="Loader\LoaderReportIntegrate.cs" />
+    <Compile Include="Loader\LoaderCustom.cs" />
     <Compile Include="Loader\LoaderRouteBlock.cs" />
     <Compile Include="Loader\LoaderRoute.cs" />
     <Compile Include="Loader\LoaderScript.cs" />
     <Compile Include="Loader\LoaderWizard.cs" />
-    <Compile Include="Loader\LoaderUserScript.cs" />
-    <Compile Include="Loader\LoaderUserSearch.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -83,6 +85,7 @@
   <ItemGroup>
     <None Include="Loader\WizardTextSample.txt" />
     <None Include="ChangeLog" />
+    <None Include="packages.config" />
     <None Include="README.md" />
     <None Include="Images\Filter.16.png" />
     <None Include="Images\Logo.svg" />
@@ -188,5 +191,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="isbTest.ico" />
+    <None Include="CustomCalculationConfig.json" />
   </ItemGroup>
 </Project>

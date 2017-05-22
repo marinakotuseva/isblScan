@@ -7,6 +7,7 @@ using System.Data;
 using System.Data.SqlTypes;
 using System.Data.SqlClient;
 using System.Collections.Generic;
+using System.Xml;
 
 namespace ISBLScan.ViewCode
 {
@@ -93,15 +94,43 @@ namespace ISBLScan.ViewCode
 							//Свойства
 							if(! reader.IsDBNull(3))
 							{
-								SqlBytes sqlbytes = reader.GetSqlBytes(3);
-								System.Text.Encoding win1251 = System.Text.Encoding.GetEncoding(1251);
-								string routeBlockProperties = win1251.GetString(sqlbytes.Value);
-								Node routeBlockPropNode = new Node();
-								routeBlockPropNode.Name = "Свойства";
-								routeBlockPropNode.Text = routeBlockProperties;
-								routeBlockPropNode.Parent = routeBlockNode;
-								routeBlockNode.Nodes.Add(routeBlockPropNode);
-							}
+                                var schemaBytes = (byte[])reader.GetValue(3);
+                                string schemaString = System.Text.Encoding.GetEncoding(1251).GetString(schemaBytes);
+                                var schema = new XmlDocument();
+                                schema.LoadXml(schemaString);
+
+                                var events = schema.SelectNodes("/Settings/Event/node()");
+                                foreach (XmlNode eventXMLNode in events)
+                                {
+                                    var eventString = getNodeString(eventXMLNode);
+                                    if (!System.String.IsNullOrEmpty(eventString))
+                                    {
+                                        Node eventNode = new Node();
+                                        eventNode.Name = eventXMLNode.Name;
+                                        eventNode.Text = eventString;
+                                        eventNode.Parent = routeBlockNode;
+                                        routeBlockNode.Nodes.Add(eventNode);
+                                    }
+                                }
+
+                                var properties = schema.SelectNodes("//Properties/Property[@Type = '2' and @Name != 'Name']");
+                                foreach (XmlNode property in properties)
+                                {
+                                    var propertyStringNode = property.SelectSingleNode("Value/Value");
+                                    if (propertyStringNode != null)
+                                    {
+                                        var propertyString = getNodeString(propertyStringNode);
+                                        if (!System.String.IsNullOrEmpty(propertyString))
+                                        {
+                                            Node blockStringNode = new Node();
+                                            blockStringNode.Name = property.Attributes["Description"].Value;
+                                            blockStringNode.Text = propertyString;
+                                            blockStringNode.Parent = routeBlockNode;
+                                            routeBlockNode.Nodes.Add(blockStringNode);
+                                        }
+                                    }
+                                }
+                            }
 							groupNode.Nodes.Add(routeBlockNode);
 						}
 					}
@@ -110,5 +139,19 @@ namespace ISBLScan.ViewCode
 			}
 			return listNode;
 		}
-	}
+
+        private string getNodeString(XmlNode node)
+        {
+            string parsedString = "";
+            parsedString = node.InnerText;
+            parsedString = parsedString.Replace("{5314B05F-CF9F-4F66-99EC-24992A5FB114}", "");
+            try
+            {
+                byte[] data = Convert.FromBase64String(parsedString);
+                parsedString = System.Text.Encoding.GetEncoding(1251).GetString(data);
+            }
+            catch { }
+            return parsedString;
+        }
+    }
 }

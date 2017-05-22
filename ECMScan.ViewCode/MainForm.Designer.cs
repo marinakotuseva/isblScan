@@ -44,10 +44,12 @@ namespace ISBLScan.ViewCode
             this.tabPageRegularExpression = new System.Windows.Forms.TabPage();
             this.textEditorControlRegExp = new ICSharpCode.TextEditor.TextEditorControl();
             this.panelSearchButtons = new System.Windows.Forms.Panel();
+            this.checkBoxFindAll = new System.Windows.Forms.CheckBox();
             this.checkBoxFindRegExp = new System.Windows.Forms.CheckBox();
             this.checkBoxFindCaseSensitive = new System.Windows.Forms.CheckBox();
             this.buttonSearch = new System.Windows.Forms.Button();
             this.groupBoxConnect = new System.Windows.Forms.GroupBox();
+            this.buttonExpand = new System.Windows.Forms.Button();
             this.buttonConnect = new System.Windows.Forms.Button();
             this.checkBoxWinAuth = new System.Windows.Forms.CheckBox();
             this.textBoxPassword = new System.Windows.Forms.TextBox();
@@ -101,8 +103,9 @@ namespace ISBLScan.ViewCode
             this.panelOptions.Controls.Add(this.groupBoxConnect);
             this.panelOptions.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelOptions.Location = new System.Drawing.Point(0, 0);
+            this.panelOptions.Margin = new System.Windows.Forms.Padding(4);
             this.panelOptions.Name = "panelOptions";
-            this.panelOptions.Size = new System.Drawing.Size(792, 146);
+            this.panelOptions.Size = new System.Drawing.Size(1056, 201);
             this.panelOptions.TabIndex = 1;
             // 
             // groupBoxSearch
@@ -112,9 +115,11 @@ namespace ISBLScan.ViewCode
             this.groupBoxSearch.Controls.Add(this.panelSearchText);
             this.groupBoxSearch.Controls.Add(this.panelSearchButtons);
             this.groupBoxSearch.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBoxSearch.Location = new System.Drawing.Point(146, 0);
+            this.groupBoxSearch.Location = new System.Drawing.Point(195, 0);
+            this.groupBoxSearch.Margin = new System.Windows.Forms.Padding(4);
             this.groupBoxSearch.Name = "groupBoxSearch";
-            this.groupBoxSearch.Size = new System.Drawing.Size(646, 146);
+            this.groupBoxSearch.Padding = new System.Windows.Forms.Padding(4);
+            this.groupBoxSearch.Size = new System.Drawing.Size(861, 201);
             this.groupBoxSearch.TabIndex = 12;
             this.groupBoxSearch.TabStop = false;
             this.groupBoxSearch.Text = "Search Text";
@@ -126,10 +131,10 @@ namespace ISBLScan.ViewCode
             this.buttonAddNewTab.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonAddNewTab.ImageIndex = 1;
             this.buttonAddNewTab.ImageList = this.imageList1;
-            this.buttonAddNewTab.Location = new System.Drawing.Point(603, 0);
+            this.buttonAddNewTab.Location = new System.Drawing.Point(804, 0);
             this.buttonAddNewTab.Margin = new System.Windows.Forms.Padding(0);
             this.buttonAddNewTab.Name = "buttonAddNewTab";
-            this.buttonAddNewTab.Size = new System.Drawing.Size(14, 14);
+            this.buttonAddNewTab.Size = new System.Drawing.Size(19, 17);
             this.buttonAddNewTab.TabIndex = 125;
             this.buttonAddNewTab.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.buttonAddNewTab.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -148,10 +153,10 @@ namespace ISBLScan.ViewCode
             this.buttonCloseCurrentTab.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonCloseCurrentTab.ImageIndex = 0;
             this.buttonCloseCurrentTab.ImageList = this.imageList1;
-            this.buttonCloseCurrentTab.Location = new System.Drawing.Point(623, 0);
+            this.buttonCloseCurrentTab.Location = new System.Drawing.Point(831, 0);
             this.buttonCloseCurrentTab.Margin = new System.Windows.Forms.Padding(0);
             this.buttonCloseCurrentTab.Name = "buttonCloseCurrentTab";
-            this.buttonCloseCurrentTab.Size = new System.Drawing.Size(14, 14);
+            this.buttonCloseCurrentTab.Size = new System.Drawing.Size(19, 17);
             this.buttonCloseCurrentTab.TabIndex = 1;
             this.buttonCloseCurrentTab.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.buttonCloseCurrentTab.UseVisualStyleBackColor = true;
@@ -161,9 +166,10 @@ namespace ISBLScan.ViewCode
             // 
             this.panelSearchText.Controls.Add(this.tabControlSarchText);
             this.panelSearchText.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelSearchText.Location = new System.Drawing.Point(3, 16);
+            this.panelSearchText.Location = new System.Drawing.Point(4, 19);
+            this.panelSearchText.Margin = new System.Windows.Forms.Padding(4);
             this.panelSearchText.Name = "panelSearchText";
-            this.panelSearchText.Size = new System.Drawing.Size(640, 104);
+            this.panelSearchText.Size = new System.Drawing.Size(853, 150);
             this.panelSearchText.TabIndex = 124;
             // 
             // tabControlSarchText
@@ -173,9 +179,10 @@ namespace ISBLScan.ViewCode
             this.tabControlSarchText.Controls.Add(this.tabPageRegularExpression);
             this.tabControlSarchText.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControlSarchText.Location = new System.Drawing.Point(0, 0);
+            this.tabControlSarchText.Margin = new System.Windows.Forms.Padding(4);
             this.tabControlSarchText.Name = "tabControlSarchText";
             this.tabControlSarchText.SelectedIndex = 0;
-            this.tabControlSarchText.Size = new System.Drawing.Size(640, 104);
+            this.tabControlSarchText.Size = new System.Drawing.Size(853, 150);
             this.tabControlSarchText.TabIndex = 123;
             this.tabControlSarchText.SelectedIndexChanged += new System.EventHandler(this.tabControlSarchText_SelectedIndexChanged);
             this.tabControlSarchText.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tabControlSarchText_Selecting);
@@ -183,10 +190,11 @@ namespace ISBLScan.ViewCode
             // tabPageSimpleSearchText
             // 
             this.tabPageSimpleSearchText.Controls.Add(this.textEditorControlSearchText);
-            this.tabPageSimpleSearchText.Location = new System.Drawing.Point(4, 22);
+            this.tabPageSimpleSearchText.Location = new System.Drawing.Point(4, 25);
+            this.tabPageSimpleSearchText.Margin = new System.Windows.Forms.Padding(4);
             this.tabPageSimpleSearchText.Name = "tabPageSimpleSearchText";
-            this.tabPageSimpleSearchText.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageSimpleSearchText.Size = new System.Drawing.Size(632, 78);
+            this.tabPageSimpleSearchText.Padding = new System.Windows.Forms.Padding(4);
+            this.tabPageSimpleSearchText.Size = new System.Drawing.Size(845, 121);
             this.tabPageSimpleSearchText.TabIndex = 0;
             this.tabPageSimpleSearchText.Tag = this.textEditorControlSearchText;
             this.tabPageSimpleSearchText.Text = "Simple Search Text (sample)";
@@ -196,22 +204,24 @@ namespace ISBLScan.ViewCode
             // 
             this.textEditorControlSearchText.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textEditorControlSearchText.IsReadOnly = false;
-            this.textEditorControlSearchText.Location = new System.Drawing.Point(3, 3);
+            this.textEditorControlSearchText.Location = new System.Drawing.Point(4, 4);
+            this.textEditorControlSearchText.Margin = new System.Windows.Forms.Padding(4);
             this.textEditorControlSearchText.Name = "textEditorControlSearchText";
             this.textEditorControlSearchText.ShowEOLMarkers = true;
             this.textEditorControlSearchText.ShowSpaces = true;
             this.textEditorControlSearchText.ShowTabs = true;
-            this.textEditorControlSearchText.Size = new System.Drawing.Size(626, 72);
+            this.textEditorControlSearchText.Size = new System.Drawing.Size(837, 113);
             this.textEditorControlSearchText.TabIndex = 1;
             this.textEditorControlSearchText.TextChanged += new System.EventHandler(this.textEditorControlRegExp_TextChanged);
             // 
             // tabPageRegularExpression
             // 
             this.tabPageRegularExpression.Controls.Add(this.textEditorControlRegExp);
-            this.tabPageRegularExpression.Location = new System.Drawing.Point(4, 22);
+            this.tabPageRegularExpression.Location = new System.Drawing.Point(4, 25);
+            this.tabPageRegularExpression.Margin = new System.Windows.Forms.Padding(4);
             this.tabPageRegularExpression.Name = "tabPageRegularExpression";
-            this.tabPageRegularExpression.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageRegularExpression.Size = new System.Drawing.Size(632, 78);
+            this.tabPageRegularExpression.Padding = new System.Windows.Forms.Padding(4);
+            this.tabPageRegularExpression.Size = new System.Drawing.Size(845, 121);
             this.tabPageRegularExpression.TabIndex = 1;
             this.tabPageRegularExpression.Tag = this.textEditorControlRegExp;
             this.tabPageRegularExpression.Text = "Regular Expression (sample)";
@@ -221,34 +231,49 @@ namespace ISBLScan.ViewCode
             // 
             this.textEditorControlRegExp.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textEditorControlRegExp.IsReadOnly = false;
-            this.textEditorControlRegExp.Location = new System.Drawing.Point(3, 3);
+            this.textEditorControlRegExp.Location = new System.Drawing.Point(4, 4);
+            this.textEditorControlRegExp.Margin = new System.Windows.Forms.Padding(4);
             this.textEditorControlRegExp.Name = "textEditorControlRegExp";
             this.textEditorControlRegExp.ShowEOLMarkers = true;
             this.textEditorControlRegExp.ShowSpaces = true;
             this.textEditorControlRegExp.ShowTabs = true;
-            this.textEditorControlRegExp.Size = new System.Drawing.Size(626, 72);
+            this.textEditorControlRegExp.Size = new System.Drawing.Size(837, 113);
             this.textEditorControlRegExp.TabIndex = 0;
             this.textEditorControlRegExp.TextChanged += new System.EventHandler(this.textEditorControlRegExp_TextChanged);
             // 
             // panelSearchButtons
             // 
+            this.panelSearchButtons.Controls.Add(this.checkBoxFindAll);
             this.panelSearchButtons.Controls.Add(this.checkBoxFindRegExp);
             this.panelSearchButtons.Controls.Add(this.checkBoxFindCaseSensitive);
             this.panelSearchButtons.Controls.Add(this.buttonSearch);
             this.panelSearchButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelSearchButtons.Location = new System.Drawing.Point(3, 120);
+            this.panelSearchButtons.Location = new System.Drawing.Point(4, 169);
             this.panelSearchButtons.Margin = new System.Windows.Forms.Padding(0);
             this.panelSearchButtons.Name = "panelSearchButtons";
-            this.panelSearchButtons.Size = new System.Drawing.Size(640, 23);
+            this.panelSearchButtons.Size = new System.Drawing.Size(853, 28);
             this.panelSearchButtons.TabIndex = 123;
+            // 
+            // checkBoxFindAll
+            // 
+            this.checkBoxFindAll.AutoSize = true;
+            this.checkBoxFindAll.Dock = System.Windows.Forms.DockStyle.Left;
+            this.checkBoxFindAll.Location = new System.Drawing.Point(320, 0);
+            this.checkBoxFindAll.Margin = new System.Windows.Forms.Padding(4);
+            this.checkBoxFindAll.Name = "checkBoxFindAll";
+            this.checkBoxFindAll.Size = new System.Drawing.Size(146, 28);
+            this.checkBoxFindAll.TabIndex = 1226;
+            this.checkBoxFindAll.Text = "satisfies all criteria";
+            this.checkBoxFindAll.UseVisualStyleBackColor = true;
             // 
             // checkBoxFindRegExp
             // 
             this.checkBoxFindRegExp.AutoSize = true;
             this.checkBoxFindRegExp.Dock = System.Windows.Forms.DockStyle.Left;
-            this.checkBoxFindRegExp.Location = new System.Drawing.Point(115, 0);
+            this.checkBoxFindRegExp.Location = new System.Drawing.Point(150, 0);
+            this.checkBoxFindRegExp.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxFindRegExp.Name = "checkBoxFindRegExp";
-            this.checkBoxFindRegExp.Size = new System.Drawing.Size(127, 23);
+            this.checkBoxFindRegExp.Size = new System.Drawing.Size(170, 28);
             this.checkBoxFindRegExp.TabIndex = 1225;
             this.checkBoxFindRegExp.Text = ".* (regular expression)";
             this.checkBoxFindRegExp.UseVisualStyleBackColor = true;
@@ -259,8 +284,9 @@ namespace ISBLScan.ViewCode
             this.checkBoxFindCaseSensitive.AutoSize = true;
             this.checkBoxFindCaseSensitive.Dock = System.Windows.Forms.DockStyle.Left;
             this.checkBoxFindCaseSensitive.Location = new System.Drawing.Point(0, 0);
+            this.checkBoxFindCaseSensitive.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxFindCaseSensitive.Name = "checkBoxFindCaseSensitive";
-            this.checkBoxFindCaseSensitive.Size = new System.Drawing.Size(115, 23);
+            this.checkBoxFindCaseSensitive.Size = new System.Drawing.Size(150, 28);
             this.checkBoxFindCaseSensitive.TabIndex = 1224;
             this.checkBoxFindCaseSensitive.Text = "Aa (case sensitive)";
             this.checkBoxFindCaseSensitive.UseVisualStyleBackColor = true;
@@ -270,9 +296,10 @@ namespace ISBLScan.ViewCode
             // 
             this.buttonSearch.Dock = System.Windows.Forms.DockStyle.Right;
             this.buttonSearch.Enabled = false;
-            this.buttonSearch.Location = new System.Drawing.Point(500, 0);
+            this.buttonSearch.Location = new System.Drawing.Point(666, 0);
+            this.buttonSearch.Margin = new System.Windows.Forms.Padding(4);
             this.buttonSearch.Name = "buttonSearch";
-            this.buttonSearch.Size = new System.Drawing.Size(140, 23);
+            this.buttonSearch.Size = new System.Drawing.Size(187, 28);
             this.buttonSearch.TabIndex = 1223;
             this.buttonSearch.Text = "Find";
             this.buttonSearch.UseVisualStyleBackColor = true;
@@ -280,6 +307,7 @@ namespace ISBLScan.ViewCode
             // 
             // groupBoxConnect
             // 
+            this.groupBoxConnect.Controls.Add(this.buttonExpand);
             this.groupBoxConnect.Controls.Add(this.buttonConnect);
             this.groupBoxConnect.Controls.Add(this.checkBoxWinAuth);
             this.groupBoxConnect.Controls.Add(this.textBoxPassword);
@@ -288,18 +316,33 @@ namespace ISBLScan.ViewCode
             this.groupBoxConnect.Controls.Add(this.textBoxSQLServer);
             this.groupBoxConnect.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupBoxConnect.Location = new System.Drawing.Point(0, 0);
+            this.groupBoxConnect.Margin = new System.Windows.Forms.Padding(4);
             this.groupBoxConnect.Name = "groupBoxConnect";
-            this.groupBoxConnect.Size = new System.Drawing.Size(146, 146);
+            this.groupBoxConnect.Padding = new System.Windows.Forms.Padding(4);
+            this.groupBoxConnect.Size = new System.Drawing.Size(195, 201);
             this.groupBoxConnect.TabIndex = 11;
             this.groupBoxConnect.TabStop = false;
             this.groupBoxConnect.Text = "Connect";
             // 
+            // buttonExpand
+            // 
+            this.buttonExpand.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.buttonExpand.Location = new System.Drawing.Point(4, 165);
+            this.buttonExpand.Margin = new System.Windows.Forms.Padding(4);
+            this.buttonExpand.Name = "buttonExpand";
+            this.buttonExpand.Size = new System.Drawing.Size(187, 32);
+            this.buttonExpand.TabIndex = 1224;
+            this.buttonExpand.Text = "Expand Tree";
+            this.buttonExpand.UseVisualStyleBackColor = true;
+            this.buttonExpand.Click += new System.EventHandler(this.buttonExpand_Click);
+            // 
             // buttonConnect
             // 
             this.buttonConnect.Dock = System.Windows.Forms.DockStyle.Top;
-            this.buttonConnect.Location = new System.Drawing.Point(3, 120);
+            this.buttonConnect.Location = new System.Drawing.Point(4, 137);
+            this.buttonConnect.Margin = new System.Windows.Forms.Padding(4);
             this.buttonConnect.Name = "buttonConnect";
-            this.buttonConnect.Size = new System.Drawing.Size(140, 23);
+            this.buttonConnect.Size = new System.Drawing.Size(187, 28);
             this.buttonConnect.TabIndex = 116;
             this.buttonConnect.Text = "Connect and Load ISBL";
             this.buttonConnect.UseVisualStyleBackColor = true;
@@ -308,9 +351,10 @@ namespace ISBLScan.ViewCode
             // checkBoxWinAuth
             // 
             this.checkBoxWinAuth.Dock = System.Windows.Forms.DockStyle.Top;
-            this.checkBoxWinAuth.Location = new System.Drawing.Point(3, 96);
+            this.checkBoxWinAuth.Location = new System.Drawing.Point(4, 107);
+            this.checkBoxWinAuth.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxWinAuth.Name = "checkBoxWinAuth";
-            this.checkBoxWinAuth.Size = new System.Drawing.Size(140, 24);
+            this.checkBoxWinAuth.Size = new System.Drawing.Size(187, 30);
             this.checkBoxWinAuth.TabIndex = 115;
             this.checkBoxWinAuth.Text = "Windows authentication";
             this.checkBoxWinAuth.UseVisualStyleBackColor = true;
@@ -320,9 +364,10 @@ namespace ISBLScan.ViewCode
             // 
             this.textBoxPassword.Dock = System.Windows.Forms.DockStyle.Top;
             this.textBoxPassword.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.textBoxPassword.Location = new System.Drawing.Point(3, 76);
+            this.textBoxPassword.Location = new System.Drawing.Point(4, 85);
+            this.textBoxPassword.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxPassword.Name = "textBoxPassword";
-            this.textBoxPassword.Size = new System.Drawing.Size(140, 20);
+            this.textBoxPassword.Size = new System.Drawing.Size(187, 22);
             this.textBoxPassword.TabIndex = 114;
             this.textBoxPassword.Text = "**************";
             this.textBoxPassword.UseSystemPasswordChar = true;
@@ -335,9 +380,10 @@ namespace ISBLScan.ViewCode
             this.textBoxLogin.Dock = System.Windows.Forms.DockStyle.Top;
             this.textBoxLogin.ForeColor = System.Drawing.SystemColors.GrayText;
             this.textBoxLogin.HideSelection = false;
-            this.textBoxLogin.Location = new System.Drawing.Point(3, 56);
+            this.textBoxLogin.Location = new System.Drawing.Point(4, 63);
+            this.textBoxLogin.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxLogin.Name = "textBoxLogin";
-            this.textBoxLogin.Size = new System.Drawing.Size(140, 20);
+            this.textBoxLogin.Size = new System.Drawing.Size(187, 22);
             this.textBoxLogin.TabIndex = 113;
             this.textBoxLogin.Text = "Login";
             this.textBoxLogin.TextChanged += new System.EventHandler(this.TextBoxLoginFormTextChanged);
@@ -348,9 +394,10 @@ namespace ISBLScan.ViewCode
             this.textBoxDB.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.HistoryList;
             this.textBoxDB.Dock = System.Windows.Forms.DockStyle.Top;
             this.textBoxDB.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.textBoxDB.Location = new System.Drawing.Point(3, 36);
+            this.textBoxDB.Location = new System.Drawing.Point(4, 41);
+            this.textBoxDB.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxDB.Name = "textBoxDB";
-            this.textBoxDB.Size = new System.Drawing.Size(140, 20);
+            this.textBoxDB.Size = new System.Drawing.Size(187, 22);
             this.textBoxDB.TabIndex = 112;
             this.textBoxDB.Text = "Data Base";
             this.textBoxDB.TextChanged += new System.EventHandler(this.TextBoxLoginFormTextChanged);
@@ -361,9 +408,10 @@ namespace ISBLScan.ViewCode
             this.textBoxSQLServer.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.HistoryList;
             this.textBoxSQLServer.Dock = System.Windows.Forms.DockStyle.Top;
             this.textBoxSQLServer.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.textBoxSQLServer.Location = new System.Drawing.Point(3, 16);
+            this.textBoxSQLServer.Location = new System.Drawing.Point(4, 19);
+            this.textBoxSQLServer.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxSQLServer.Name = "textBoxSQLServer";
-            this.textBoxSQLServer.Size = new System.Drawing.Size(140, 20);
+            this.textBoxSQLServer.Size = new System.Drawing.Size(187, 22);
             this.textBoxSQLServer.TabIndex = 111;
             this.textBoxSQLServer.Text = "Sql Server";
             this.textBoxSQLServer.TextChanged += new System.EventHandler(this.TextBoxLoginFormTextChanged);
@@ -374,8 +422,9 @@ namespace ISBLScan.ViewCode
             this.panelResults.Controls.Add(this.groupBoxResults);
             this.panelResults.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelResults.Location = new System.Drawing.Point(0, 0);
+            this.panelResults.Margin = new System.Windows.Forms.Padding(4);
             this.panelResults.Name = "panelResults";
-            this.panelResults.Size = new System.Drawing.Size(792, 398);
+            this.panelResults.Size = new System.Drawing.Size(1056, 552);
             this.panelResults.TabIndex = 2;
             // 
             // groupBoxResults
@@ -383,8 +432,10 @@ namespace ISBLScan.ViewCode
             this.groupBoxResults.Controls.Add(this.splitContainerResults);
             this.groupBoxResults.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBoxResults.Location = new System.Drawing.Point(0, 0);
+            this.groupBoxResults.Margin = new System.Windows.Forms.Padding(4);
             this.groupBoxResults.Name = "groupBoxResults";
-            this.groupBoxResults.Size = new System.Drawing.Size(792, 398);
+            this.groupBoxResults.Padding = new System.Windows.Forms.Padding(4);
+            this.groupBoxResults.Size = new System.Drawing.Size(1056, 552);
             this.groupBoxResults.TabIndex = 0;
             this.groupBoxResults.TabStop = false;
             this.groupBoxResults.Text = "Results";
@@ -392,7 +443,8 @@ namespace ISBLScan.ViewCode
             // splitContainerResults
             // 
             this.splitContainerResults.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainerResults.Location = new System.Drawing.Point(3, 16);
+            this.splitContainerResults.Location = new System.Drawing.Point(4, 19);
+            this.splitContainerResults.Margin = new System.Windows.Forms.Padding(4);
             this.splitContainerResults.Name = "splitContainerResults";
             // 
             // splitContainerResults.Panel1
@@ -404,18 +456,19 @@ namespace ISBLScan.ViewCode
             // splitContainerResults.Panel2
             // 
             this.splitContainerResults.Panel2.Controls.Add(this.panelISBLResult);
-            this.splitContainerResults.Size = new System.Drawing.Size(786, 379);
-            this.splitContainerResults.SplitterDistance = 210;
-            this.splitContainerResults.SplitterWidth = 7;
+            this.splitContainerResults.Size = new System.Drawing.Size(1048, 529);
+            this.splitContainerResults.SplitterDistance = 280;
+            this.splitContainerResults.SplitterWidth = 9;
             this.splitContainerResults.TabIndex = 0;
             // 
             // panelTree
             // 
             this.panelTree.Controls.Add(this.treeViewResults);
             this.panelTree.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelTree.Location = new System.Drawing.Point(0, 20);
+            this.panelTree.Location = new System.Drawing.Point(0, 25);
+            this.panelTree.Margin = new System.Windows.Forms.Padding(4);
             this.panelTree.Name = "panelTree";
-            this.panelTree.Size = new System.Drawing.Size(210, 359);
+            this.panelTree.Size = new System.Drawing.Size(280, 504);
             this.panelTree.TabIndex = 212;
             // 
             // treeViewResults
@@ -424,8 +477,9 @@ namespace ISBLScan.ViewCode
             this.treeViewResults.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeViewResults.HideSelection = false;
             this.treeViewResults.Location = new System.Drawing.Point(0, 0);
+            this.treeViewResults.Margin = new System.Windows.Forms.Padding(4);
             this.treeViewResults.Name = "treeViewResults";
-            this.treeViewResults.Size = new System.Drawing.Size(210, 359);
+            this.treeViewResults.Size = new System.Drawing.Size(280, 504);
             this.treeViewResults.TabIndex = 2121;
             this.treeViewResults.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewResultsAfterSelect);
             // 
@@ -434,16 +488,18 @@ namespace ISBLScan.ViewCode
             this.panelFilterTree.Controls.Add(this.textBoxFilter);
             this.panelFilterTree.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelFilterTree.Location = new System.Drawing.Point(0, 0);
+            this.panelFilterTree.Margin = new System.Windows.Forms.Padding(4);
             this.panelFilterTree.Name = "panelFilterTree";
-            this.panelFilterTree.Size = new System.Drawing.Size(210, 20);
+            this.panelFilterTree.Size = new System.Drawing.Size(280, 25);
             this.panelFilterTree.TabIndex = 211;
             // 
             // textBoxFilter
             // 
             this.textBoxFilter.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textBoxFilter.Location = new System.Drawing.Point(0, 0);
+            this.textBoxFilter.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxFilter.Name = "textBoxFilter";
-            this.textBoxFilter.Size = new System.Drawing.Size(210, 20);
+            this.textBoxFilter.Size = new System.Drawing.Size(280, 22);
             this.textBoxFilter.TabIndex = 2111;
             this.textBoxFilter.TextChanged += new System.EventHandler(this.TextBoxFilter_TextChanged);
             // 
@@ -453,8 +509,9 @@ namespace ISBLScan.ViewCode
             this.panelISBLResult.Controls.Add(this.textEditorControlISBL);
             this.panelISBLResult.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelISBLResult.Location = new System.Drawing.Point(0, 0);
+            this.panelISBLResult.Margin = new System.Windows.Forms.Padding(4);
             this.panelISBLResult.Name = "panelISBLResult";
-            this.panelISBLResult.Size = new System.Drawing.Size(569, 379);
+            this.panelISBLResult.Size = new System.Drawing.Size(759, 529);
             this.panelISBLResult.TabIndex = 220;
             // 
             // textEditorControlISBL
@@ -466,11 +523,12 @@ namespace ISBLScan.ViewCode
             this.textEditorControlISBL.IsIconBarVisible = true;
             this.textEditorControlISBL.IsReadOnly = false;
             this.textEditorControlISBL.Location = new System.Drawing.Point(0, 0);
+            this.textEditorControlISBL.Margin = new System.Windows.Forms.Padding(4);
             this.textEditorControlISBL.Name = "textEditorControlISBL";
             this.textEditorControlISBL.ShowEOLMarkers = true;
             this.textEditorControlISBL.ShowSpaces = true;
             this.textEditorControlISBL.ShowTabs = true;
-            this.textEditorControlISBL.Size = new System.Drawing.Size(569, 379);
+            this.textEditorControlISBL.Size = new System.Drawing.Size(759, 529);
             this.textEditorControlISBL.TabIndex = 0;
             this.textEditorControlISBL.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
             this.textEditorControlISBL.VRulerRow = 100;
@@ -479,6 +537,7 @@ namespace ISBLScan.ViewCode
             // 
             this.splitContainerMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainerMain.Location = new System.Drawing.Point(0, 0);
+            this.splitContainerMain.Margin = new System.Windows.Forms.Padding(4);
             this.splitContainerMain.Name = "splitContainerMain";
             this.splitContainerMain.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
@@ -490,9 +549,9 @@ namespace ISBLScan.ViewCode
             // splitContainerMain.Panel2
             // 
             this.splitContainerMain.Panel2.Controls.Add(this.panelResults);
-            this.splitContainerMain.Size = new System.Drawing.Size(792, 551);
-            this.splitContainerMain.SplitterDistance = 146;
-            this.splitContainerMain.SplitterWidth = 7;
+            this.splitContainerMain.Size = new System.Drawing.Size(1056, 762);
+            this.splitContainerMain.SplitterDistance = 201;
+            this.splitContainerMain.SplitterWidth = 9;
             this.splitContainerMain.TabIndex = 3;
             // 
             // timerRegExpFind
@@ -502,47 +561,50 @@ namespace ISBLScan.ViewCode
             // 
             // statusStrip1
             // 
+            this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabelLastUpd,
             this.toolStripStatusLabelDash,
             this.toolStripStatusLabelSelectedElement,
             this.toolStripStatusLabelTest});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 551);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 762);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(792, 22);
+            this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 19, 0);
+            this.statusStrip1.Size = new System.Drawing.Size(1056, 25);
             this.statusStrip1.TabIndex = 6;
             this.statusStrip1.Text = "statusStrip1";
             // 
             // toolStripStatusLabelLastUpd
             // 
             this.toolStripStatusLabelLastUpd.Name = "toolStripStatusLabelLastUpd";
-            this.toolStripStatusLabelLastUpd.Size = new System.Drawing.Size(110, 17);
+            this.toolStripStatusLabelLastUpd.Size = new System.Drawing.Size(137, 20);
             this.toolStripStatusLabelLastUpd.Text = "00.00.0000 00:00:00";
             // 
             // toolStripStatusLabelDash
             // 
             this.toolStripStatusLabelDash.Name = "toolStripStatusLabelDash";
-            this.toolStripStatusLabelDash.Size = new System.Drawing.Size(11, 17);
+            this.toolStripStatusLabelDash.Size = new System.Drawing.Size(15, 20);
             this.toolStripStatusLabelDash.Text = "-";
             // 
             // toolStripStatusLabelSelectedElement
             // 
             this.toolStripStatusLabelSelectedElement.Name = "toolStripStatusLabelSelectedElement";
-            this.toolStripStatusLabelSelectedElement.Size = new System.Drawing.Size(32, 17);
+            this.toolStripStatusLabelSelectedElement.Size = new System.Drawing.Size(45, 20);
             this.toolStripStatusLabelSelectedElement.Text = "None";
             // 
             // toolStripStatusLabelTest
             // 
             this.toolStripStatusLabelTest.Name = "toolStripStatusLabelTest";
-            this.toolStripStatusLabelTest.Size = new System.Drawing.Size(0, 17);
+            this.toolStripStatusLabelTest.Size = new System.Drawing.Size(0, 20);
             // 
             // panelMain
             // 
             this.panelMain.Controls.Add(this.splitContainerMain);
             this.panelMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelMain.Location = new System.Drawing.Point(0, 0);
+            this.panelMain.Margin = new System.Windows.Forms.Padding(4);
             this.panelMain.Name = "panelMain";
-            this.panelMain.Size = new System.Drawing.Size(792, 551);
+            this.panelMain.Size = new System.Drawing.Size(1056, 762);
             this.panelMain.TabIndex = 7;
             // 
             // backgroundWorkerFind
@@ -555,13 +617,14 @@ namespace ISBLScan.ViewCode
             // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(792, 573);
+            this.ClientSize = new System.Drawing.Size(1056, 787);
             this.Controls.Add(this.panelMain);
             this.Controls.Add(this.statusStrip1);
             this.HelpButton = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "MainForm";
             this.Text = "ISBLScan ViewCode";
             this.panelOptions.ResumeLayout(false);
@@ -635,8 +698,10 @@ namespace ISBLScan.ViewCode
         private System.Windows.Forms.CheckBox checkBoxFindRegExp;
         private System.ComponentModel.BackgroundWorker backgroundWorkerFind;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelTest;
-		//Main menu
+        private System.Windows.Forms.CheckBox checkBoxFindAll;
+        private System.Windows.Forms.Button buttonExpand;
+        //Main menu
 
-		
-	}
+
+    }
 }
