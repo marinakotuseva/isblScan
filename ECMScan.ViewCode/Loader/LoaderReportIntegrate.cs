@@ -26,7 +26,6 @@ namespace ISBLScan.ViewCode
 				listNode = new Node();
 				listNode.Name = "Интегрированный отчёт";
 				listNode.Text = null;
-				listNode.Parent = null;
 				listNode.Nodes = new List<Node>();
 				
 				{
@@ -39,7 +38,6 @@ namespace ISBLScan.ViewCode
 						while(reader.Read())
 						{
 							Node reportNode = new Node();
-							reportNode.Parent = listNode;
 							//ИД отчёта
 							reportNode.Id = reader.GetInt32(0);
 							//Имя отчёта
@@ -62,7 +60,6 @@ namespace ISBLScan.ViewCode
 								Node reportTextNode = new Node();
 								reportTextNode.Name = "-=[ Шаблон ]=-";
 								reportTextNode.Text = scriptText;
-								reportTextNode.Parent = reportNode;
 								reportNode.Nodes.Add(reportTextNode);
 							}
 							//Расчёт отчёта
@@ -72,7 +69,6 @@ namespace ISBLScan.ViewCode
 								Node reportTemplateNode = new Node();
 								reportTemplateNode.Name = "-=[ Расчёт ]=-";
 								reportTemplateNode.Text = templateText;
-								reportTemplateNode.Parent = reportNode;
 								reportNode.Nodes.Add(reportTemplateNode);
 							}
 							listNode.Nodes.Add(reportNode);

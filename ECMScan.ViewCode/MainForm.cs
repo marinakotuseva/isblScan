@@ -2,171 +2,177 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Data.SqlClient;
-using System.Data.SqlTypes;
-using System.IO;
 using System.Text.RegularExpressions;
-using System.Configuration;
-using System.Collections.Specialized;
-using System.Reflection;
 using ICSharpCode.TextEditor.Document;
-using System.ComponentModel;
 
 namespace ISBLScan.ViewCode
 {
-	/// <summary>
-	/// Description of MainForm.
-	/// </summary>
-	public partial class MainForm : Form
-	{
-		Loader isblLoader;
+    /// <summary>
+    /// Description of MainForm.
+    /// </summary>
+    public partial class MainForm : Form
+    {
+        Loader isblLoader;
 
         /// <summary>
         /// Список корневых узлов элементов разработки (узлы могут быть пустыми, null)
         /// </summary>
-		List<Node> ISBLNodes { get; set; }
-        
-        /// <summary>
-        /// Полное количество узлов в дереве
-        /// </summary>
-        int CountOfISBLNodes { get; set; }
-
-        /// <summary>
-        /// Количество узлов, обработанных в процессе поиска, служебная глобальная переменная
-        /// </summary>
-        int CountOfProcessedISBLNodes { get; set; }
+		List<Node> SourceISBLNodes { get; set; }
 
         /// <summary>
         /// Список поисковых фраз по которым выполняется поиск, служебная глобальная переменная
         /// </summary>
         string[] searchStrs;
 
+        class MyTextEditorControl : ICSharpCode.TextEditor.TextEditorControl
+        {
+            public TreeView TreeViewResults { get; set; } = new TreeView();
+
+            public MyTextEditorControl(MainForm form)
+            {
+                TreeViewResults.CheckBoxes = false;
+                TreeViewResults.Dock = System.Windows.Forms.DockStyle.Fill;
+                TreeViewResults.HideSelection = false;
+                TreeViewResults.Location = new System.Drawing.Point(0, 0);
+                TreeViewResults.Margin = new System.Windows.Forms.Padding(4);
+                TreeViewResults.Name = "treeViewResults";
+                //TreeViewResults.Size = new System.Drawing.Size(280, 504);
+                TreeViewResults.TabIndex = 2121;
+                TreeViewResults.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(form.TreeViewResultsAfterSelect);
+
+                form.panelTree.Controls.Add(TreeViewResults);
+                form.panelTree.Dock = System.Windows.Forms.DockStyle.Fill;
+                form.panelTree.Location = new System.Drawing.Point(0, 25);
+                form.panelTree.Margin = new System.Windows.Forms.Padding(4);
+                form.panelTree.Name = "panelTree";
+                //form.panelTree.Size = new System.Drawing.Size(280, 504);
+                form.panelTree.TabIndex = 212;
+            }
+            
+        }
         /// <summary>
         /// Редактор текста с критериями поиска, активный в текущий момент
         /// </summary>
-        ICSharpCode.TextEditor.TextEditorControl ActiveSearchStringControl { get; set; }
+        MyTextEditorControl ActiveSearchStringControl  { get; set; }
+
+        /// <summary>
+        /// Список элементов разработки, отфильтрованный по критериям поиска вкладки, активной в текущий момент
+        /// </summary>
+        List<Node> ActiveISBLNodes
+        {
+            get { return (List<Node>)ActiveSearchStringControl.Tag; }
+            set { ActiveSearchStringControl.Tag = value; }
+        }
 
         /// <summary>
         /// Словарь поисковых фраз и соотвествующих регулярных выражений
         /// </summary>
         Dictionary<string, Regex> dictRegEx = new Dictionary<string, Regex>();
 
-        int LastISBLRefreshPercentage { get; set; }
+        public MainForm()
+        {
+            //
+            // The InitializeComponent() call is required for Windows Forms designer support.
+            //
+            InitializeComponent();
+            groupBoxSearch_Resize(null, null);
+            isblLoader = new Loader();
 
-		public MainForm()
-		{
-			//
-			// The InitializeComponent() call is required for Windows Forms designer support.
-			//
-			InitializeComponent();
-			groupBoxSearch_Resize(null, null);
-			isblLoader = new Loader();
-			
-			string sqlServer;
-			string dataBase;
-			string login;
-			bool isWinAuth;
-			if(Configuration.Load(out sqlServer, out dataBase, out login, out isWinAuth))
-			{
-				textBoxSQLServer.Text = sqlServer;
-				textBoxDB.Text = dataBase;
-				textBoxLogin.Text = login;
-				if(isWinAuth)
-				{
-					checkBoxWinAuth.Checked = isWinAuth;
-				}
-				else
-				{
-					textBoxPassword.Text = "";
-				}
-			}
-			//
-			// TODO: Добавить хороший список предопределённых строк.
-			//
-			string[] defaultSearchStrings = 
-			{
-				"AddWhere      AddFrom  AddOrderBy  AddSelect     SQL(     CSQL   drop    xp_",
-				"Выполнить     Execute  Exec        CreateObject",
-				"Login         Логин    Pass        Пароль        Admin    Админ",				
-				"AccessRights  Grant    Control     Encrypt       Decrypt  Шифр   Secret  Секрет",
-				""
-			};
-			foreach(string searchString in defaultSearchStrings)
-			{
-                		this.textEditorControlSearchText.Document.TextContent += (searchString + this.textEditorControlSearchText.Document.TextEditorProperties.LineTerminator);
-			}
-			string[] defaultRegExp = 
-			{
-				"index.*=",
-				".*= *СценарийПарам *[(]",
-				"Incorrect RegEx Sample: .*((("
-			};
-			foreach(string searchString in defaultRegExp)
-			{
-                		this.textEditorControlRegExp.Document.TextContent += (searchString + this.textEditorControlRegExp.Document.TextEditorProperties.LineTerminator);
-			}
+            string sqlServer;
+            string dataBase;
+            string login;
+            bool isWinAuth;
+            if (Configuration.Load(out sqlServer, out dataBase, out login, out isWinAuth))
+            {
+                textBoxSQLServer.Text = sqlServer;
+                textBoxDB.Text = dataBase;
+                textBoxLogin.Text = login;
+                if (isWinAuth)
+                {
+                    checkBoxWinAuth.Checked = isWinAuth;
+                }
+                else
+                {
+                    textBoxPassword.Text = "";
+                }
+            }
+            //
+            // TODO: Добавить хороший список предопределённых строк.
+            //
+            string[] defaultSearchStrings =
+            {
+                "AddWhere      AddFrom  AddOrderBy  AddSelect     SQL(     CSQL   drop    xp_",
+                "Выполнить     Execute  Exec        CreateObject",
+                "Login         Логин    Pass        Пароль        Admin    Админ",
+                "AccessRights  Grant    Control     Encrypt       Decrypt  Шифр   Secret  Секрет",
+                ""
+            };
+            foreach (string searchString in defaultSearchStrings)
+            {
+                this.textEditorControlSearchText.Document.TextContent += (searchString + this.textEditorControlSearchText.Document.TextEditorProperties.LineTerminator);
+            }
 
-			//
-			// TODO: Добавить хорошую стправку на начальной странице
-			//
-			ApplicationInfo applicationInfo = new ApplicationInfo();
-			//this.richTextBoxResult.Text = string.Format("{0} {1}\n{2}", applicationInfo.ProductName, applicationInfo.Version, applicationInfo.Description);
-			//HighLight("", null);
+            //
+            // TODO: Добавить хорошую стправку на начальной странице
+            //
+            ApplicationInfo applicationInfo = new ApplicationInfo();
+            //this.richTextBoxResult.Text = string.Format("{0} {1}\n{2}", applicationInfo.ProductName, applicationInfo.Version, applicationInfo.Description);
+            //HighLight("", null);
 
-			string str =    "Ly8vIElTQkxTY2FuIENvZGVWaWV3Ci8vLyBUb29sIGZvciB2aWV3IHNvdXJjZSBjb2RlIG9mIEVDTSBzeXN0ZW1zIGJhc2VkIG9uIElTLUJ1aWxkZXIgNyAoRElSRUNUVU0sIE9yaWVuZ2UgQ29udGVycmEpIG" +
-					"FuZCBDUE0gc3lzdGVtcyBiYXNlZCBvbiBJUy1CdWlsZGVyIDUgKFByZXN0aW1hKS4KLy8vIFNhbXBsZSBJU0JMIHNvdXJjZSBjb2RlOgoKICBRVUVSWV9GSUVMRFNfREVMSU1JVEVSID0gIiwiCiAgRUxFTUVO" +
-					"VFNfRE9FU19OT1RfRVhJU1QgPSAwCiAgU1RSSU5HX0xFTkdUSCA9IDgwIAogIFNUUklOR19TVEFSVF9JTkRFWCA9IDEKICBCQV9FVkVOVFNfVEFCTEVfTkFNRV9URU1QTEFURSA9ICJCQUV2ZW50cyVzIgogIE" +
-					"5VTExfVkFMVUUgPSAiTlVMTCIgICAgICAKICBUQUJMRV9OQU1FX1JFUExBQ0VfRlJPTV9URVhUID0gIl0iCiAgVEFCTEVfTkFNRV9SRVBMQUNFX1RPX1RFWFQgPSAiXV0iICAKICBCQUV2ZW50c1RhYmxlTmFt" +
-					"ZSA9IEZvcm1hdChCQV9FVkVOVFNfVEFCTEVfTkFNRV9URU1QTEFURTsgU3RhbmRhcmRSb3V0ZUNvZGUpCiAgQkFFdmVudHNUYWJsZU5hbWUgPSBSZXBsYWNlKEJBRXZlbnRzVGFibGVOYW1lOyBUQUJMRV9OQU" +
-					"1FX1JFUExBQ0VfRlJPTV9URVhUOyBUQUJMRV9OQU1FX1JFUExBQ0VfVE9fVEVYVCkKICBpZiBGaWVsZExpc3QuQ291bnQgPiBFTEVNRU5UU19ET0VTX05PVF9FWElTVAogICAgLy8g0J/QvtC70YPRh9C40YLR" +
-					"jCDRiNCw0LHQu9C+0L3RiyDQt9Cw0L/RgNC+0YHQvtCyINC00LvRjyDQstGB0YLQsNCy0LrQuCDQuCDQvtCx0L3QvtCy0LvQtdC90LjRjyDQt9Cw0L/QuNGB0LXQuSDQsiDRgtCw0LHQu9C40YbQtS4g0J7Qsd" +
-					"C90L7QstC70Y/RjtGC0YHRjyDQv9C+0LvRjywg0L/QtdGA0LXQtNCw0L3QvdGL0LUg0LIg0L/QsNGA0LDQvNC10YLRgNC1IEZpZWxkTGlzdAogICAgLy8g0KTQvtGA0LzQsNGCINGB0L/QuNGB0LrQsCBGaWVs" +
-					"ZExpc3Q6CiAgICAvLyBOYW1lIC0g0JjQvNGPINC/0L7Qu9GPCiAgICAvLyBWYWx1ZSAtINCX0L3QsNGH0LXQvdC40LUg0L/QvtC70Y8KICAgIEluZGV4ID0gMAogICAgVXBkYXRlU2V0Rm9yVXBkYXRlUXVlcn" +
-					"kgPSAiIgogICAgRmllbGROYW1lc0Zvckluc2VydFF1ZXJ5ID0gIiIKICAgIEZpZWxkVmFsdWVzRm9ySW5zZXJ0UXVlcnkgPSAiIgogICAgZm9yZWFjaCBGaWVsZFZhbHVlI" +
-					"GluIEZpZWxkTGlzdAogICAgICBGaWVsZE5hbWUgPSBGaWVsZExpc3QuTmFtZXMoSW5kZXgpCiAgICAgIGlmIEFzc2lnbmVkKEZpZWxkVmFsdWUpCiAgICAgICAgRmllbGRWYWx1ZSA9IEZvcm1hdCgiJyVzJyI" +
-					"7IENvcHkoRmllbGRWYWx1ZTsgU1RSSU5HX1NUQVJUX0lOREVYOyBTVFJJTkdfTEVOR1RIKSkKICAgICAgZWxzZQogICAgICAgIEZpZWxkVmFsdWUgPSBOVUxMX1ZBTFVFICAKICAgICAgZW5kaWYKICAgICAgV" +
-					"XBkYXRlU2V0Rm9yVXBkYXRlUXVlcnkgPSBBZGRTdWJTdHJpbmcoRm9ybWF0KCIlcyA9ICVzIjsgQXJyYXlPZihGaWVsZE5hbWU7IEZpZWxkVmFsdWUpKTsgVXBkYXRlU2V0Rm9yVXBkYXRlUXVlcnk7IFFVRVJ" +
-					"ZX0ZJRUxEU19ERUxJTUlURVIpCiAgICAgIEZpZWxkTmFtZXNGb3JJbnNlcnRRdWVyeSA9IEFkZFN1YlN0cmluZyhGaWVsZE5hbWU7IEZpZWxkTmFtZXNGb3JJbnNlcnRRdWVyeTsgUVVFUllfRklFTERTX0RFT" +
-					"ElNSVRFUikKICAgICAgRmllbGRWYWx1ZXNGb3JJbnNlcnRRdWVyeSA9IEFkZFN1YlN0cmluZyhGaWVsZFZhbHVlOyBGaWVsZFZhbHVlc0Zvckluc2VydFF1ZXJ5OyBRVUVSWV9GSUVMRFNfREVMSU1JVEVSKSA" +
-					"KICAgICAgSW5kZXggPSBJbmRleCArIDEKICAgIGVuZGZvcmVhY2gKICAgIFNlbGVjdFF1ZXJ5VGVtcGxhdGUgPSAiCiAgICAgIHNlbGVjdCAKICAgICAgICAxCiAgICAgIGZyb20KICAgICAgICBbJTA6c10KI" +
-					"CAgICAgd2hlcmUKICAgICAgICBUYXNrSUQgPSAlMTpzCiAgICAgICAgYW5kIEJsb2NrSUQgPSAlMjpzCiAgICAgICAgYW5kIEl0ZXJhdGlvbiA9ICUzOnMiCiAgICBRdWVyeVJlc3VsdCA9IFNRTChGb3JtYXQ" +
-					"oU2VsZWN0UXVlcnlUZW1wbGF0ZTsgQXJyYXlPZihCQUV2ZW50c1RhYmxlTmFtZTsgVGFza0lEOyBCbG9ja0lEOyBJdGVyYXRpb24pKSkKICAgIGlmIEFzc2lnbmVkKFF1ZXJ5UmVzdWx0KQogICAgICAvLyDQl" +
-					"dGB0LvQuCDQt9Cw0L/QuNGB0Ywg0LXRgdGC0YwsINGC0L4g0L7QsdC90L7QstC40YLRjAogICAgICBVcGRhdGVRdWVyeVRlbXBsYXRlID0gIgogICAgICAgIHVwZGF0ZSBbJTA6c10gc2V0CiAgICAgICAgICA" +
-					"lNDpzCiAgICAgICAgd2hlcmUKICAgICAgICAgIFRhc2tJRCA9ICUxOnMKICAgICAgICAgIGFuZCBCbG9ja0lEID0gJTI6cwogICAgICAgICAgYW5kIEl0ZXJhdGlvbiA9ICUzOnMiCiAgICAgIFNRTChGb3JtY" +
-					"XQoVXBkYXRlUXVlcnlUZW1wbGF0ZTsgQXJyYXlPZihCQUV2ZW50c1RhYmxlTmFtZTsgVGFza0lEOyBCbG9ja0lEOyBJdGVyYXRpb247IFVwZGF0ZVNldEZvclVwZGF0ZVF1ZXJ5KSkpCiAgICBlbmRpZiAgIAo" +
-					"gIGVuZGlmCgoKICAhVEFTS19TVEFURV9ET05FID0gItCS0YvQv9C+0LvQvdC10L3QsCIKICAhUFJPSkVDVF9UQVNLX0NPTVBMRVRFX1BFUkNFTlQgPSAxMDAKCiAvLyAhUHJvamVjdD3QodGG0LXQvdCw0YDQu" +
-					"NC50J/QsNGA0LDQvCgiUHJvamVjdCIpCiAgIU1TVGFza3MgPSDQodGG0LXQvdCw0YDQuNC50J/QsNGA0LDQvCgiVGFza3Mi" +
-					"KSAKICAhSUREb2MgPSDQodGG0LXQvdCw0YDQuNC50J/QsNGA0LDQvCgiSUQiKQogLy8g0LXRgdC70Lgg0L3QtdGCINC60LDQutC+0LPQvi3Qu9C40LHQviDQv9Cw0YDQsNC80LXRgtGA0LAsINGC0L4g0LfQvd" +
-					"Cw0YfQuNGCINGB0YbQtdC90LDRgNC40Lkg0LLRi9C30YvQstCw0LXRgtGB0Y8g0L3QtSDQuNC3IE1TIE9mZmljZSAgIAogIGlmICghTVNUYXNrcyA9PSAiIikgb3IgKCFJRERvYyA9PSAiIikKICAgICFNZXNz" +
-					"YWdlID0gTG9hZFN0cmluZygiRElSU1RSXzQwIjsgIkVETSIpCiAgICBSYWlzZShDcmVhdGVFeGNlcHRpb24oIiI7ICFNZXNzYWdlOyBlY1dhcm5pbmcpKSAvLyBb0JrQsNGC0LXQs9C+0YDQuNGPXSA9IGVjRX" +
-					"hjZXB0aW9uIE9SIGVjV2FybmluZyBPUiBlY0luZm9ybWF0aW9uIAogIGVuZGlmCiAgCiAvLyDQv9C+0LvRg9GH0LjRgtGMINC/0YDQuNC70L7QttC10L3QuNC1CiAgIUFwcCA9ICFTZW5kZXIuQXBwbGljYXRp" +
-					"b24KIC8vINC40L3RhNC+0YDQvNCw0YbQuNGPINC+INC00L7QutGD0LzQtdC90YLQtSAo0L7QsdGK0LXQutGC0LUpIAogICFFRG9jSW5mbyA9ICFBcHAuRURvY3VtZW50RmFjdG9yeS5PYmplY3RJbmZvKCFJRE" +
-					"RvYykKCiAgIVByb2dyZXNzID0gQ3JlYXRlUHJvZ3Jlc3MoIDsgIU1TVGFza3MuQ291bnQ7KQogICFQcm9ncmVzcy5TaG93CiAgIUZpbGxlZCA9IDAKIC8vINC/0YDQvtC50LTRkdC8INC/0L4g0LLRgdC10Lwg" +
-					"0LfQsNC00LDRh9Cw0LwgCiAgIWkgPSAxCiAgd2hpbGUgIWkgPD0gIU1TVGFza3MuQ291bnQKICAgLy8g0LXRgdC70Lgg0LfQsNC00LDRh9CwINGB0L7Qt9C00LDQvdCwCiAgICAhTVNUYXNrID0gIU1TVGFza3" +
-					"MuSXRlbSghaSkKICAgIGlmIG5vdCBWYXJJc051bGwoIU1TVGFzaykgIAogICAgICBpZiAhTVNUYXNrLkZsYWcyMAogICAgICAgICFIeXBlckxpbmsgPSAhTVNUYXNrLlRleHQyMAogICAgICAgICFJRCA9IFN1" +
-					"YlN0cmluZyghSHlwZXJMaW5rOyAiPSI7IDMpCiAgICAgICAgRXhjZXB0aW9uc09mZigpCiAgICAgICAgRnJlZUV4Y2VwdGlvbigpCiAgICAgICAgIVRhc2sgPSAhQXBwLlRhc2tGYWN0b3J5LkNvbXBvbmVudC" +
-					"ghSUQpCiAgICAgICAgaWYgbm90IEV4Y2VwdGlvbkV4aXN0cygpCiAgICAgICAgIC8vINC30LDQv9C+0LvQvdC40Lwg0YTQsNC60YIg0L/QviDQt9Cw0LTQsNGH0LUg0LX" +
-					"RgdC70Lgg0LfQsNC00LDRh9CwINCy0YvQv9C+0LvQvdC10L3QsAogICAgICAgICAvLyDQvdC+INGN0YLQsNC/INC10YnQtSDQvdC1INC30LDQstC10YDRiNC10L0KICAgICAgICAgIGlmICghVGFzay5EYXRhU" +
-					"2V0LlJlcXVpc2l0ZXMoIlRhc2tTdGF0ZSIpLkFzU3RyaW5nID09ICFUQVNLX1NUQVRFX0RPTkUpIGFuZAogICAgICAgICAgICAgKCFNU1Rhc2suUGVyY2VudENvbXBsZXRlIDwgIVBST0pFQ1RfVEFTS19DT01" +
-					"QTEVURV9QRVJDRU5UKSAKICAgICAgICAgICAgIU1TVGFzay5BY3R1YWxGaW5pc2ggPSAhVGFzay5EYXRhU2V0LlJlcXVpc2l0ZXMoIkVuZERhdGUiKS5Bc1N0cmluZwogICAgICAgICAgICAhTVNUYXNrLlBlc" +
-					"mNlbnRDb21wbGV0ZSA9ICFQUk9KRUNUX1RBU0tfQ09NUExFVEVfUEVSQ0VOVAogICAgICAgICAgICAhRmlsbGVkID0gIUZpbGxlZCArIDEgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgZW5kaWYKICA" +
-					"gICAgICBlbmRpZgogICAgICAgIEV4Y2VwdGlvbnNPbigpICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgZW5kaWYKICAgIGVuZGlmICAgCiAgICAhaSA9ICFpI" +
-					"CsgMQogICAgIVByb2dyZXNzLk5leHQKICBlbmR3aGlsZSAgICAgICAKCiAgaWYgIUZpbGxlZCA+IDEKICAgLy8gItCX0LDQv9C+0LvQvdC10L0g0YTQsNC60YIg0L/QviAlcyDRjdGC0LDQv9Cw0LwuIiAgICA" +
-					"gICAgCiAgICAhUmVzdWx0ID0gTG9hZFN0cmluZ0ZtdCgiRElSOEZFOEQxRDRfNTlGN180Mzc2Xzg5QkZfNkJGQkVBMDJGNTJGIjsgIkNPTU1PTiI7IEFycmF5T2YoIUZpbGxlZCkpICAgIAogIGVuZGlmICAKI" +
-					"CBpZiAoQ29weSghRmlsbGVkOyBMZW5ndGgoIUZpbGxlZCk7IDEpID09ICIxIikgYW5kIChDb3B5KCFGaWxsZWQ7IExlbmd0aCghRmlsbGVkKS0xOyAxKSA8PD4+ICIxIikKICAgLy8gItCX0LDQv9C+0LvQvdC" +
-					"10L0g0YTQsNC60YIg0L/QviAlcyDRjdGC0LDQv9GDLiIKICAgICFSZXN1bHQgPSBMb2FkU3RyaW5nRm10KCJESVIyQThBNjE4NF9CQkZBXzQyMEVfQUFBRl84OEU0MUM5MTQ4NDQiOyAiQ09NTU9OIjsgQXJyY" +
-					"XlPZighRmlsbGVkKSkgICAgICAKICBlbmRpZgogIGlmICFGaWxsZWQgPSAxCiAgIC8vICLQl9Cw0L/QvtC70L3QtdC9INGE0LDQutGCINC/0L4g0L7QtNC90L7QvNGDIN" +
-					"GN0YLQsNC/0YMuIgogICAgIVJlc3VsdCA9IExvYWRTdHJpbmcoIkRJUjQxQkIxRUU5Xzk3NTNfNDExQl85NDVFXzNDMEIwQTFDMjE4NyI7ICJDT01NT04iKQogIGVuZGlmCiAgaWYgIUZpbGxlZCA9IDAKICAg" +
-					"Ly8gItCd0Lgg0L/QviDQvtC00L3QvtC80YMg0Y3RgtCw0L/RgyDRhNCw0LrRgiDQvdC1INCx0YvQuyDQt9Cw0L/QvtC70L3QtdC9LiIKICAgICFSZXN1bHQgPSBMb2FkU3RyaW5nKCJESVJGOUREQjlERF80QU" +
-					"M5XzRGNzRfQTgzQl8yODM0Q0M1NzU4NzkiOyAiQ09NTU9OIikgICAgCiAgZW5kaWYg";
+            string str = "Ly8vIElTQkxTY2FuIENvZGVWaWV3Ci8vLyBUb29sIGZvciB2aWV3IHNvdXJjZSBjb2RlIG9mIEVDTSBzeXN0ZW1zIGJhc2VkIG9uIElTLUJ1aWxkZXIgNyAoRElSRUNUVU0sIE9yaWVuZ2UgQ29udGVycmEpIG" +
+                    "FuZCBDUE0gc3lzdGVtcyBiYXNlZCBvbiBJUy1CdWlsZGVyIDUgKFByZXN0aW1hKS4KLy8vIFNhbXBsZSBJU0JMIHNvdXJjZSBjb2RlOgoKICBRVUVSWV9GSUVMRFNfREVMSU1JVEVSID0gIiwiCiAgRUxFTUVO" +
+                    "VFNfRE9FU19OT1RfRVhJU1QgPSAwCiAgU1RSSU5HX0xFTkdUSCA9IDgwIAogIFNUUklOR19TVEFSVF9JTkRFWCA9IDEKICBCQV9FVkVOVFNfVEFCTEVfTkFNRV9URU1QTEFURSA9ICJCQUV2ZW50cyVzIgogIE" +
+                    "5VTExfVkFMVUUgPSAiTlVMTCIgICAgICAKICBUQUJMRV9OQU1FX1JFUExBQ0VfRlJPTV9URVhUID0gIl0iCiAgVEFCTEVfTkFNRV9SRVBMQUNFX1RPX1RFWFQgPSAiXV0iICAKICBCQUV2ZW50c1RhYmxlTmFt" +
+                    "ZSA9IEZvcm1hdChCQV9FVkVOVFNfVEFCTEVfTkFNRV9URU1QTEFURTsgU3RhbmRhcmRSb3V0ZUNvZGUpCiAgQkFFdmVudHNUYWJsZU5hbWUgPSBSZXBsYWNlKEJBRXZlbnRzVGFibGVOYW1lOyBUQUJMRV9OQU" +
+                    "1FX1JFUExBQ0VfRlJPTV9URVhUOyBUQUJMRV9OQU1FX1JFUExBQ0VfVE9fVEVYVCkKICBpZiBGaWVsZExpc3QuQ291bnQgPiBFTEVNRU5UU19ET0VTX05PVF9FWElTVAogICAgLy8g0J/QvtC70YPRh9C40YLR" +
+                    "jCDRiNCw0LHQu9C+0L3RiyDQt9Cw0L/RgNC+0YHQvtCyINC00LvRjyDQstGB0YLQsNCy0LrQuCDQuCDQvtCx0L3QvtCy0LvQtdC90LjRjyDQt9Cw0L/QuNGB0LXQuSDQsiDRgtCw0LHQu9C40YbQtS4g0J7Qsd" +
+                    "C90L7QstC70Y/RjtGC0YHRjyDQv9C+0LvRjywg0L/QtdGA0LXQtNCw0L3QvdGL0LUg0LIg0L/QsNGA0LDQvNC10YLRgNC1IEZpZWxkTGlzdAogICAgLy8g0KTQvtGA0LzQsNGCINGB0L/QuNGB0LrQsCBGaWVs" +
+                    "ZExpc3Q6CiAgICAvLyBOYW1lIC0g0JjQvNGPINC/0L7Qu9GPCiAgICAvLyBWYWx1ZSAtINCX0L3QsNGH0LXQvdC40LUg0L/QvtC70Y8KICAgIEluZGV4ID0gMAogICAgVXBkYXRlU2V0Rm9yVXBkYXRlUXVlcn" +
+                    "kgPSAiIgogICAgRmllbGROYW1lc0Zvckluc2VydFF1ZXJ5ID0gIiIKICAgIEZpZWxkVmFsdWVzRm9ySW5zZXJ0UXVlcnkgPSAiIgogICAgZm9yZWFjaCBGaWVsZFZhbHVlI" +
+                    "GluIEZpZWxkTGlzdAogICAgICBGaWVsZE5hbWUgPSBGaWVsZExpc3QuTmFtZXMoSW5kZXgpCiAgICAgIGlmIEFzc2lnbmVkKEZpZWxkVmFsdWUpCiAgICAgICAgRmllbGRWYWx1ZSA9IEZvcm1hdCgiJyVzJyI" +
+                    "7IENvcHkoRmllbGRWYWx1ZTsgU1RSSU5HX1NUQVJUX0lOREVYOyBTVFJJTkdfTEVOR1RIKSkKICAgICAgZWxzZQogICAgICAgIEZpZWxkVmFsdWUgPSBOVUxMX1ZBTFVFICAKICAgICAgZW5kaWYKICAgICAgV" +
+                    "XBkYXRlU2V0Rm9yVXBkYXRlUXVlcnkgPSBBZGRTdWJTdHJpbmcoRm9ybWF0KCIlcyA9ICVzIjsgQXJyYXlPZihGaWVsZE5hbWU7IEZpZWxkVmFsdWUpKTsgVXBkYXRlU2V0Rm9yVXBkYXRlUXVlcnk7IFFVRVJ" +
+                    "ZX0ZJRUxEU19ERUxJTUlURVIpCiAgICAgIEZpZWxkTmFtZXNGb3JJbnNlcnRRdWVyeSA9IEFkZFN1YlN0cmluZyhGaWVsZE5hbWU7IEZpZWxkTmFtZXNGb3JJbnNlcnRRdWVyeTsgUVVFUllfRklFTERTX0RFT" +
+                    "ElNSVRFUikKICAgICAgRmllbGRWYWx1ZXNGb3JJbnNlcnRRdWVyeSA9IEFkZFN1YlN0cmluZyhGaWVsZFZhbHVlOyBGaWVsZFZhbHVlc0Zvckluc2VydFF1ZXJ5OyBRVUVSWV9GSUVMRFNfREVMSU1JVEVSKSA" +
+                    "KICAgICAgSW5kZXggPSBJbmRleCArIDEKICAgIGVuZGZvcmVhY2gKICAgIFNlbGVjdFF1ZXJ5VGVtcGxhdGUgPSAiCiAgICAgIHNlbGVjdCAKICAgICAgICAxCiAgICAgIGZyb20KICAgICAgICBbJTA6c10KI" +
+                    "CAgICAgd2hlcmUKICAgICAgICBUYXNrSUQgPSAlMTpzCiAgICAgICAgYW5kIEJsb2NrSUQgPSAlMjpzCiAgICAgICAgYW5kIEl0ZXJhdGlvbiA9ICUzOnMiCiAgICBRdWVyeVJlc3VsdCA9IFNRTChGb3JtYXQ" +
+                    "oU2VsZWN0UXVlcnlUZW1wbGF0ZTsgQXJyYXlPZihCQUV2ZW50c1RhYmxlTmFtZTsgVGFza0lEOyBCbG9ja0lEOyBJdGVyYXRpb24pKSkKICAgIGlmIEFzc2lnbmVkKFF1ZXJ5UmVzdWx0KQogICAgICAvLyDQl" +
+                    "dGB0LvQuCDQt9Cw0L/QuNGB0Ywg0LXRgdGC0YwsINGC0L4g0L7QsdC90L7QstC40YLRjAogICAgICBVcGRhdGVRdWVyeVRlbXBsYXRlID0gIgogICAgICAgIHVwZGF0ZSBbJTA6c10gc2V0CiAgICAgICAgICA" +
+                    "lNDpzCiAgICAgICAgd2hlcmUKICAgICAgICAgIFRhc2tJRCA9ICUxOnMKICAgICAgICAgIGFuZCBCbG9ja0lEID0gJTI6cwogICAgICAgICAgYW5kIEl0ZXJhdGlvbiA9ICUzOnMiCiAgICAgIFNRTChGb3JtY" +
+                    "XQoVXBkYXRlUXVlcnlUZW1wbGF0ZTsgQXJyYXlPZihCQUV2ZW50c1RhYmxlTmFtZTsgVGFza0lEOyBCbG9ja0lEOyBJdGVyYXRpb247IFVwZGF0ZVNldEZvclVwZGF0ZVF1ZXJ5KSkpCiAgICBlbmRpZiAgIAo" +
+                    "gIGVuZGlmCgoKICAhVEFTS19TVEFURV9ET05FID0gItCS0YvQv9C+0LvQvdC10L3QsCIKICAhUFJPSkVDVF9UQVNLX0NPTVBMRVRFX1BFUkNFTlQgPSAxMDAKCiAvLyAhUHJvamVjdD3QodGG0LXQvdCw0YDQu" +
+                    "NC50J/QsNGA0LDQvCgiUHJvamVjdCIpCiAgIU1TVGFza3MgPSDQodGG0LXQvdCw0YDQuNC50J/QsNGA0LDQvCgiVGFza3Mi" +
+                    "KSAKICAhSUREb2MgPSDQodGG0LXQvdCw0YDQuNC50J/QsNGA0LDQvCgiSUQiKQogLy8g0LXRgdC70Lgg0L3QtdGCINC60LDQutC+0LPQvi3Qu9C40LHQviDQv9Cw0YDQsNC80LXRgtGA0LAsINGC0L4g0LfQvd" +
+                    "Cw0YfQuNGCINGB0YbQtdC90LDRgNC40Lkg0LLRi9C30YvQstCw0LXRgtGB0Y8g0L3QtSDQuNC3IE1TIE9mZmljZSAgIAogIGlmICghTVNUYXNrcyA9PSAiIikgb3IgKCFJRERvYyA9PSAiIikKICAgICFNZXNz" +
+                    "YWdlID0gTG9hZFN0cmluZygiRElSU1RSXzQwIjsgIkVETSIpCiAgICBSYWlzZShDcmVhdGVFeGNlcHRpb24oIiI7ICFNZXNzYWdlOyBlY1dhcm5pbmcpKSAvLyBb0JrQsNGC0LXQs9C+0YDQuNGPXSA9IGVjRX" +
+                    "hjZXB0aW9uIE9SIGVjV2FybmluZyBPUiBlY0luZm9ybWF0aW9uIAogIGVuZGlmCiAgCiAvLyDQv9C+0LvRg9GH0LjRgtGMINC/0YDQuNC70L7QttC10L3QuNC1CiAgIUFwcCA9ICFTZW5kZXIuQXBwbGljYXRp" +
+                    "b24KIC8vINC40L3RhNC+0YDQvNCw0YbQuNGPINC+INC00L7QutGD0LzQtdC90YLQtSAo0L7QsdGK0LXQutGC0LUpIAogICFFRG9jSW5mbyA9ICFBcHAuRURvY3VtZW50RmFjdG9yeS5PYmplY3RJbmZvKCFJRE" +
+                    "RvYykKCiAgIVByb2dyZXNzID0gQ3JlYXRlUHJvZ3Jlc3MoIDsgIU1TVGFza3MuQ291bnQ7KQogICFQcm9ncmVzcy5TaG93CiAgIUZpbGxlZCA9IDAKIC8vINC/0YDQvtC50LTRkdC8INC/0L4g0LLRgdC10Lwg" +
+                    "0LfQsNC00LDRh9Cw0LwgCiAgIWkgPSAxCiAgd2hpbGUgIWkgPD0gIU1TVGFza3MuQ291bnQKICAgLy8g0LXRgdC70Lgg0LfQsNC00LDRh9CwINGB0L7Qt9C00LDQvdCwCiAgICAhTVNUYXNrID0gIU1TVGFza3" +
+                    "MuSXRlbSghaSkKICAgIGlmIG5vdCBWYXJJc051bGwoIU1TVGFzaykgIAogICAgICBpZiAhTVNUYXNrLkZsYWcyMAogICAgICAgICFIeXBlckxpbmsgPSAhTVNUYXNrLlRleHQyMAogICAgICAgICFJRCA9IFN1" +
+                    "YlN0cmluZyghSHlwZXJMaW5rOyAiPSI7IDMpCiAgICAgICAgRXhjZXB0aW9uc09mZigpCiAgICAgICAgRnJlZUV4Y2VwdGlvbigpCiAgICAgICAgIVRhc2sgPSAhQXBwLlRhc2tGYWN0b3J5LkNvbXBvbmVudC" +
+                    "ghSUQpCiAgICAgICAgaWYgbm90IEV4Y2VwdGlvbkV4aXN0cygpCiAgICAgICAgIC8vINC30LDQv9C+0LvQvdC40Lwg0YTQsNC60YIg0L/QviDQt9Cw0LTQsNGH0LUg0LX" +
+                    "RgdC70Lgg0LfQsNC00LDRh9CwINCy0YvQv9C+0LvQvdC10L3QsAogICAgICAgICAvLyDQvdC+INGN0YLQsNC/INC10YnQtSDQvdC1INC30LDQstC10YDRiNC10L0KICAgICAgICAgIGlmICghVGFzay5EYXRhU" +
+                    "2V0LlJlcXVpc2l0ZXMoIlRhc2tTdGF0ZSIpLkFzU3RyaW5nID09ICFUQVNLX1NUQVRFX0RPTkUpIGFuZAogICAgICAgICAgICAgKCFNU1Rhc2suUGVyY2VudENvbXBsZXRlIDwgIVBST0pFQ1RfVEFTS19DT01" +
+                    "QTEVURV9QRVJDRU5UKSAKICAgICAgICAgICAgIU1TVGFzay5BY3R1YWxGaW5pc2ggPSAhVGFzay5EYXRhU2V0LlJlcXVpc2l0ZXMoIkVuZERhdGUiKS5Bc1N0cmluZwogICAgICAgICAgICAhTVNUYXNrLlBlc" +
+                    "mNlbnRDb21wbGV0ZSA9ICFQUk9KRUNUX1RBU0tfQ09NUExFVEVfUEVSQ0VOVAogICAgICAgICAgICAhRmlsbGVkID0gIUZpbGxlZCArIDEgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgZW5kaWYKICA" +
+                    "gICAgICBlbmRpZgogICAgICAgIEV4Y2VwdGlvbnNPbigpICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgZW5kaWYKICAgIGVuZGlmICAgCiAgICAhaSA9ICFpI" +
+                    "CsgMQogICAgIVByb2dyZXNzLk5leHQKICBlbmR3aGlsZSAgICAgICAKCiAgaWYgIUZpbGxlZCA+IDEKICAgLy8gItCX0LDQv9C+0LvQvdC10L0g0YTQsNC60YIg0L/QviAlcyDRjdGC0LDQv9Cw0LwuIiAgICA" +
+                    "gICAgCiAgICAhUmVzdWx0ID0gTG9hZFN0cmluZ0ZtdCgiRElSOEZFOEQxRDRfNTlGN180Mzc2Xzg5QkZfNkJGQkVBMDJGNTJGIjsgIkNPTU1PTiI7IEFycmF5T2YoIUZpbGxlZCkpICAgIAogIGVuZGlmICAKI" +
+                    "CBpZiAoQ29weSghRmlsbGVkOyBMZW5ndGgoIUZpbGxlZCk7IDEpID09ICIxIikgYW5kIChDb3B5KCFGaWxsZWQ7IExlbmd0aCghRmlsbGVkKS0xOyAxKSA8PD4+ICIxIikKICAgLy8gItCX0LDQv9C+0LvQvdC" +
+                    "10L0g0YTQsNC60YIg0L/QviAlcyDRjdGC0LDQv9GDLiIKICAgICFSZXN1bHQgPSBMb2FkU3RyaW5nRm10KCJESVIyQThBNjE4NF9CQkZBXzQyMEVfQUFBRl84OEU0MUM5MTQ4NDQiOyAiQ09NTU9OIjsgQXJyY" +
+                    "XlPZighRmlsbGVkKSkgICAgICAKICBlbmRpZgogIGlmICFGaWxsZWQgPSAxCiAgIC8vICLQl9Cw0L/QvtC70L3QtdC9INGE0LDQutGCINC/0L4g0L7QtNC90L7QvNGDIN" +
+                    "GN0YLQsNC/0YMuIgogICAgIVJlc3VsdCA9IExvYWRTdHJpbmcoIkRJUjQxQkIxRUU5Xzk3NTNfNDExQl85NDVFXzNDMEIwQTFDMjE4NyI7ICJDT01NT04iKQogIGVuZGlmCiAgaWYgIUZpbGxlZCA9IDAKICAg" +
+                    "Ly8gItCd0Lgg0L/QviDQvtC00L3QvtC80YMg0Y3RgtCw0L/RgyDRhNCw0LrRgiDQvdC1INCx0YvQuyDQt9Cw0L/QvtC70L3QtdC9LiIKICAgICFSZXN1bHQgPSBMb2FkU3RyaW5nKCJESVJGOUREQjlERF80QU" +
+                    "M5XzRGNzRfQTgzQl8yODM0Q0M1NzU4NzkiOyAiQ09NTU9OIikgICAgCiAgZW5kaWYg";
             ActiveSearchStringControl = this.textEditorControlSearchText;
 
-			byte[] data = System.Convert.FromBase64String(str);
-			System.Text.Encoding win1251 = System.Text.Encoding.UTF8;
-			string scriptText = win1251.GetString(data);
-			textEditorControlISBL.Document.TextContent = scriptText;
-			textEditorControlISBL.Document.HighlightingStrategy = 
-				HighlightingStrategyFactory.CreateHighlightingStrategy("ISBL");
+            byte[] data = System.Convert.FromBase64String(str);
+            System.Text.Encoding win1251 = System.Text.Encoding.UTF8;
+            string scriptText = win1251.GetString(data);
+            textEditorControlISBL.Document.TextContent = scriptText;
+            textEditorControlISBL.Document.HighlightingStrategy =
+                HighlightingStrategyFactory.CreateHighlightingStrategy("ISBL");
             textEditorControlISBL.Document.FoldingManager.FoldingStrategy =
                 new IndentFoldingStrategy();
 
@@ -176,69 +182,6 @@ namespace ISBLScan.ViewCode
             textEditorControlISBL.Document.TextEditorProperties = prop;
             textEditorControlISBL.Document.ReadOnly = true;
             MarkSearchStrings();
-		}
-		
-        /// <summary>
-        /// Загрузка добавление узла разработки в список узлов дерева.
-        /// А также рекурсивный вызов для подузлов.
-        /// </summary>
-        /// <param name="treeNodes">Список узлов TreeVeiew, в который добавляется узел.</param>
-        /// <param name="isblNode">Добавляемый элемент разработки.</param>
-		void LoadSubNodes(TreeNodeCollection treeNodes, Node isblNode)
-		{
-			if(isblNode != null && isblNode.Visible)
-			{
-				TreeNode treeNode = treeNodes.Add(isblNode.Name);
-                treeNode.Tag = isblNode;
-                isblNode.Tag = treeNode;
-                if (isblNode.IsMatch)
-                {
-                    treeNode.Checked = true;
-                    treeNode.ForeColor = Color.Black;
-                }
-                else
-                {
-                    treeNode.Checked = false;
-                    treeNode.ForeColor = Color.Gray;
-                }
-                
-                if (isblNode.Nodes != null)
-				{
-					foreach(Node isblSubNode in isblNode.Nodes)
-					{
-						LoadSubNodes(treeNode.Nodes, isblSubNode);
-					}
-				}
-			}
-		}
-  
-
-        void ClearSearchStatus(List<Node> isblNodes)
-        {
-            if (isblNodes != null)
-            {
-                foreach (Node node in isblNodes)
-                {
-                    if (node != null)
-                    {
-                        node.IsMatch = false;
-                        node.IsContainsMatchedNode = false;
-                        ClearSearchStatus(node.Nodes);
-                    }
-                }
-            }
-        }
-
-        void RefreshTreeView(List<Node> isblNodes)
-        {
-            if (isblNodes != null)
-            {
-                treeViewResults.Nodes.Clear();
-                foreach (Node isblNode in ISBLNodes)
-                {
-                    LoadSubNodes(this.treeViewResults.Nodes, isblNode);
-                }
-            }
         }
 
         /// <summary>
@@ -246,50 +189,48 @@ namespace ISBLScan.ViewCode
         /// </summary>
         /// <returns></returns>
 		bool Connect()
-		{
-			bool connect;
-			if(checkBoxWinAuth.Checked)
-			{
-				connect = isblLoader.Connect(textBoxSQLServer.Text,
-				                   textBoxDB.Text,
-				                   "",
-				                   "",
-				                   true);
-			}
-			else
-			{
-				connect = isblLoader.Connect(textBoxSQLServer.Text,
-				                   textBoxDB.Text,
-				                   textBoxLogin.Text,
-				                   textBoxPassword.Text,
-				                   false
-				                  );
-			}
-			if(connect)
-			{
-				Configuration.Save(textBoxSQLServer.Text, textBoxDB.Text, textBoxLogin.Text, checkBoxWinAuth.Checked);
-			}
-			return connect;
-		}
-		
+        {
+            bool connect;
+            if (checkBoxWinAuth.Checked)
+            {
+                connect = isblLoader.Connect(textBoxSQLServer.Text,
+                                   textBoxDB.Text,
+                                   "",
+                                   "",
+                                   true);
+            }
+            else
+            {
+                connect = isblLoader.Connect(textBoxSQLServer.Text,
+                                   textBoxDB.Text,
+                                   textBoxLogin.Text,
+                                   textBoxPassword.Text,
+                                   false
+                                  );
+            }
+            if (connect)
+            {
+                Configuration.Save(textBoxSQLServer.Text, textBoxDB.Text, textBoxLogin.Text, checkBoxWinAuth.Checked);
+            }
+            return connect;
+        }
+
         /// <summary>
         /// Загрузка элементов разработки из базы данных
         /// </summary>
-		void GetISBL()
-		{
-			ISBLNodes = isblLoader.Load();
-            CountOfISBLNodes = 0;
-            int countNotNullNodes = 0;
-            foreach (Node node in ISBLNodes)
+        bool GetISBL()
+        {
+            SourceISBLNodes = isblLoader.Load();
+            bool ISBLNodesIsEmpty = true;
+            foreach (Node node in SourceISBLNodes)
             {
                 if (node != null)
                 {
-                    countNotNullNodes++;
-                    CountOfISBLNodes++;
-                    CountOfISBLNodes += node.ChildCount;
+                    ISBLNodesIsEmpty = false;
+                    break;
                 }
             }
-            if (countNotNullNodes == 0)
+            if (ISBLNodesIsEmpty)
             {
                 string loginSQLUser = this.textBoxLogin.Text;
                 if (this.checkBoxWinAuth.Checked)
@@ -312,64 +253,63 @@ namespace ISBLScan.ViewCode
                 MessageBoxIcon icon = MessageBoxIcon.Information;
                 //MessageBoxDefaultButton defaultButton = MessageBoxDefaultButton.Button1;
                 MessageBox.Show(text, caption, buttons, icon);
+                return false;
             }
-            else
-            {
-                treeViewResults.Nodes.Clear();
-                foreach (Node isblNode in ISBLNodes)
-                {
-                    LoadSubNodes(this.treeViewResults.Nodes, isblNode);
-                }
-            }
-		}
-		
+            else return true;
+        }
+
         /// <summary>
         /// Соединение с SQL Server и загрузка элементов разработки из базы данных
         /// </summary>
-		void ConnectAndGetISBL()
-		{
-				if((textBoxSQLServer.Text.Trim() != "")&&(textBoxDB.Text.Trim() != "")&&
-			   		(checkBoxWinAuth.Checked || (!checkBoxWinAuth.Checked && textBoxLogin.Text.Trim() != ""))
-			  	)
-				{
-					if(Connect())
-					{
-						GetISBL();
-						buttonSearch.Enabled = true;
-					}
-					else
-					{
-						MessageBox.Show(isblLoader.errorText, "Ошибка открытия базы данных");
-					}
-				}
-				else
-				{
-					if(textBoxLogin.Text.Trim() == "")
-					{
-						textBoxLogin.Text = "Login";
-						textBoxLogin.Font = new Font(textBoxLogin.Font, FontStyle.Italic);
-						textBoxLogin.BackColor = Color.LightCoral;
-						textBoxLogin.SelectAll();
-						textBoxLogin.Focus();
-					}
-					if(textBoxDB.Text.Trim() == "")
-					{
-						textBoxDB.Text = "Data Base";
-						textBoxDB.Font = new Font(textBoxDB.Font, FontStyle.Italic);
-						textBoxDB.BackColor = Color.LightCoral;
-						textBoxDB.SelectAll();
-						textBoxDB.Focus();
-					}
-					if(textBoxSQLServer.Text.Trim() == "")
-					{
-						textBoxSQLServer.Text = "Sql Server";
-						textBoxSQLServer.Font = new Font(textBoxSQLServer.Font, FontStyle.Italic);
-						textBoxSQLServer.BackColor = Color.LightCoral;
-						textBoxSQLServer.SelectAll();
-						textBoxSQLServer.Focus();
-					}
-				}			
-		}
+        void ConnectAndGetISBL()
+        {
+            if ((textBoxSQLServer.Text.Trim() != "") && (textBoxDB.Text.Trim() != "") &&
+                   (checkBoxWinAuth.Checked || (!checkBoxWinAuth.Checked && textBoxLogin.Text.Trim() != ""))
+              )
+            {
+                if (Connect())
+                {
+                    if (GetISBL())
+                    {
+                        ActiveISBLNodes = new List<Node>(SourceISBLNodes);
+                        buildDisplayTree();
+                        showTree();
+                        buttonSearch.Enabled = true;
+                    }
+                }
+                else
+                {
+                    MessageBox.Show(isblLoader.errorText, "Ошибка открытия базы данных");
+                }
+            }
+            else
+            {
+                if (textBoxLogin.Text.Trim() == "")
+                {
+                    textBoxLogin.Text = "Login";
+                    textBoxLogin.Font = new Font(textBoxLogin.Font, FontStyle.Italic);
+                    textBoxLogin.BackColor = Color.LightCoral;
+                    textBoxLogin.SelectAll();
+                    textBoxLogin.Focus();
+                }
+                if (textBoxDB.Text.Trim() == "")
+                {
+                    textBoxDB.Text = "Data Base";
+                    textBoxDB.Font = new Font(textBoxDB.Font, FontStyle.Italic);
+                    textBoxDB.BackColor = Color.LightCoral;
+                    textBoxDB.SelectAll();
+                    textBoxDB.Focus();
+                }
+                if (textBoxSQLServer.Text.Trim() == "")
+                {
+                    textBoxSQLServer.Text = "Sql Server";
+                    textBoxSQLServer.Font = new Font(textBoxSQLServer.Font, FontStyle.Italic);
+                    textBoxSQLServer.BackColor = Color.LightCoral;
+                    textBoxSQLServer.SelectAll();
+                    textBoxSQLServer.Focus();
+                }
+            }
+        }
 
         /// <summary>
         /// Нажатие кнопки "Conact and Load ISBL"
@@ -377,38 +317,30 @@ namespace ISBLScan.ViewCode
         /// <param name="sender"></param>
         /// <param name="e"></param>
 		void ButtonConnectClick(object sender, EventArgs e)
-		{
-			 ConnectAndGetISBL();
-		}
-		
+        {
+            ConnectAndGetISBL();
+        }
+
         /// <summary>
         /// Выбор узла в дереве разработки
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-		void TreeViewResultsAfterSelect(object sender, TreeViewEventArgs e)
-		{
-			if(e.Node.Tag != null)
-			{				
-				textEditorControlISBL.IsReadOnly = true;
+        void TreeViewResultsAfterSelect(object sender, TreeViewEventArgs e)
+        {
+            if (e.Node.Tag != null)
+            {
+                textEditorControlISBL.IsReadOnly = true;
                 Node node = e.Node.Tag as Node;
                 textEditorControlISBL.Document.TextContent = node.Text;
                 MarkSearchStrings();
-                if (node.LastUpdate != null)
-                {
-                    toolStripStatusLabelLastUpd.Text = node.LastUpdate.Value.ToString("dd.MM.yyyy hh:mm:ss");
-                }
-                else
-                {
-                    toolStripStatusLabelLastUpd.Text = "00.00.0000 00:00:00";
-                }
                 toolStripStatusLabelSelectedElement.Text = node.Name;
-			}
-			else
-			{
-				textEditorControlISBL.Document.TextContent = "";
-			}
-		}
+            }
+            else
+            {
+                textEditorControlISBL.Document.TextContent = "";
+            }
+        }
 
         /// <summary>
         /// Проверка списка регулярных выражений на корректность и возврат списка строк корректных регулярных выражений.
@@ -478,7 +410,7 @@ namespace ISBLScan.ViewCode
             bool isFound = false;
             //Сначала выделим текущий элемент так, как будто в нём ничего не найдено
             node.IsMatch = false;
-            node.Visible = false;
+            node.IsContainsMatchedNode = false;
             if (node.Nodes != null)
             {
                 foreach (Node subNode in node.Nodes)
@@ -486,7 +418,6 @@ namespace ISBLScan.ViewCode
                     if (FilterNode(subNode, searchStrArray, caseSensitive, regExp, findAll))
                     {
                         node.IsContainsMatchedNode = true;
-                        node.Visible = true;
                         isFound = true;
                     }
                 }
@@ -509,7 +440,7 @@ namespace ISBLScan.ViewCode
                         regEx = new Regex(searchPhrase, regExpOptions);
                         dictRegEx.Add(searchPhrase, regEx);
                     }
-                    if ( (!String.IsNullOrEmpty(isblText) && regEx.IsMatch(isblText)) || regEx.IsMatch(nodeName))
+                    if ((!String.IsNullOrEmpty(isblText) && regEx.IsMatch(isblText)) || regEx.IsMatch(nodeName))
                     {
                         searchSatisfied = true;
                         if (!findAll) break;
@@ -527,7 +458,7 @@ namespace ISBLScan.ViewCode
             else
             {
                 StringComparison comparation = caseSensitive ? StringComparison.CurrentCulture : StringComparison.CurrentCultureIgnoreCase;
-                
+
                 foreach (string searchPhrase in searchStrArray)
                 {
                     if (
@@ -551,93 +482,18 @@ namespace ISBLScan.ViewCode
             if (searchSatisfied)
             {
                 node.IsMatch = true;
-                node.Visible = true;
                 isFound = true;
             }
-            CountOfProcessedISBLNodes++;
-            int procent = (100 * CountOfProcessedISBLNodes) / CountOfISBLNodes;
-            backgroundWorkerFind.ReportProgress(procent);
             return isFound;
         }
-
-		//Рекурсивный поиск по дереву разработки
-		bool FilterNode(TreeNode node, string[] searchStrArray, bool caseSensitive, bool regExp)
-		{
-			bool isFound = false;
-			//Сначала выделим текущий элемент так, как будто в нём ничего не найдено
-			node.ForeColor = Color.Gray;
-			node.Checked = false;
-			if(node.Nodes != null)
-			{
-				foreach(TreeNode subNode in node.Nodes)
-				{
-                    if (FilterNode(subNode, searchStrArray, caseSensitive, regExp))
-					{
-						node.ForeColor = Color.Black;
-						isFound = true;
-					}
-				}
-			}
-			//if(node.Tag != null)
-			{
-				//RegexOptions ro = RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase;
-				//Разделение поисковых фраз по строкам
-                string isblText = node.Tag != null ? node.Tag.ToString() : "";
-                string nodeName = node.Name;
-                if (regExp)
-                {
-                    RegexOptions regExpOptions = caseSensitive ? RegexOptions.Compiled : RegexOptions.Compiled | RegexOptions.IgnoreCase;
-                    foreach (string searchPhrase in searchStrArray)
-                    {
-                        Regex regEx = null;
-                        if (dictRegEx.ContainsKey(searchPhrase))
-                        {
-                            regEx = dictRegEx[searchPhrase];
-                        }
-                        else
-                        {
-                            regEx = new Regex(searchPhrase, regExpOptions);
-                            dictRegEx.Add(searchPhrase, regEx);
-                        }
-                        if(regEx.IsMatch(isblText) || regEx.IsMatch(nodeName))
-                        {
-                            node.ForeColor = Color.Black;
-                            node.Checked = true;
-                            isFound = true;
-                        }
-                    }
-                }
-                else
-                {
-                    StringComparison comparation = caseSensitive ? StringComparison.CurrentCulture : StringComparison.CurrentCultureIgnoreCase;
-                    foreach (string searchPhrase in searchStrArray)
-                    {
-                        //Пропуск пустых поисковых строк
-                        if (
-                            (isblText.IndexOf(searchPhrase, 0, comparation) > 0) ||
-                            (nodeName.IndexOf(searchPhrase, 0, comparation) > 0)
-                            )
-                        {
-                            node.ForeColor = Color.Black;
-                            node.Checked = true;
-                            isFound = true;
-                        }
-                    }
-                }
-			}
-            CountOfProcessedISBLNodes++;
-            backgroundWorkerFind.ReportProgress((100 * CountOfProcessedISBLNodes) % CountOfISBLNodes);
-			return isFound;
-		}
 
         /// <summary>
         /// Возврат всех слов из текста реактора поискового запроса, 
         /// разделителями слов в тексте выступают пробельные символы.
         /// </summary>
         /// <returns></returns>
-        string[] GetSearchStrArray()
+        void GetSearchStrArray()
         {
-            string[] searchStrs;
             if (checkBoxFindRegExp.Checked)
             {
                 searchStrs = checkRegExpFormat();
@@ -662,7 +518,6 @@ namespace ISBLScan.ViewCode
                 }
                 searchStrs = searchWords.ToArray();
             }
-            return searchStrs;
         }
 
         /// <summary>
@@ -672,15 +527,17 @@ namespace ISBLScan.ViewCode
         /// <param name="e"></param>
 		void ButtonFilterClick(object sender, EventArgs e)
 		{
-            if (backgroundWorkerFind.IsBusy != true)
+            buttonSearch.Enabled = false;
+            GetSearchStrArray();
+            foreach (Node node in SourceISBLNodes)
             {
-                CountOfProcessedISBLNodes = 0; 
-                buttonSearch.Enabled = false;
-                searchStrs = GetSearchStrArray();
-                ClearSearchStatus(ISBLNodes);
-                backgroundWorkerFind.RunWorkerAsync();
+                FilterNode(node, searchStrs, checkBoxFindCaseSensitive.Checked, checkBoxFindRegExp.Checked, checkBoxFindAll.Checked);
             }
-		}
+            buildTabISBLNodes();
+            buildDisplayTree();
+            showTree();
+            buttonSearch.Enabled = true;
+        }
 		
 
         /// <summary>
@@ -688,7 +545,7 @@ namespace ISBLScan.ViewCode
         /// </summary>
         public void MarkSearchStrings()
         {
-            string[] searchStrs = GetSearchStrArray();
+             GetSearchStrArray();
             textEditorControlISBL.Document.MarkerStrategy.RemoveAll((marker) => { return true; });
             textEditorControlISBL.Document.BookmarkManager.RemoveMarks((bookmark) => { return true; });
 
@@ -841,86 +698,138 @@ namespace ISBLScan.ViewCode
 			(sender as TextBox).BackColor = this.textBoxFilter.BackColor;
             (sender as TextBox).ForeColor = this.textBoxFilter.ForeColor;
 		}
-		
 
+        void buildDisplayTree()
+        {
+            filterISBLNodesByName();
+            ActiveSearchStringControl.TreeViewResults.Nodes.Clear();
+            copyISBLNodesToTreeNodes(ActiveISBLNodes, ActiveSearchStringControl.TreeViewResults.Nodes);
+        }
+        void showTree()
+        {
+            ActiveSearchStringControl.TreeViewResults.BringToFront();
+            var SelectedNode = ActiveSearchStringControl.TreeViewResults.SelectedNode;
+            if(SelectedNode != null)
+            {
+                Node node = SelectedNode.Tag as Node;
+                textEditorControlISBL.Document.TextContent = node.Text;
+                MarkSearchStrings();
+                toolStripStatusLabelSelectedElement.Text = node.Name;
+            }
+        }
+        void filterISBLNodesByName()
+        {
+            if(ActiveISBLNodes != null)
+            {
+                foreach (Node node in ActiveISBLNodes)
+                {
+                    FilterNodeByName(node, textBoxFilter.Text);
+                }
+            }
+        }
 
-		//Рекурсивный поиск по дереву разработки
-		bool FilterNodeByName (Node node, string nameFilter)
+        bool FilterNodeByName(Node node, string nameFilter)
+        {
+            if (node == null)
+                return false;
+
+            bool isFound = false;
+            //Пропуск пустых поисковых строк
+            if (node.Name.ToUpper().Contains(nameFilter.ToUpper()))
+            {
+                SetVisible(node);
+                isFound = true;
+            }
+            else
+            {
+                if (node.Nodes != null)
+                {
+                    foreach (Node subNode in node.Nodes)
+                    {
+                        if (FilterNodeByName(subNode, nameFilter))
+                        {
+                            isFound = true;
+                        }
+                    }
+                }
+            }
+            node.Visible = isFound;
+            return isFound;
+        }
+        void SetVisible(Node node)
+        {
+            node.Visible = true;
+            if (node.Nodes != null)
+            {
+                foreach (Node childNode in node.Nodes)
+                {
+                    SetVisible(childNode);
+                }
+            }
+        }
+        void copyISBLNodesToTreeNodes(List<Node> ISBLNodes, TreeNodeCollection TreeNodes)
+        {
+            foreach (Node isblNode in ISBLNodes)
+            {
+                if (isblNode.Visible)
+                {
+                    TreeNode treeNode = TreeNodes.Add(isblNode.Name);
+                    treeNode.Tag = isblNode;
+                    isblNode.Tag = treeNode;
+
+                    if (isblNode.IsMatch)
+                    {
+                        treeNode.Checked = true;
+                        treeNode.ForeColor = Color.Black;
+                    }
+                    else
+                    {
+                        treeNode.Checked = false;
+                        treeNode.ForeColor = Color.Gray;
+                    }
+
+                    if (isblNode.Nodes != null)
+                    {
+                        copyISBLNodesToTreeNodes(isblNode.Nodes, treeNode.Nodes);
+                    }
+                }
+            }
+        }
+
+        void buildTabISBLNodes()
+        {
+            ActiveISBLNodes.Clear();
+            copyMatchedISBLNodes(ActiveISBLNodes, SourceISBLNodes);
+        }
+
+        void copyMatchedISBLNodes(List<Node> TargetNodes, List<Node> SourceNodes)
+        {
+            if (SourceNodes != null)
+            {
+                foreach (Node isblNode in SourceNodes)
+                {
+                    if (isblNode.IsMatch || isblNode.IsContainsMatchedNode)
+                    {
+                        var nodeCopy = isblNode.Clone();
+                        if (isblNode.Nodes != null)
+                        {
+                            nodeCopy.Nodes = new List<Node>();
+                            copyMatchedISBLNodes(nodeCopy.Nodes, isblNode.Nodes);
+                        }
+                        TargetNodes.Add(nodeCopy);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Изменение текста в поле фильтрации дерева проекта
+        /// </summary>
+        void TextBoxFilter_TextChanged (object sender, System.EventArgs e)
 		{
-			if(node == null)
-				return false;
-
-			bool isFound = false;
-			//Пропуск пустых поисковых строк
-			if (node.Name.ToUpper ().Contains (nameFilter.ToUpper ()))
-			{
-				SetVisible (node, true);
-				isFound = true;
-			}
-			else
-			{
-				if(node.Nodes != null)
-				{
-					foreach(Node subNode in node.Nodes)
-					{
-						if(FilterNodeByName(subNode, nameFilter))
-						{
-							isFound = true;
-						}
-					}
-				}
-			}
-			node.Visible = isFound;
-			return isFound;
-		}
-
-		void SetVisible (Node node, bool isVisible)
-		{
-			if(node == null)
-				return;
-			node.Visible = isVisible;
-			if (node.Nodes != null)
-			{
-				foreach(Node subNode in node.Nodes)
-				{
-					SetVisible(subNode, isVisible);
-				}
-			}
-		}
-
-
-		/// <summary>
-		/// Изменение текста в поле фильтрации дерева проекта
-		/// </summary>
-		void TextBoxFilter_TextChanged (object sender, System.EventArgs e)
-		{
-			if(ISBLNodes == null)
-				return;
-			if (textBoxFilter.Text == "")
-			{
-				foreach (Node node in ISBLNodes)
-				{
-					SetVisible (node, true);
-				}
-			}
-			else
-			{
-				foreach (Node node in ISBLNodes)
-				{
-					FilterNodeByName (node, textBoxFilter.Text);
-				}
-			}
-			treeViewResults.Nodes.Clear();
-			foreach(Node isblNode in ISBLNodes)
-			{
-				LoadSubNodes(this.treeViewResults.Nodes, isblNode);
-			}
-		}
-		
-		void ButtonRefreshClick(object sender, EventArgs e)
-		{
-			GetISBL();
-		}
+            buildDisplayTree();
+            showTree();
+        }
 		
 		void CheckBoxWinAuthCheckedChanged(object sender, EventArgs e)
 		{
@@ -955,17 +864,17 @@ namespace ISBLScan.ViewCode
         {
             TabPage tabPageSearchNew = new TabPage(string.Format("Search {0}", tabControlSarchText.TabCount+1));
 
-            ICSharpCode.TextEditor.TextEditorControl textEditor = new ICSharpCode.TextEditor.TextEditorControl();
+            MyTextEditorControl textEditor = new MyTextEditorControl(this);
             textEditor.Dock = System.Windows.Forms.DockStyle.Fill;
             textEditor.IsReadOnly = false;
-            textEditor.Location = new System.Drawing.Point(3, 3);
+            textEditor.Location = new System.Drawing.Point(0, 0);
             textEditor.ShowEOLMarkers = true;
             textEditor.ShowSpaces = true;
             textEditor.ShowTabs = true;
-            textEditor.Size = new System.Drawing.Size(626, 72);
+            //textEditor.Size = new System.Drawing.Size(100, 50);
             textEditor.TabIndex = 1;
             textEditor.TextChanged += new System.EventHandler(textEditorControlRegExp_TextChanged);
-
+            textEditor.Tag = new List<Node>(SourceISBLNodes);
             tabPageSearchNew.Tag = textEditor;
             tabPageSearchNew.Controls.Add(textEditor);
 
@@ -975,7 +884,7 @@ namespace ISBLScan.ViewCode
 
         private void tabControlSarchText_Selecting(object sender, TabControlCancelEventArgs e)
         {
-            ActiveSearchStringControl = (ICSharpCode.TextEditor.TextEditorControl)tabControlSarchText.SelectedTab.Tag;            
+            ActiveSearchStringControl = (MyTextEditorControl)tabControlSarchText.SelectedTab.Tag;            
         }
 
         private void checkBoxFindRegExp_CheckedChanged(object sender, EventArgs e)
@@ -985,65 +894,28 @@ namespace ISBLScan.ViewCode
 
         private void tabControlSarchText_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ActiveSearchStringControl = (ICSharpCode.TextEditor.TextEditorControl)tabControlSarchText.SelectedTab.Tag;
-            MarkSearchStrings();
+            ActiveSearchStringControl = (MyTextEditorControl)tabControlSarchText.SelectedTab.Tag;
+            showTree();
         }
 
         private void checkBoxFindCaseSensitive_CheckedChanged(object sender, EventArgs e)
         {
             MarkSearchStrings();
         }
-
-        private void backgroundWorkerFind_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
-        {
-            BackgroundWorker worker = sender as BackgroundWorker;
-            LastISBLRefreshPercentage = 0;
-
-            foreach (Node node in ISBLNodes)
-            {
-                if (worker.CancellationPending == true)
-                {
-                    e.Cancel = true;
-                    break;
-                }
-                else
-                {
-                    if (node != null)
-                    {
-                        // Perform a time consuming operation and report progress.
-                        FilterNode(node, searchStrs, checkBoxFindCaseSensitive.Checked, checkBoxFindRegExp.Checked, checkBoxFindAll.Checked);
-                    }
-                }
-            }
-        }
-
-        private void backgroundWorkerFind_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            buttonSearch.Enabled = true;
-            buttonSearch.Text = "Find";
-            RefreshTreeView(ISBLNodes);
-            LastISBLRefreshPercentage = 0;
-        }
-
-        private void backgroundWorkerFind_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            buttonSearch.Text = e.ProgressPercentage.ToString() + "%";
-        }
 	
-	
-	void groupBoxSearch_Resize (object sender, System.EventArgs e)
-	{
-		this.buttonAddNewTab.Left = groupBoxSearch.Width - 36;
-		this.buttonCloseCurrentTab.Left = groupBoxSearch.Width - 19;
-
-	}
+	    void groupBoxSearch_Resize (object sender, System.EventArgs e)
+	    {
+		    this.buttonAddNewTab.Left = groupBoxSearch.Width - 36;
+		    this.buttonCloseCurrentTab.Left = groupBoxSearch.Width - 19;
+	    }
 
         private void buttonExpand_Click(object sender, EventArgs e)
         {
-            foreach (TreeNode node in treeViewResults.Nodes)
+            foreach (TreeNode node in ActiveSearchStringControl.TreeViewResults.Nodes)
             {
                 node.ExpandAll();
             }
+            showTree();
         }
     }
 }

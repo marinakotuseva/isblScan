@@ -29,11 +29,6 @@ namespace ISBLScan.ViewCode
         public string Text { get; set; }
 
         /// <summary>
-        /// Gets or sets Признак того, что узел явялется конечным
-        /// </summary>
-        public bool Flag { get; set; }
-	
-        /// <summary>
         /// Gets or sets a value indicating whether this <see cref="Node"/> is visible.
         /// </summary>
         /// <value>
@@ -52,61 +47,6 @@ namespace ISBLScan.ViewCode
         public bool IsMatch { get; set; }
 
         /// <summary>
-        /// Gets or sets Количество совпадений
-        /// </summary>
-        public int? MatchCount { get; set; }
-
-
-        int? _ChildMathCount;
-        /// <summary>
-        /// Gets or sets Количество совпадений с учётом дочерних узлов
-        /// </summary>
-        public int? ChildMathCount
-        {
-            get
-            {
-                return _ChildMathCount;
-            }
-
-            set
-            {
-                if (value.HasValue)
-                {
-                    if (_ChildMathCount.HasValue)
-                    {
-                        if (Parent.ChildMathCount.HasValue)
-                        {
-                            int distance = value.Value - _ChildMathCount.Value;
-                            Parent.ChildMathCount += distance;
-                        }
-                        else
-                        {
-                            Parent.ChildMathCount = value;
-                        }
-                        _ChildMathCount = value;
-                    }
-                    else
-                    {
-                        if (Parent.ChildMathCount.HasValue)
-                        {
-                            int distance = value.Value;
-                            Parent.ChildMathCount += distance;
-                        }
-                        else
-                        {
-                            Parent.ChildMathCount = value;
-                        }
-                        _ChildMathCount = value;
-                    }
-                }
-                else
-                {
-                    _ChildMathCount = value;
-                }
-            }
-        }
-
-        /// <summary>
         /// Gets or sets Признак того, что узел содержит подузлы, которые соответствуют поисковому запросу
         /// </summary>
         public bool IsContainsMatchedNode { get; set; }
@@ -116,51 +56,23 @@ namespace ISBLScan.ViewCode
         /// </summary>
         public DateTime? LastUpdate { get; set; }
 
-        /// <summary>
-        /// Gets or sets Список родительского узла
-        /// </summary>
-        public Node Parent { get; set; }
-
-        public int ChildCount
+        public Node()
         {
-            get
-            {
-                int count = 0;
-                if (Nodes != null)
-                {
-                    count = Nodes.Count;
-                    foreach(Node childrenNode in Nodes)
-                    {
-                        count += childrenNode.ChildCount;
-                    }
-                }
-                return count;
-            }
+            Visible = true;
         }
 
-	    public Node()
-	    {
-			    Visible = true;
-			    Flag = true;
-	    }
-
-        public string TimeStamp { get; internal set; }
-
-        string GetTimeStamp()
+        public Node Clone()
         {
-            return DateTime.Now.ToString("yyyyMMddHHmmssffffzzz");
+            var Node = new Node();
+            Node.Name = this.Name;
+            Node.IsContainsMatchedNode = this.IsContainsMatchedNode;
+            Node.IsMatch = this.IsMatch;
+            Node.Text = this.Text;
+            Node.Id = this.Id;
+            Node.Code = this.Code;
+            return Node;
         }
 
         public object Tag { get; set; }
     }
-	/// <summary>
-	/// Description of Tree.
-	/// </summary>
-	public class Tree
-	{
-		public Tree()
-		{
-			
-		}
-	}
 }

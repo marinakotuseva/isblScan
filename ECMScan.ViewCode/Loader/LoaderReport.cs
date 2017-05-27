@@ -32,7 +32,6 @@ namespace ISBLScan.ViewCode
 					while(reader.Read())
 					{
 						Node node = new Node();
-						node.Parent = rootNode;
 						node.Id = reader.GetInt32(0);
 						if(! reader.IsDBNull(1))
 						{
@@ -56,7 +55,6 @@ namespace ISBLScan.ViewCode
 				listNode = new Node();
 				listNode.Name = "Аналитический отчёт";
 				listNode.Text = null;
-				listNode.Parent = null;
 				listNode.Nodes = new List<Node>();
 				
 				List<Node> listGroups = LoadGroups(listNode);
@@ -75,7 +73,6 @@ namespace ISBLScan.ViewCode
 						while(reader.Read())
 						{
 							Node reportNode = new Node();
-							reportNode.Parent = groupNode;
 							//ИД отчёта
 							reportNode.Id = reader.GetInt32(0);
 							//Имя отчёта
@@ -98,7 +95,6 @@ namespace ISBLScan.ViewCode
 								Node reportTextNode = new Node();
 								reportTextNode.Name = "-=[ Шаблон ]=-";
 								reportTextNode.Text = scriptText;
-								reportTextNode.Parent = reportNode;
 								reportNode.Nodes.Add(reportTextNode);
 							}
 							//Расчёт отчёта
@@ -108,7 +104,6 @@ namespace ISBLScan.ViewCode
 								Node reportTemplateNode = new Node();
 								reportTemplateNode.Name = "-=[ Расчёт ]=-";
 								reportTemplateNode.Text = templateText;
-								reportTemplateNode.Parent = reportNode;
 								reportNode.Nodes.Add(reportTemplateNode);
 							}
 							groupNode.Nodes.Add(reportNode);

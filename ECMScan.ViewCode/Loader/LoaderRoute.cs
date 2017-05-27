@@ -37,7 +37,6 @@ order by NameAn";
                 while (reader.Read())
                 {
                     Node node = new Node();
-                    node.Parent = rootNode;
                     // ИД группы маршрутов
                     node.Id = reader.GetInt32(0);
                     // Имя группы маршрутов
@@ -57,7 +56,6 @@ order by NameAn";
             listNode = new Node();
             listNode.Name = "Типовой маршрут";
             listNode.Text = null;
-            listNode.Parent = null;
             listNode.Nodes = new List<Node>();
 
             List<Node> listGroups = LoadGroups(listNode);
@@ -85,7 +83,6 @@ order by MBAnalit.NameAn";
                     {
                         Node routeNode = new Node();
                         routeNode.Nodes = new List<Node>();
-                        routeNode.Parent = groupNode;
 
                         // ИД
                         routeNode.Id = reader.GetInt32(0);
@@ -115,7 +112,6 @@ order by MBAnalit.NameAn";
                                     Node eventNode = new Node();
                                     eventNode.Name = eventNameToTitle.ContainsKey(eventXMLNode.Name) ? eventNameToTitle[eventXMLNode.Name] : eventXMLNode.Name;
                                     eventNode.Text = eventString;
-                                    eventNode.Parent = routeNode;
                                     routeNode.Nodes.Add(eventNode);
                                 }
                             }
@@ -131,7 +127,6 @@ order by MBAnalit.NameAn";
                                         Node routeStringNode = new Node();
                                         routeStringNode.Name = property.Attributes["Description"].Value;
                                         routeStringNode.Text = propertyString;
-                                        routeStringNode.Parent = routeNode;
                                         routeNode.Nodes.Add(routeStringNode);
                                     }
                                 }
@@ -159,7 +154,6 @@ order by MBAnalit.NameAn";
                                             Node blockStringNode = new Node();
                                             blockStringNode.Name = property.Attributes["Description"].Value;
                                             blockStringNode.Text = propertyString;
-                                            blockStringNode.Parent = blockNode;
                                             blockNode.Nodes.Add(blockStringNode);
                                         }
                                     }
@@ -167,7 +161,7 @@ order by MBAnalit.NameAn";
 
                                 if (blockNode.Nodes.Count > 0)
                                 {
-                                    blockNode.Parent = routeNode; routeNode.Nodes.Add(blockNode);
+                                    routeNode.Nodes.Add(blockNode);
                                 }
                                 else blockNode = null;
 

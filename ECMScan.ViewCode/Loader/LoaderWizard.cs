@@ -47,7 +47,6 @@ namespace ISBLScan.ViewCode
 					while(reader.Read())
 					{
 						Node node = new Node();
-						node.Parent = rootNode;
 						node.Id = reader.GetInt32(0);
 						if(! reader.IsDBNull(1))
 						{
@@ -220,7 +219,6 @@ namespace ISBLScan.ViewCode
 			Node wizardEventsNode = new Node();
 			wizardEventsNode.Name = "События мастера";
 			wizardEventsNode.Text = "";
-			wizardEventsNode.Parent = wizardNode;
 			wizardEventsNode.Nodes = new List<Node>();
 			//Загрузка "События мастера"
 			while((this.lineIndex < this.linesWizardCount) && (linesWizardText[this.lineIndex].Replace("\r", "") != "    end>"))
@@ -245,7 +243,6 @@ namespace ISBLScan.ViewCode
 					break;
 				}
 				wizardEventInfoNode.Text = eventInfo.text;
-				wizardEventInfoNode.Parent = wizardEventsNode;
 				wizardEventsNode.Nodes.Add(wizardEventInfoNode);
 			}
 			wizardNode.Nodes.Add(wizardEventsNode);
@@ -262,7 +259,6 @@ namespace ISBLScan.ViewCode
 				listNode.Name = "Мастер действий";
 				listNode.Text = null;
 				listNode.Id = vidAnalitID;
-				listNode.Parent = null;
 				listNode.Nodes = new List<Node>();
 				
 				List<Node> listGroups = LoadGroups(listNode);
@@ -284,7 +280,6 @@ namespace ISBLScan.ViewCode
 						while(reader.Read())
 						{
 							Node wizardNode = new Node();
-							wizardNode.Parent = groupNode;
 							wizardNode.Id = reader.GetInt32(0);
 							if(! reader.IsDBNull(1))
 							{

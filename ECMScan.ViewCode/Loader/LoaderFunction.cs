@@ -48,7 +48,6 @@ order by t.name";
 					while (reader.Read()) 
 					{
 						Node node = new Node ();
-						node.Parent = rootNode;
 						//Номер группы функций
 						node.Id = reader.GetInt32 (0);
 						//Имя группы функций
@@ -142,7 +141,6 @@ order by t.name";
 				{
 					Node funcRecvNode = new Node ();
 					funcRecvNode.Name = "-=[ Параметры функции ]=-";
-					funcRecvNode.Parent = rootNode;
 					rootNode.Nodes.Add (funcRecvNode);
 					while (reader.Read ()) 
 					{
@@ -175,7 +173,6 @@ order by t.name";
 				listNode = new Node ();
 				listNode.Name = "Функция";
 				listNode.Text = null;
-				listNode.Parent = null;
 				listNode.Nodes = new List<Node> ();
 				char[] charsSysUserFunc = {'P', 'S'};
 				foreach (char charSysFunc in charsSysUserFunc) 
@@ -187,7 +184,6 @@ order by t.name";
 						systemFuncNode.Name = "Системная";
 					}
 					systemFuncNode.Text = null;
-					systemFuncNode.Parent = listNode;
 					systemFuncNode.Nodes = new List<Node> ();
 					listNode.Nodes.Add (systemFuncNode);
 					
@@ -212,7 +208,6 @@ order by t.name";
 							{
 								Node functionNode = new Node ();
 								functionNode.Nodes = new List<Node> ();
-								functionNode.Parent = groupNode;
 								//ИД
 								functionNode.Id = reader.GetInt32 (0);
 								//Имя функции
@@ -224,7 +219,6 @@ order by t.name";
 									Node funcDescriptionNode = new Node ();
 									funcDescriptionNode.Name = "-=[ Описание функции ]=-";
 									funcDescriptionNode.Text = reader.GetString (2);
-									funcDescriptionNode.Parent = functionNode;
 									functionNode.Nodes.Add (funcDescriptionNode);
 								}
 								//Справка по функции
@@ -243,7 +237,6 @@ order by t.name";
 									Node funcTextNode = new Node ();
 									funcTextNode.Name = "-=[ Текст функции ]=-";
 									funcTextNode.Text = reader.GetString (4);
-									funcTextNode.Parent = functionNode;
 									functionNode.Nodes.Add (funcTextNode);
 								}
 								//Дата и время последнего изменения

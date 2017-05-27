@@ -48,7 +48,6 @@ namespace ISBLScan.ViewCode
             listNode = new Node();
             listNode.Name = "Custom Calculations";
             listNode.Text = null;
-            listNode.Parent = null;
             listNode.Nodes = new List<Node>();
 
             var config = LoadConfig();
@@ -83,7 +82,6 @@ where ref.Vid = (select Vid from MBVidAn where Kod = '" + setting.ReferenceName 
                 {
                     Node refNode = new Node();
                     refNode.Nodes = new List<Node>();
-                    refNode.Parent = listNode;
                     refNode.Name = setting.CalculationName;
                     while (reader.Read())
                     {
@@ -101,7 +99,6 @@ where ref.Vid = (select Vid from MBVidAn where Kod = '" + setting.ReferenceName 
                             }
 
                             Node recordNode = new Node();
-                            recordNode.Parent = refNode;
                             recordNode.Text = calculation;
                             recordNode.Name = reader.GetString(0);
                             refNode.Nodes.Add(recordNode);

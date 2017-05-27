@@ -34,7 +34,6 @@ namespace ISBLScan.ViewCode
 					while(reader.Read())
 					{
 						Node node = new Node();
-						node.Parent = rootNode;
 						node.Id = reader.GetInt32(0);
 						if(! reader.IsDBNull(1))
 						{
@@ -58,7 +57,6 @@ namespace ISBLScan.ViewCode
 				listNode = new Node();
 				listNode.Name = "Блок типового маршрута";
 				listNode.Text = null;
-				listNode.Parent = null;
 				listNode.Nodes = new List<Node>();
 				
 				List<Node> listGroups = LoadGroups(listNode);
@@ -77,7 +75,6 @@ namespace ISBLScan.ViewCode
 						while(reader.Read())
 						{
 							Node routeBlockNode = new Node();
-							routeBlockNode.Parent = groupNode;
 							//ИД
 							routeBlockNode.Id = reader.GetInt32(0);
 							//Имя
@@ -108,7 +105,6 @@ namespace ISBLScan.ViewCode
                                         Node eventNode = new Node();
                                         eventNode.Name = eventXMLNode.Name;
                                         eventNode.Text = eventString;
-                                        eventNode.Parent = routeBlockNode;
                                         routeBlockNode.Nodes.Add(eventNode);
                                     }
                                 }
@@ -125,7 +121,6 @@ namespace ISBLScan.ViewCode
                                             Node blockStringNode = new Node();
                                             blockStringNode.Name = property.Attributes["Description"].Value;
                                             blockStringNode.Text = propertyString;
-                                            blockStringNode.Parent = routeBlockNode;
                                             routeBlockNode.Nodes.Add(blockStringNode);
                                         }
                                     }

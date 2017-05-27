@@ -33,7 +33,6 @@ namespace ISBLScan.ViewCode
 					while(reader.Read())
 					{
 						Node node = new Node();
-						node.Parent = rootNode;
 						node.Id = reader.GetInt32(0);
 						if(! reader.IsDBNull(1))
 						{
@@ -57,7 +56,6 @@ namespace ISBLScan.ViewCode
 				listNode = new Node();
 				listNode.Name = "Сценарий (расчёт)";
 				listNode.Text = null;
-				listNode.Parent = null;
 				listNode.Nodes = new List<Node>();
 				
 				List<Node> listGroups = LoadGroups(listNode);
@@ -76,7 +74,6 @@ namespace ISBLScan.ViewCode
 						while(reader.Read())
 						{
 							Node scriptNode = new Node();
-							scriptNode.Parent = groupNode;
 							scriptNode.Id = reader.GetInt32(0);
 							if(! reader.IsDBNull(1))
 							{
@@ -96,7 +93,6 @@ namespace ISBLScan.ViewCode
 								Node scriptTextNode = new Node();
 								scriptTextNode.Name = "-=[ Текст сценария ]=-";
 								scriptTextNode.Text = scriptText;
-								scriptTextNode.Parent = scriptNode;
 								scriptNode.Nodes.Add(scriptTextNode);
 							}
 							groupNode.Nodes.Add(scriptNode);

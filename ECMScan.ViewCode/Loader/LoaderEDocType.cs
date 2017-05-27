@@ -39,7 +39,6 @@ namespace ISBLScan.ViewCode
 					if(! reader.IsDBNull(0))
 					{
 						Node groupNode = new Node();
-						groupNode.Parent = eDocTypeNode;
 						groupNode.Nodes = new List<Node>();
 						string recvRazdel = reader.GetString(0);
 						groupNode.Text = recvRazdel;
@@ -108,7 +107,6 @@ namespace ISBLScan.ViewCode
 						while(reader.Read())
 						{
 							Node eDocRecvNode = new Node();
-							eDocRecvNode.Parent = groupNode;
 							eDocRecvNode.Nodes = new List<Node>();
 							//ИД
 							eDocRecvNode.Id = reader.GetInt32(0);
@@ -129,7 +127,6 @@ namespace ISBLScan.ViewCode
 								Node exprnEDocRecvNode = new Node();
 								exprnEDocRecvNode.Name = "-=[ Вычисление ]=-";
 								exprnEDocRecvNode.Text = reader.GetString(3);
-								exprnEDocRecvNode.Parent = eDocRecvNode;
 								eDocRecvNode.Nodes.Add(exprnEDocRecvNode);
 							}
 							//Выбор из справочника для реквизита типа "справочник" или "строка"
@@ -138,7 +135,6 @@ namespace ISBLScan.ViewCode
 								Node eventEDocRecvNode = new Node();
 								eventEDocRecvNode.Name = "-=[ Выбор из справочника ]=-";
 								eventEDocRecvNode.Text = reader.GetString(4);
-								eventEDocRecvNode.Parent = eDocRecvNode;
 								eDocRecvNode.Nodes.Add(eventEDocRecvNode);
 							}
 							//Добавление в дерево элементов, если есть вычисления
@@ -233,14 +229,12 @@ namespace ISBLScan.ViewCode
 					listNode = new Node();
 					listNode.Name = "Тип карточки электронного документа";
 					listNode.Text = null;
-					listNode.Parent = null;
 					listNode.Nodes = new List<Node>();
 					
 					while(reader.Read())
 					{
 						Node eDocNode = new Node();
 						eDocNode.Nodes = new List<Node>();
-						eDocNode.Parent = listNode;
 						//ИД 
 						eDocNode.Id = reader.GetInt32(0);
 						//Имя 

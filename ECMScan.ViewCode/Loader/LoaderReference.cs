@@ -46,7 +46,6 @@ namespace ISBLScan.ViewCode
 					while(reader.Read())
 					{
 						Node recvNode = new Node();
-						recvNode.Parent = recvGroupNode;
 						recvNode.Nodes = new List<Node>();
 						if(!reader.IsDBNull(0))
 						{
@@ -62,7 +61,6 @@ namespace ISBLScan.ViewCode
 							Node exprnRefRecvNode = new Node();
 							exprnRefRecvNode.Name = "-=[ Вычисление ]=-";
 							exprnRefRecvNode.Text = reader.GetString(2);
-							exprnRefRecvNode.Parent = recvNode;
 							recvNode.Nodes.Add(exprnRefRecvNode);
 						}
 						if(!reader.IsDBNull(3))
@@ -70,7 +68,6 @@ namespace ISBLScan.ViewCode
 							Node inpExprnRefRecvNode = new Node();
 							inpExprnRefRecvNode.Name = "-=[ Выбор из справочника ]=-";
 							inpExprnRefRecvNode.Text = reader.GetString(3);
-							inpExprnRefRecvNode.Parent = recvNode;
 							recvNode.Nodes.Add(inpExprnRefRecvNode);
 						}
 						//Добавить реквизит в дерево, если у него есть вычисления (подузлы)
@@ -174,7 +171,6 @@ namespace ISBLScan.ViewCode
 				{
 					refRecvNode.Name = "-=[ Реквизиты и действия типа справочника ]=-";
 					refRecvNode.Text = null;
-					refRecvNode.Parent = refNode;
 					refNode.Nodes.Add(refRecvNode);
 
 					while(reader.Read())
@@ -185,7 +181,6 @@ namespace ISBLScan.ViewCode
 						//Вид аналитики
 						recvGroupNode.Id = refNode.Id;
 						recvGroupNode.Name = GetGroupRecvName(recvGroupNode.Code[0]);
-						recvGroupNode.Parent = refRecvNode;
 						recvGroupNode.Nodes = new List<Node>();
 						refRecvNode.Nodes.Add(recvGroupNode);
 					}
@@ -212,13 +207,11 @@ namespace ISBLScan.ViewCode
 					rootRefNode = new Node();
 					rootRefNode.Name = "Тип справочника";
 					rootRefNode.Text = null;
-					rootRefNode.Parent = null;
 					rootRefNode.Nodes = new List<Node>();
 					
 					while(reader.Read())
 					{
 						Node refNode = new Node();
-						refNode.Parent = rootRefNode;
 						refNode.Nodes = new List<Node>();
 						//ИД 
 						refNode.Id = reader.GetInt32(0);
@@ -239,7 +232,6 @@ namespace ISBLScan.ViewCode
 							Node refEventNode = new Node();
 							refEventNode.Name = "-=[ События ]=-";
 							refEventNode.Text = reader.GetString(4).Trim();
-							refEventNode.Parent = refNode;
 							refNode.Nodes.Add(refEventNode);
 						}
 						rootRefNode.Nodes.Add(refNode);
