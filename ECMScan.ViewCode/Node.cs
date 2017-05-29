@@ -1,7 +1,8 @@
+using System;
+using System.Collections.Generic;
+
 namespace ISBLScan.ViewCode
 {
-    using System;
-    using System.Collections.Generic;
 
     /// <summary>
     /// Узел дерева элементов разработки
@@ -63,16 +64,14 @@ namespace ISBLScan.ViewCode
 
         public Node Clone()
         {
-            var Node = new Node();
-            Node.Name = this.Name;
-            Node.IsContainsMatchedNode = this.IsContainsMatchedNode;
-            Node.IsMatch = this.IsMatch;
-            Node.Text = this.Text;
-            Node.Id = this.Id;
-            Node.Code = this.Code;
-            return Node;
+            var node = new Node();
+            node.Name = this.Name;
+            node.IsContainsMatchedNode = this.IsContainsMatchedNode;
+            node.IsMatch = this.IsMatch;
+            node.Text = this.Text;
+            node.Id = this.Id;
+            node.Code = this.Code;
+            return node;
         }
-
-        public object Tag { get; set; }
     }
 }

@@ -25,11 +25,11 @@ namespace ISBLScan.ViewCode
 			
 			SqlCommand command = new SqlCommand();
 			command.CommandType = CommandType.Text;
-			command.Connection = connection;
+			command.Connection = Connection;
 			command.CommandText = "select [Razd] from [MBEDocTypeRecv] where not(([Exprn] is null) and ([InpExprn] is null)) and ([TypeID] = @eDocTypeID ) group by [Razd] order by [Razd] desc";
-			SqlParameter paramEDocTypeID = new SqlParameter("@eDocTypeID", SqlDbType.Int);
-			paramEDocTypeID.Value = eDocTypeNode.Id;
-			command.Parameters.Add(paramEDocTypeID);
+			SqlParameter paramEDocTypeId = new SqlParameter("@eDocTypeID", SqlDbType.Int);
+			paramEDocTypeId.Value = eDocTypeNode.Id;
+			command.Parameters.Add(paramEDocTypeId);
 			command.Prepare();
 			SqlDataReader reader = command.ExecuteReader();
 			if(reader.HasRows)
@@ -82,7 +82,7 @@ namespace ISBLScan.ViewCode
 		}
 		private void LoadRecvisite(Node eDocTypeNode)
 		{
-			if(this.checkTableExist("MBEDocTypeRecv"))
+			if(this.CheckTableExist("MBEDocTypeRecv"))
 			{
 				List<Node> listGroups = LoadGroupRecvisite(eDocTypeNode);
 				foreach(Node groupNode in listGroups)
@@ -91,14 +91,14 @@ namespace ISBLScan.ViewCode
 					groupNode.Text = null;
 
 					SqlCommand command = new SqlCommand();
-					command.Connection = connection;
+					command.Connection = Connection;
 					command.CommandText = "select [XRecID], [Name], [Kod], [Exprn], [InpExprn] from MBEDocTypeRecv where [TypeID] = @eDocTypeID and [Razd] = @RazdID and (not([Exprn] is null) or not([InpExprn] is null)) order by [Name]";
-					SqlParameter paramEDocTypeID = new SqlParameter("@eDocTypeID", SqlDbType.Int);
-					SqlParameter paramRazdID = new SqlParameter("@RazdID", SqlDbType.NChar, 1);
-					paramEDocTypeID.Value = eDocTypeNode.Id;
-					paramRazdID.Value = charGroup;
-					command.Parameters.Add(paramEDocTypeID);
-					command.Parameters.Add(paramRazdID);
+					SqlParameter paramEDocTypeId = new SqlParameter("@eDocTypeID", SqlDbType.Int);
+					SqlParameter paramRazdId = new SqlParameter("@RazdID", SqlDbType.NChar, 1);
+					paramEDocTypeId.Value = eDocTypeNode.Id;
+					paramRazdId.Value = charGroup;
+					command.Parameters.Add(paramEDocTypeId);
+					command.Parameters.Add(paramRazdId);
 					command.Prepare();
 					SqlDataReader reader = command.ExecuteReader();
 					
@@ -150,7 +150,7 @@ namespace ISBLScan.ViewCode
 		}
 		
 		//Выделение в тексте событий вида электронного документа, названий событий
-		private string parseEventText(string eventText)
+		private string ParseEventText(string eventText)
 		{
 			string parseResult;
 			parseResult = eventText;
@@ -218,10 +218,10 @@ namespace ISBLScan.ViewCode
 		public Node Load()
 		{
 			Node listNode = null;
-			if(this.checkTableExist("MBEDocType"))
+			if(this.CheckTableExist("MBEDocType"))
 			{
 				SqlCommand command = new SqlCommand();
-				command.Connection = connection;
+				command.Connection = Connection;
 				command.CommandText = "select TypeID, Name, Exprn, LastUpd from MBEDocType order by Name ASC";
 				SqlDataReader reader = command.ExecuteReader();
 				if(reader.HasRows)
@@ -245,7 +245,7 @@ namespace ISBLScan.ViewCode
 						//Текст событий
 						if(! reader.IsDBNull(2))
 						{
-							eDocNode.Text = parseEventText(reader.GetString(2));
+							eDocNode.Text = ParseEventText(reader.GetString(2));
 						}
 						//Дата последнего изменения
 						if(!reader.IsDBNull(3))

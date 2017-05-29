@@ -55,7 +55,7 @@ namespace ISBLScan.ViewCode
             foreach (Calculation setting in config.Calculations)
             {
                 SqlCommand command = new SqlCommand();
-                command.Connection = connection;
+                command.Connection = Connection;
                 if (setting.IsTextRequisite)
                 {
                     command.CommandText = @"
@@ -90,8 +90,8 @@ where ref.Vid = (select Vid from MBVidAn where Kod = '" + setting.ReferenceName 
                             string calculation = "";
                             if (setting.IsTextRequisite)
                             {
-                                var Bytes = (byte[])reader.GetValue(1);
-                                calculation = System.Text.Encoding.UTF8.GetString(Bytes);
+                                var bytes = (byte[])reader.GetValue(1);
+                                calculation = System.Text.Encoding.UTF8.GetString(bytes);
                             }
                             else
                             {

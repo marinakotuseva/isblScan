@@ -28,10 +28,10 @@ namespace ISBLScan.ViewCode
 		/// </param>
 		void LoadRecvisite(Node recvGroupNode)
 		{
-			if(this.checkTableExist("MBVidAnRecv"))
+			if(this.CheckTableExist("MBVidAnRecv"))
 			{
 				SqlCommand command = new SqlCommand();
-				command.Connection = this.connection;
+				command.Connection = this.Connection;
 				command.CommandText = "SELECT [Name], [Kod], [Exprn], [InpExprn] FROM [MBVidAnRecv] WHERE [Vid]=@Vid AND [Razd]=@Razd ORDER BY [NumRecv]";
 				SqlParameter paramVid = new SqlParameter("@Vid", SqlDbType.Int);
 				paramVid.Value = recvGroupNode.Id;
@@ -153,10 +153,10 @@ namespace ISBLScan.ViewCode
 		/// </param>
 		void LoadGroupRecv(Node refNode)
 		{
-			if(this.checkTableExist("MBVidAnRecv"))
+			if(this.CheckTableExist("MBVidAnRecv"))
 			{
 				SqlCommand command = new SqlCommand();
-				command.Connection = this.connection;
+				command.Connection = this.Connection;
 				command.CommandText = "SELECT [Razd] FROM [MBVidAnRecv] WHERE [Vid] = @Vid GROUP BY [Razd] ORDER BY [Razd] DESC";
 				SqlParameter paramVid = new SqlParameter("@Vid", SqlDbType.Int);
 				paramVid.Value = refNode.Id;
@@ -196,10 +196,10 @@ namespace ISBLScan.ViewCode
 		public Node Load()
 		{
 			Node rootRefNode = null;
-			if(this.checkTableExist("MBVidAn"))
+			if(this.CheckTableExist("MBVidAn"))
 			{
 				SqlCommand command = new SqlCommand();
-				command.Connection = connection;
+				command.Connection = Connection;
 				command.CommandText = "select Vid, Name, Kod, Comment, Exprn from MBVidAn order by Name ASC";
 				SqlDataReader reader = command.ExecuteReader();
 				if(reader.HasRows)

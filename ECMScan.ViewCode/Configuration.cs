@@ -9,12 +9,12 @@ namespace ISBLScan.ViewCode
 	/// </summary>
 	public static class Configuration
 	{
-		private static string nameSqlServer = "Sql Server:";
-		private static string nameDataBase = "Data Base:";
-		private static string nameLogin = "Login:";
-		private static string nameIsWinAuth = "IsWinAuth:";
+		private static string _nameSqlServer = "Sql Server:";
+		private static string _nameDataBase = "Data Base:";
+		private static string _nameLogin = "Login:";
+		private static string _nameIsWinAuth = "IsWinAuth:";
 		
-		private static string configFilePath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData) + "/ISBLScan.ViewCode.cfg";
+		private static string _configFilePath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData) + "/ISBLScan.ViewCode.cfg";
 		
 
 		public static bool Load(out string sqlServer, out string dataBase, out string login, out bool isWinAuth)
@@ -23,26 +23,26 @@ namespace ISBLScan.ViewCode
 			dataBase = "";
 			login = "";
 			isWinAuth = true;
-			if(System.IO.File.Exists(configFilePath))
+			if(System.IO.File.Exists(_configFilePath))
 			{
-				string[] configStrings = System.IO.File.ReadAllLines(configFilePath);
+				string[] configStrings = System.IO.File.ReadAllLines(_configFilePath);
 				foreach(string configString in configStrings)
 				{
-					if(configString.StartsWith(nameSqlServer))
+					if(configString.StartsWith(_nameSqlServer))
 					{
-						sqlServer = configString.Remove(0, nameSqlServer.Length);
+						sqlServer = configString.Remove(0, _nameSqlServer.Length);
 					}
-					if(configString.StartsWith(nameDataBase))
+					if(configString.StartsWith(_nameDataBase))
 					{
-						dataBase = configString.Remove(0, nameDataBase.Length);
+						dataBase = configString.Remove(0, _nameDataBase.Length);
 					}
-					if(configString.StartsWith(nameLogin))
+					if(configString.StartsWith(_nameLogin))
 					{
-						login = configString.Remove(0, nameLogin.Length);
+						login = configString.Remove(0, _nameLogin.Length);
 					}
-					if(configString.StartsWith(nameIsWinAuth))
+					if(configString.StartsWith(_nameIsWinAuth))
 					{
-						isWinAuth = Convert.ToBoolean(configString.Remove(0, nameIsWinAuth.Length));
+						isWinAuth = Convert.ToBoolean(configString.Remove(0, _nameIsWinAuth.Length));
 					}					
 				}
 				return true;
@@ -55,12 +55,12 @@ namespace ISBLScan.ViewCode
 		
 		public static void Save(string sqlServer, string dataBase, string login, bool isWinAuth)
 		{
-			System.IO.File.WriteAllText(configFilePath,
+			System.IO.File.WriteAllText(_configFilePath,
 			                            String.Format("{0}{1}\n{2}{3}\n{4}{5}\n{6}{7}",
-			                                          nameSqlServer, sqlServer,
-			                                          nameDataBase, dataBase,
-			                                          nameLogin, login,
-			                                          nameIsWinAuth, isWinAuth));
+			                                          _nameSqlServer, sqlServer,
+			                                          _nameDataBase, dataBase,
+			                                          _nameLogin, login,
+			                                          _nameIsWinAuth, isWinAuth));
 			                                                
 		}
 	}

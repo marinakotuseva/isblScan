@@ -14,14 +14,14 @@ namespace ISBLScan.ViewCode
 		{
 			this.DoubleBuffered = true;
 		}
-        public int[] WM_EVENTS = { 0x115, 0x20A};
-		public int[] WM_NO_EVENTS = { 0x20, 0x200};
+        public int[] WmEvents = { 0x115, 0x20A};
+		public int[] WmNoEvents = { 0x20, 0x200};
 		
-		private bool isScrollEvent(int eventCode)
+		private bool IsScrollEvent(int eventCode)
 		{
-			foreach(int wm_eventCode in WM_EVENTS)
+			foreach(int wmEventCode in WmEvents)
 			{
-				if(wm_eventCode == eventCode)
+				if(wmEventCode == eventCode)
 				{
 					return true;
 				}
@@ -29,11 +29,11 @@ namespace ISBLScan.ViewCode
 			return false;
 		}
 		
-		private bool isNoScrollEvent(int eventCode)
+		private bool IsNoScrollEvent(int eventCode)
 		{
-			foreach(int wm_eventCode in WM_NO_EVENTS)
+			foreach(int wmEventCode in WmNoEvents)
 			{
-				if(wm_eventCode == eventCode)
+				if(wmEventCode == eventCode)
 				{
 					return false;
 				}
@@ -42,12 +42,12 @@ namespace ISBLScan.ViewCode
 		}
 
 		
-		private int eventNumber = 0;
-        List<SynchronizedScrollRichTextBox> peers = new List<SynchronizedScrollRichTextBox>();
+		private int _eventNumber = 0;
+        List<SynchronizedScrollRichTextBox> _peers = new List<SynchronizedScrollRichTextBox>();
 
         public void AddPeer(SynchronizedScrollRichTextBox peer)
         {
-            this.peers.Add(peer);
+            this._peers.Add(peer);
         }
 
         public void DirectWndProc(ref Message m)

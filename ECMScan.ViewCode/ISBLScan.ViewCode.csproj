@@ -52,8 +52,8 @@
     <Reference Include="System.Runtime.Remoting" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Collections\Tree.cs" />
-    <Compile Include="ISBLFoldingStrategy.cs" />
+    <Compile Include="TabsController.cs" />
+    <Compile Include="Node.cs" />
     <Compile Include="Loader\LoaderCommon.cs" />
     <Compile Include="Loader\LoaderEDocType.cs" />
     <Compile Include="Loader\LoaderFunction.cs" />
@@ -84,7 +84,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Loader\WizardTextSample.txt" />
-    <None Include="ChangeLog" />
     <None Include="packages.config" />
     <None Include="README.md" />
     <None Include="Images\Filter.16.png" />

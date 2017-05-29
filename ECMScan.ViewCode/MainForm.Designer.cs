@@ -38,10 +38,8 @@ namespace ISBLScan.ViewCode
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.buttonCloseCurrentTab = new System.Windows.Forms.Button();
             this.panelSearchText = new System.Windows.Forms.Panel();
+            this.tabControlSearchText = new System.Windows.Forms.TabControl();
             this.panelSearchButtons = new System.Windows.Forms.Panel();
-            this.checkBoxFindAll = new System.Windows.Forms.CheckBox();
-            this.checkBoxFindRegExp = new System.Windows.Forms.CheckBox();
-            this.checkBoxFindCaseSensitive = new System.Windows.Forms.CheckBox();
             this.buttonSearch = new System.Windows.Forms.Button();
             this.groupBoxConnect = new System.Windows.Forms.GroupBox();
             this.buttonExpand = new System.Windows.Forms.Button();
@@ -56,7 +54,6 @@ namespace ISBLScan.ViewCode
             this.splitContainerResults = new System.Windows.Forms.SplitContainer();
             this.panelTree = new System.Windows.Forms.Panel();
             this.panelFilterTree = new System.Windows.Forms.Panel();
-            this.textBoxFilter = new System.Windows.Forms.TextBox();
             this.panelISBLResult = new System.Windows.Forms.Panel();
             this.textEditorControlISBL = new ICSharpCode.TextEditor.TextEditorControl();
             this.splitContainerMain = new System.Windows.Forms.SplitContainer();
@@ -69,8 +66,6 @@ namespace ISBLScan.ViewCode
             this.panelMain = new System.Windows.Forms.Panel();
             this.backgroundWorkerFind = new System.ComponentModel.BackgroundWorker();
             this.tabPageSimpleSearchText = new System.Windows.Forms.TabPage();
-            this.textEditorControlSearchText = new MyTextEditorControl(this);
-            this.tabControlSarchText = new System.Windows.Forms.TabControl();
             this.panelOptions.SuspendLayout();
             this.groupBoxSearch.SuspendLayout();
             this.panelSearchText.SuspendLayout();
@@ -81,16 +76,11 @@ namespace ISBLScan.ViewCode
             this.splitContainerResults.Panel1.SuspendLayout();
             this.splitContainerResults.Panel2.SuspendLayout();
             this.splitContainerResults.SuspendLayout();
-            this.panelTree.SuspendLayout();
-            this.panelFilterTree.SuspendLayout();
-            this.panelISBLResult.SuspendLayout();
             this.splitContainerMain.Panel1.SuspendLayout();
             this.splitContainerMain.Panel2.SuspendLayout();
             this.splitContainerMain.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.panelMain.SuspendLayout();
-            this.tabPageSimpleSearchText.SuspendLayout();
-            this.tabControlSarchText.SuspendLayout();
             this.SuspendLayout();
             // 
             // panelOptions
@@ -101,7 +91,7 @@ namespace ISBLScan.ViewCode
             this.panelOptions.Location = new System.Drawing.Point(0, 0);
             this.panelOptions.Margin = new System.Windows.Forms.Padding(4);
             this.panelOptions.Name = "panelOptions";
-            this.panelOptions.Size = new System.Drawing.Size(1056, 201);
+            this.panelOptions.Size = new System.Drawing.Size(1056, 213);
             this.panelOptions.TabIndex = 1;
             // 
             // groupBoxSearch
@@ -115,8 +105,8 @@ namespace ISBLScan.ViewCode
             this.groupBoxSearch.Margin = new System.Windows.Forms.Padding(4);
             this.groupBoxSearch.Name = "groupBoxSearch";
             this.groupBoxSearch.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBoxSearch.Size = new System.Drawing.Size(861, 201);
-            this.groupBoxSearch.TabIndex = 12;
+            this.groupBoxSearch.Size = new System.Drawing.Size(861, 213);
+            this.groupBoxSearch.TabIndex = 140;
             this.groupBoxSearch.TabStop = false;
             this.groupBoxSearch.Text = "Search Text";
             this.groupBoxSearch.DoubleClick += new System.EventHandler(this.buttonAddNewTab_Click);
@@ -131,7 +121,7 @@ namespace ISBLScan.ViewCode
             this.buttonAddNewTab.Margin = new System.Windows.Forms.Padding(0);
             this.buttonAddNewTab.Name = "buttonAddNewTab";
             this.buttonAddNewTab.Size = new System.Drawing.Size(19, 17);
-            this.buttonAddNewTab.TabIndex = 125;
+            this.buttonAddNewTab.TabIndex = 3000;
             this.buttonAddNewTab.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.buttonAddNewTab.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.buttonAddNewTab.UseVisualStyleBackColor = true;
@@ -153,71 +143,40 @@ namespace ISBLScan.ViewCode
             this.buttonCloseCurrentTab.Margin = new System.Windows.Forms.Padding(0);
             this.buttonCloseCurrentTab.Name = "buttonCloseCurrentTab";
             this.buttonCloseCurrentTab.Size = new System.Drawing.Size(19, 17);
-            this.buttonCloseCurrentTab.TabIndex = 1;
+            this.buttonCloseCurrentTab.TabIndex = 2000;
             this.buttonCloseCurrentTab.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.buttonCloseCurrentTab.UseVisualStyleBackColor = true;
             this.buttonCloseCurrentTab.Click += new System.EventHandler(this.buttonCloseCurrentTab_Click);
             // 
             // panelSearchText
             // 
-            this.panelSearchText.Controls.Add(this.tabControlSarchText);
+            this.panelSearchText.Controls.Add(this.tabControlSearchText);
             this.panelSearchText.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelSearchText.Location = new System.Drawing.Point(4, 19);
             this.panelSearchText.Margin = new System.Windows.Forms.Padding(4);
             this.panelSearchText.Name = "panelSearchText";
-            this.panelSearchText.Size = new System.Drawing.Size(853, 150);
+            this.panelSearchText.Size = new System.Drawing.Size(853, 162);
             this.panelSearchText.TabIndex = 124;
+            // 
+            // tabControlSearchText
+            // 
+            this.tabControlSearchText.Dock = System.Windows.Forms.DockStyle.Fill;
+		    this.tabControlSearchText.SelectedIndexChanged += new System.EventHandler(this.tabControlSearchText_SelectedIndexChanged);
+            this.tabControlSearchText.Location = new System.Drawing.Point(0, 0);
+            this.tabControlSearchText.Name = "tabControlSearchText";
+            this.tabControlSearchText.SelectedIndex = 0;
+            this.tabControlSearchText.Size = new System.Drawing.Size(853, 162);
+            this.tabControlSearchText.TabIndex = 0;
             // 
             // panelSearchButtons
             // 
-            this.panelSearchButtons.Controls.Add(this.checkBoxFindAll);
-            this.panelSearchButtons.Controls.Add(this.checkBoxFindRegExp);
-            this.panelSearchButtons.Controls.Add(this.checkBoxFindCaseSensitive);
             this.panelSearchButtons.Controls.Add(this.buttonSearch);
             this.panelSearchButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelSearchButtons.Location = new System.Drawing.Point(4, 169);
+            this.panelSearchButtons.Location = new System.Drawing.Point(4, 181);
             this.panelSearchButtons.Margin = new System.Windows.Forms.Padding(0);
             this.panelSearchButtons.Name = "panelSearchButtons";
             this.panelSearchButtons.Size = new System.Drawing.Size(853, 28);
-            this.panelSearchButtons.TabIndex = 123;
-            // 
-            // checkBoxFindAll
-            // 
-            this.checkBoxFindAll.AutoSize = true;
-            this.checkBoxFindAll.Dock = System.Windows.Forms.DockStyle.Left;
-            this.checkBoxFindAll.Location = new System.Drawing.Point(320, 0);
-            this.checkBoxFindAll.Margin = new System.Windows.Forms.Padding(4);
-            this.checkBoxFindAll.Name = "checkBoxFindAll";
-            this.checkBoxFindAll.Size = new System.Drawing.Size(146, 28);
-            this.checkBoxFindAll.TabIndex = 1226;
-            this.checkBoxFindAll.Text = "satisfies all criteria";
-            this.checkBoxFindAll.UseVisualStyleBackColor = true;
-            // 
-            // checkBoxFindRegExp
-            // 
-            this.checkBoxFindRegExp.AutoSize = true;
-            this.checkBoxFindRegExp.Dock = System.Windows.Forms.DockStyle.Left;
-            this.checkBoxFindRegExp.Location = new System.Drawing.Point(150, 0);
-            this.checkBoxFindRegExp.Margin = new System.Windows.Forms.Padding(4);
-            this.checkBoxFindRegExp.Name = "checkBoxFindRegExp";
-            this.checkBoxFindRegExp.Size = new System.Drawing.Size(170, 28);
-            this.checkBoxFindRegExp.TabIndex = 1225;
-            this.checkBoxFindRegExp.Text = ".* (regular expression)";
-            this.checkBoxFindRegExp.UseVisualStyleBackColor = true;
-            this.checkBoxFindRegExp.CheckedChanged += new System.EventHandler(this.checkBoxFindRegExp_CheckedChanged);
-            // 
-            // checkBoxFindCaseSensitive
-            // 
-            this.checkBoxFindCaseSensitive.AutoSize = true;
-            this.checkBoxFindCaseSensitive.Dock = System.Windows.Forms.DockStyle.Left;
-            this.checkBoxFindCaseSensitive.Location = new System.Drawing.Point(0, 0);
-            this.checkBoxFindCaseSensitive.Margin = new System.Windows.Forms.Padding(4);
-            this.checkBoxFindCaseSensitive.Name = "checkBoxFindCaseSensitive";
-            this.checkBoxFindCaseSensitive.Size = new System.Drawing.Size(150, 28);
-            this.checkBoxFindCaseSensitive.TabIndex = 1224;
-            this.checkBoxFindCaseSensitive.Text = "Aa (case sensitive)";
-            this.checkBoxFindCaseSensitive.UseVisualStyleBackColor = true;
-            this.checkBoxFindCaseSensitive.CheckedChanged += new System.EventHandler(this.checkBoxFindCaseSensitive_CheckedChanged);
+            this.panelSearchButtons.TabIndex = 300;
             // 
             // buttonSearch
             // 
@@ -227,7 +186,7 @@ namespace ISBLScan.ViewCode
             this.buttonSearch.Margin = new System.Windows.Forms.Padding(4);
             this.buttonSearch.Name = "buttonSearch";
             this.buttonSearch.Size = new System.Drawing.Size(187, 28);
-            this.buttonSearch.TabIndex = 1223;
+            this.buttonSearch.TabIndex = 200;
             this.buttonSearch.Text = "Find";
             this.buttonSearch.UseVisualStyleBackColor = true;
             this.buttonSearch.Click += new System.EventHandler(this.ButtonFilterClick);
@@ -246,7 +205,7 @@ namespace ISBLScan.ViewCode
             this.groupBoxConnect.Margin = new System.Windows.Forms.Padding(4);
             this.groupBoxConnect.Name = "groupBoxConnect";
             this.groupBoxConnect.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBoxConnect.Size = new System.Drawing.Size(195, 201);
+            this.groupBoxConnect.Size = new System.Drawing.Size(195, 213);
             this.groupBoxConnect.TabIndex = 11;
             this.groupBoxConnect.TabStop = false;
             this.groupBoxConnect.Text = "Connect";
@@ -254,7 +213,7 @@ namespace ISBLScan.ViewCode
             // buttonExpand
             // 
             this.buttonExpand.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.buttonExpand.Location = new System.Drawing.Point(4, 165);
+            this.buttonExpand.Location = new System.Drawing.Point(4, 177);
             this.buttonExpand.Margin = new System.Windows.Forms.Padding(4);
             this.buttonExpand.Name = "buttonExpand";
             this.buttonExpand.Size = new System.Drawing.Size(187, 32);
@@ -351,7 +310,7 @@ namespace ISBLScan.ViewCode
             this.panelResults.Location = new System.Drawing.Point(0, 0);
             this.panelResults.Margin = new System.Windows.Forms.Padding(4);
             this.panelResults.Name = "panelResults";
-            this.panelResults.Size = new System.Drawing.Size(1056, 552);
+            this.panelResults.Size = new System.Drawing.Size(1056, 540);
             this.panelResults.TabIndex = 2;
             // 
             // groupBoxResults
@@ -362,7 +321,7 @@ namespace ISBLScan.ViewCode
             this.groupBoxResults.Margin = new System.Windows.Forms.Padding(4);
             this.groupBoxResults.Name = "groupBoxResults";
             this.groupBoxResults.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBoxResults.Size = new System.Drawing.Size(1056, 552);
+            this.groupBoxResults.Size = new System.Drawing.Size(1056, 540);
             this.groupBoxResults.TabIndex = 0;
             this.groupBoxResults.TabStop = false;
             this.groupBoxResults.Text = "Results";
@@ -383,14 +342,20 @@ namespace ISBLScan.ViewCode
             // splitContainerResults.Panel2
             // 
             this.splitContainerResults.Panel2.Controls.Add(this.panelISBLResult);
-            this.splitContainerResults.Size = new System.Drawing.Size(1048, 529);
+            this.splitContainerResults.Size = new System.Drawing.Size(1048, 517);
             this.splitContainerResults.SplitterDistance = 280;
             this.splitContainerResults.SplitterWidth = 9;
             this.splitContainerResults.TabIndex = 0;
             // 
+            // panelTree
+            // 
+            this.panelTree.Location = new System.Drawing.Point(0, 0);
+            this.panelTree.Name = "panelTree";
+            this.panelTree.Size = new System.Drawing.Size(200, 100);
+            this.panelTree.TabIndex = 0;
+            // 
             // panelFilterTree
             // 
-            this.panelFilterTree.Controls.Add(this.textBoxFilter);
             this.panelFilterTree.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelFilterTree.Location = new System.Drawing.Point(0, 0);
             this.panelFilterTree.Margin = new System.Windows.Forms.Padding(4);
@@ -398,45 +363,23 @@ namespace ISBLScan.ViewCode
             this.panelFilterTree.Size = new System.Drawing.Size(280, 25);
             this.panelFilterTree.TabIndex = 211;
             // 
-            // textBoxFilter
-            // 
-            this.textBoxFilter.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBoxFilter.Location = new System.Drawing.Point(0, 0);
-            this.textBoxFilter.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxFilter.Name = "textBoxFilter";
-            this.textBoxFilter.Size = new System.Drawing.Size(280, 22);
-            this.textBoxFilter.TabIndex = 2111;
-            this.textBoxFilter.TextChanged += new System.EventHandler(this.TextBoxFilter_TextChanged);
-            // 
             // panelISBLResult
             // 
             this.panelISBLResult.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.panelISBLResult.Controls.Add(this.textEditorControlISBL);
             this.panelISBLResult.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelISBLResult.Location = new System.Drawing.Point(0, 0);
             this.panelISBLResult.Margin = new System.Windows.Forms.Padding(4);
             this.panelISBLResult.Name = "panelISBLResult";
-            this.panelISBLResult.Size = new System.Drawing.Size(759, 529);
+            this.panelISBLResult.Size = new System.Drawing.Size(759, 517);
             this.panelISBLResult.TabIndex = 220;
             // 
             // textEditorControlISBL
             // 
-            this.textEditorControlISBL.BracketMatchingStyle = ICSharpCode.TextEditor.Document.BracketMatchingStyle.Before;
-            this.textEditorControlISBL.ConvertTabsToSpaces = true;
-            this.textEditorControlISBL.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textEditorControlISBL.EnableFolding = false;
-            this.textEditorControlISBL.IsIconBarVisible = true;
             this.textEditorControlISBL.IsReadOnly = false;
             this.textEditorControlISBL.Location = new System.Drawing.Point(0, 0);
-            this.textEditorControlISBL.Margin = new System.Windows.Forms.Padding(4);
             this.textEditorControlISBL.Name = "textEditorControlISBL";
-            this.textEditorControlISBL.ShowEOLMarkers = true;
-            this.textEditorControlISBL.ShowSpaces = true;
-            this.textEditorControlISBL.ShowTabs = true;
-            this.textEditorControlISBL.Size = new System.Drawing.Size(759, 529);
+            this.textEditorControlISBL.Size = new System.Drawing.Size(100, 100);
             this.textEditorControlISBL.TabIndex = 0;
-            this.textEditorControlISBL.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-            this.textEditorControlISBL.VRulerRow = 100;
             // 
             // splitContainerMain
             // 
@@ -455,7 +398,7 @@ namespace ISBLScan.ViewCode
             // 
             this.splitContainerMain.Panel2.Controls.Add(this.panelResults);
             this.splitContainerMain.Size = new System.Drawing.Size(1056, 762);
-            this.splitContainerMain.SplitterDistance = 201;
+            this.splitContainerMain.SplitterDistance = 213;
             this.splitContainerMain.SplitterWidth = 9;
             this.splitContainerMain.TabIndex = 3;
             // 
@@ -514,44 +457,10 @@ namespace ISBLScan.ViewCode
             // 
             // tabPageSimpleSearchText
             // 
-            this.tabPageSimpleSearchText.Controls.Add(this.textEditorControlSearchText);
-            this.tabPageSimpleSearchText.Location = new System.Drawing.Point(4, 25);
-            this.tabPageSimpleSearchText.Margin = new System.Windows.Forms.Padding(4);
+            this.tabPageSimpleSearchText.Location = new System.Drawing.Point(0, 0);
             this.tabPageSimpleSearchText.Name = "tabPageSimpleSearchText";
-            this.tabPageSimpleSearchText.Padding = new System.Windows.Forms.Padding(4);
-            this.tabPageSimpleSearchText.Size = new System.Drawing.Size(845, 121);
+            this.tabPageSimpleSearchText.Size = new System.Drawing.Size(200, 100);
             this.tabPageSimpleSearchText.TabIndex = 0;
-            this.tabPageSimpleSearchText.Tag = this.textEditorControlSearchText;
-            this.tabPageSimpleSearchText.Text = "Simple Search Text (sample)";
-            this.tabPageSimpleSearchText.UseVisualStyleBackColor = true;
-            // 
-            // textEditorControlSearchText
-            // 
-            this.textEditorControlSearchText.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textEditorControlSearchText.IsReadOnly = false;
-            this.textEditorControlSearchText.Location = new System.Drawing.Point(4, 4);
-            this.textEditorControlSearchText.Margin = new System.Windows.Forms.Padding(4);
-            this.textEditorControlSearchText.Name = "textEditorControlSearchText";
-            this.textEditorControlSearchText.ShowEOLMarkers = true;
-            this.textEditorControlSearchText.ShowSpaces = true;
-            this.textEditorControlSearchText.ShowTabs = true;
-            this.textEditorControlSearchText.Size = new System.Drawing.Size(837, 113);
-            this.textEditorControlSearchText.TabIndex = 1;
-            this.textEditorControlSearchText.TextChanged += new System.EventHandler(this.textEditorControlRegExp_TextChanged);
-            // 
-            // tabControlSarchText
-            // 
-            this.tabControlSarchText.AllowDrop = true;
-            this.tabControlSarchText.Controls.Add(this.tabPageSimpleSearchText);
-            this.tabControlSarchText.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControlSarchText.Location = new System.Drawing.Point(0, 0);
-            this.tabControlSarchText.Margin = new System.Windows.Forms.Padding(4);
-            this.tabControlSarchText.Name = "tabControlSarchText";
-            this.tabControlSarchText.SelectedIndex = 0;
-            this.tabControlSarchText.Size = new System.Drawing.Size(853, 150);
-            this.tabControlSarchText.TabIndex = 123;
-            this.tabControlSarchText.SelectedIndexChanged += new System.EventHandler(this.tabControlSarchText_SelectedIndexChanged);
-            this.tabControlSarchText.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tabControlSarchText_Selecting);
             // 
             // MainForm
             // 
@@ -569,7 +478,6 @@ namespace ISBLScan.ViewCode
             this.groupBoxSearch.ResumeLayout(false);
             this.panelSearchText.ResumeLayout(false);
             this.panelSearchButtons.ResumeLayout(false);
-            this.panelSearchButtons.PerformLayout();
             this.groupBoxConnect.ResumeLayout(false);
             this.groupBoxConnect.PerformLayout();
             this.panelResults.ResumeLayout(false);
@@ -577,18 +485,12 @@ namespace ISBLScan.ViewCode
             this.splitContainerResults.Panel1.ResumeLayout(false);
             this.splitContainerResults.Panel2.ResumeLayout(false);
             this.splitContainerResults.ResumeLayout(false);
-            this.panelTree.ResumeLayout(false);
-            this.panelFilterTree.ResumeLayout(false);
-            this.panelFilterTree.PerformLayout();
-            this.panelISBLResult.ResumeLayout(false);
             this.splitContainerMain.Panel1.ResumeLayout(false);
             this.splitContainerMain.Panel2.ResumeLayout(false);
             this.splitContainerMain.ResumeLayout(false);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.panelMain.ResumeLayout(false);
-            this.tabPageSimpleSearchText.ResumeLayout(false);
-            this.tabControlSarchText.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -597,7 +499,6 @@ namespace ISBLScan.ViewCode
 		private System.Windows.Forms.CheckBox checkBoxWinAuth;
         private System.Windows.Forms.Button buttonConnect;
 
-		private System.Windows.Forms.TextBox textBoxFilter;
 		private System.Windows.Forms.Panel panelFilterTree;
 		private System.Windows.Forms.Panel panelTree;
 		private System.Windows.Forms.Panel panelResults;
@@ -614,7 +515,6 @@ namespace ISBLScan.ViewCode
         private System.Windows.Forms.Panel panelSearchButtons;
         private System.Windows.Forms.Button buttonSearch;
         private System.Windows.Forms.Panel panelSearchText;
-        private System.Windows.Forms.CheckBox checkBoxFindCaseSensitive;
         private System.Windows.Forms.SplitContainer splitContainerMain;
         private System.Windows.Forms.Timer timerRegExpFind;
         private System.Windows.Forms.Button buttonCloseCurrentTab;
@@ -626,14 +526,11 @@ namespace ISBLScan.ViewCode
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelLastUpd;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelDash;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelSelectedElement;
-        private System.Windows.Forms.CheckBox checkBoxFindRegExp;
         private System.ComponentModel.BackgroundWorker backgroundWorkerFind;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelTest;
-        private System.Windows.Forms.CheckBox checkBoxFindAll;
         private System.Windows.Forms.Button buttonExpand;
-        private System.Windows.Forms.TabControl tabControlSarchText;
+        private System.Windows.Forms.TabControl tabControlSearchText;
         private System.Windows.Forms.TabPage tabPageSimpleSearchText;
-        private MyTextEditorControl textEditorControlSearchText;
         //Main menu
 
 

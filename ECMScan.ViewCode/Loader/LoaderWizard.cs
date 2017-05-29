@@ -12,18 +12,18 @@ namespace ISBLScan.ViewCode
 {
 	struct EventStruct
 	{
-		public string name;
-		public string text;
+		public string Name;
+		public string Text;
 	}
 	/// <summary>
 	/// Мастер действий.
 	/// </summary>
 	public class Wizard : LoaderCommon
 	{
-		private string originWizardText;
-		private string[] linesWizardText;
-		int linesWizardCount;
-		int lineIndex;	
+		private string _originWizardText;
+		private string[] _linesWizardText;
+		int _linesWizardCount;
+		int _lineIndex;	
 		public Wizard(SqlConnection sqlConnect) : base(sqlConnect)
 		{
 		}
@@ -31,14 +31,14 @@ namespace ISBLScan.ViewCode
 		private List<Node> LoadGroups(Node rootNode)
 		{
 			List<Node> listGroups = new List<Node>();
-			Int32 vidAnalitID = getVidAnalitID("WIZARD_GROUPS");
-			if(vidAnalitID >= 0)
+			Int32 vidAnalitId = GetVidAnalitId("WIZARD_GROUPS");
+			if(vidAnalitId >= 0)
 			{
 				SqlCommand command = new SqlCommand();
-				command.Connection = connection;
+				command.Connection = Connection;
 				command.CommandText = "select Analit, NameAn, Soder from MBAnalit where Vid=@vidAnalit";
 				SqlParameter paramVidAnalit = new SqlParameter("@vidAnalit", SqlDbType.Int);
-				paramVidAnalit.Value = vidAnalitID;
+				paramVidAnalit.Value = vidAnalitId;
 				command.Parameters.Add(paramVidAnalit);
 				command.Prepare();
 				SqlDataReader reader = command.ExecuteReader();
@@ -68,10 +68,10 @@ namespace ISBLScan.ViewCode
 		private void LoadText(Node wizardNode)
 		{
 			string wizardText;
-			if(checkTableExist("MBText"))
+			if(CheckTableExist("MBText"))
 			{
 				SqlCommand command = new SqlCommand();
-				command.Connection = connection;
+				command.Connection = Connection;
 				command.CommandText = "select SearchCondition from MBText where SrcRecID=@wizardAnalit";
 				SqlParameter wizardAnalit = new SqlParameter("@wizardAnalit", SqlDbType.Int);
 				wizardAnalit.Value = wizardNode.Id;
@@ -88,20 +88,20 @@ namespace ISBLScan.ViewCode
 							
 							System.Text.Encoding win1251 = System.Text.Encoding.GetEncoding(1251);
 							wizardText = win1251.GetString(sqlbytes.Value);
-							this.parseWizardText(wizardText, wizardNode);
+							this.ParseWizardText(wizardText, wizardNode);
 						}
 					}
 				}
 				reader.Close();
 			}
 		}
-		private string parseISBLText(string strIndent)
+		private string ParseIsblText(string strIndent)
 		{
 			string isblText = "";
-			while((this.linesWizardText[this.lineIndex].StartsWith(strIndent + "    "))&&(this.lineIndex < this.linesWizardCount))
+			while((this._linesWizardText[this._lineIndex].StartsWith(strIndent + "    "))&&(this._lineIndex < this._linesWizardCount))
 			{
 				//Получение отдельной строки текста
-				string isblTextLine = this.linesWizardText[this.lineIndex].Trim().Replace("\r", "");
+				string isblTextLine = this._linesWizardText[this._lineIndex].Trim().Replace("\r", "");
 				//если строка не последняя, то она заканчивается на " +", его надо удалить
 				if(isblTextLine.EndsWith(" +"))
 				{
@@ -141,42 +141,42 @@ namespace ISBLScan.ViewCode
 						break;
 					}
 				}
-				this.lineIndex++;
+				this._lineIndex++;
 			}
 			return isblText;
 		}
-		private EventStruct parseEventWizard()
+		private EventStruct ParseEventWizard()
 		{
 			EventStruct res = new EventStruct();
 			//Проверка, что текущая строка равна "item"
-			if(this.linesWizardText[this.lineIndex].Replace("\r", "").Trim() == "item")
+			if(this._linesWizardText[this._lineIndex].Replace("\r", "").Trim() == "item")
 			{
 				//определение величины отступа
-				string strIndent = this.linesWizardText[this.lineIndex].Remove(this.linesWizardText[this.lineIndex].IndexOf("item"));
-				while((!this.linesWizardText[this.lineIndex].StartsWith(strIndent + "end"))&&(this.lineIndex < this.linesWizardCount))
+				string strIndent = this._linesWizardText[this._lineIndex].Remove(this._linesWizardText[this._lineIndex].IndexOf("item"));
+				while((!this._linesWizardText[this._lineIndex].StartsWith(strIndent + "end"))&&(this._lineIndex < this._linesWizardCount))
 				{
-					if(this.linesWizardText[this.lineIndex].StartsWith(strIndent + "  ISBLText = "))
+					if(this._linesWizardText[this._lineIndex].StartsWith(strIndent + "  ISBLText = "))
 					{
-						this.lineIndex++;
-						res.text = this.parseISBLText(strIndent);
+						this._lineIndex++;
+						res.Text = this.ParseIsblText(strIndent);
 					}
 					else
-					if(this.linesWizardText[this.lineIndex].StartsWith(strIndent + "  EventType = "))
+					if(this._linesWizardText[this._lineIndex].StartsWith(strIndent + "  EventType = "))
 					{
 						string strEventTypeSuffix = "EventType = ";
-						res.name = this.linesWizardText[this.lineIndex].Trim().Remove(0, strEventTypeSuffix.Length);
-						this.lineIndex++;
+						res.Name = this._linesWizardText[this._lineIndex].Trim().Remove(0, strEventTypeSuffix.Length);
+						this._lineIndex++;
 					}
 					else
-						this.lineIndex++;
+						this._lineIndex++;
 				}
 			}
 			return res;
 		}
 		
-		private void parseWizardText(string originText, Node wizardNode)
+		private void ParseWizardText(string originText, Node wizardNode)
 		{
-			this.originWizardText = originText;
+			this._originWizardText = originText;
 		
 			/**********************************************************************
 			 * Структура свойств мастера находится в структуре, похожей на
@@ -206,13 +206,13 @@ namespace ISBLScan.ViewCode
 			 * 		ОК
 			 **********************************************************************/
 			char[] charDelimeters = {'\n'};
-			this.linesWizardText = originWizardText.Split(charDelimeters);
-			this.linesWizardCount = linesWizardText.Length;
-			this.lineIndex = 0;
+			this._linesWizardText = _originWizardText.Split(charDelimeters);
+			this._linesWizardCount = _linesWizardText.Length;
+			this._lineIndex = 0;
 			//Поиск начала секции с событиями маршрута
-			while((this.lineIndex < this.linesWizardCount) && (linesWizardText[this.lineIndex].Replace("\r", "") != "  Events = <"))
+			while((this._lineIndex < this._linesWizardCount) && (_linesWizardText[this._lineIndex].Replace("\r", "") != "  Events = <"))
 			{
-				this.lineIndex = this.lineIndex + 1;
+				this._lineIndex = this._lineIndex + 1;
 			}
 
 			
@@ -221,13 +221,13 @@ namespace ISBLScan.ViewCode
 			wizardEventsNode.Text = "";
 			wizardEventsNode.Nodes = new List<Node>();
 			//Загрузка "События мастера"
-			while((this.lineIndex < this.linesWizardCount) && (linesWizardText[this.lineIndex].Replace("\r", "") != "    end>"))
+			while((this._lineIndex < this._linesWizardCount) && (_linesWizardText[this._lineIndex].Replace("\r", "") != "    end>"))
 			{
 				//переходим к следующей строке
-				this.lineIndex++;
-				EventStruct eventInfo = this.parseEventWizard();
+				this._lineIndex++;
+				EventStruct eventInfo = this.ParseEventWizard();
 				Node wizardEventInfoNode = new Node();
-				switch (eventInfo.name)
+				switch (eventInfo.Name)
 				{
 				case "wetWizardBeforeSelection":
 					wizardEventInfoNode.Name = "До выбора";
@@ -239,10 +239,10 @@ namespace ISBLScan.ViewCode
 					wizardEventInfoNode.Name = "Завершение";
 					break;
 				default:
-					wizardEventInfoNode.Name = "Неизвестное событие: " + eventInfo.name;
+					wizardEventInfoNode.Name = "Неизвестное событие: " + eventInfo.Name;
 					break;
 				}
-				wizardEventInfoNode.Text = eventInfo.text;
+				wizardEventInfoNode.Text = eventInfo.Text;
 				wizardEventsNode.Nodes.Add(wizardEventInfoNode);
 			}
 			wizardNode.Nodes.Add(wizardEventsNode);
@@ -252,27 +252,27 @@ namespace ISBLScan.ViewCode
 		public Node Load()
 		{
 			Node listNode = null;
-			Int32 vidAnalitID = getVidAnalitID("WIZARDS");
-			if(vidAnalitID >= 0)
+			Int32 vidAnalitId = GetVidAnalitId("WIZARDS");
+			if(vidAnalitId >= 0)
 			{
 				listNode = new Node();
 				listNode.Name = "Мастер действий";
 				listNode.Text = null;
-				listNode.Id = vidAnalitID;
+				listNode.Id = vidAnalitId;
 				listNode.Nodes = new List<Node>();
 				
 				List<Node> listGroups = LoadGroups(listNode);
 				foreach(Node groupNode in listGroups)
 				{
 					SqlCommand command = new SqlCommand();
-					command.Connection = connection;
+					command.Connection = Connection;
 					command.CommandText = "select Analit, NameAn, Soder from MBAnalit where Vid=@vidAnalit and HighLvl=@groupID";
 					SqlParameter paramVidAnalit = new SqlParameter("@vidAnalit", SqlDbType.Int);
-					SqlParameter paramGroupID = new SqlParameter("@groupID", SqlDbType.Int);
-					paramVidAnalit.Value = vidAnalitID;
-					paramGroupID.Value = groupNode.Id;
+					SqlParameter paramGroupId = new SqlParameter("@groupID", SqlDbType.Int);
+					paramVidAnalit.Value = vidAnalitId;
+					paramGroupId.Value = groupNode.Id;
 					command.Parameters.Add(paramVidAnalit);
-					command.Parameters.Add(paramGroupID);
+					command.Parameters.Add(paramGroupId);
 					command.Prepare();
 					SqlDataReader reader = command.ExecuteReader();
 					if(reader.HasRows)

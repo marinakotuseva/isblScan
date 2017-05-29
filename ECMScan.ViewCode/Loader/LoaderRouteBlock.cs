@@ -23,10 +23,10 @@ namespace ISBLScan.ViewCode
 		private List<Node> LoadGroups(Node rootNode)
 		{
 			List<Node> listGroups = new List<Node>();
-			if(this.checkTableExist("SBRouteBlockGroup"))
+			if(this.CheckTableExist("SBRouteBlockGroup"))
 			{
 				SqlCommand command = new SqlCommand();
-				command.Connection = connection;
+				command.Connection = Connection;
 				command.CommandText = "select t.id, t.name from (select SBRouteBlockGroup.XrecID [id], Max(SBRouteBlockGroup.Name) [name] from SBRouteBlockGroup join SBRouteBlock on (SBRouteBlockGroup.XRecID = SBRouteBlock.BlockGroup)  group by SBRouteBlockGroup.XRecID) t order by t.name";
 				SqlDataReader reader = command.ExecuteReader();
 				if(reader.HasRows)
@@ -52,7 +52,7 @@ namespace ISBLScan.ViewCode
 		public Node Load()
 		{
 			Node listNode = null;
-			if(this.checkTableExist("SBRouteBlock"))
+			if(this.CheckTableExist("SBRouteBlock"))
 			{
 				listNode = new Node();
 				listNode.Name = "Блок типового маршрута";
@@ -63,11 +63,11 @@ namespace ISBLScan.ViewCode
 				foreach(Node groupNode in listGroups)
 				{
 					SqlCommand command = new SqlCommand();
-					command.Connection = connection;
+					command.Connection = Connection;
 					command.CommandText = "select XRecID, Name, Comment, Properties from SBRouteBlock where BlockGroup=@groupID order by Name";
-					SqlParameter paramGroupID = new SqlParameter("@groupID", SqlDbType.Int);
-					paramGroupID.Value = groupNode.Id;
-					command.Parameters.Add(paramGroupID);
+					SqlParameter paramGroupId = new SqlParameter("@groupID", SqlDbType.Int);
+					paramGroupId.Value = groupNode.Id;
+					command.Parameters.Add(paramGroupId);
 					command.Prepare();
 					SqlDataReader reader = command.ExecuteReader();
 					if(reader.HasRows)
@@ -97,13 +97,13 @@ namespace ISBLScan.ViewCode
                                 schema.LoadXml(schemaString);
 
                                 var events = schema.SelectNodes("/Settings/Event/node()");
-                                foreach (XmlNode eventXMLNode in events)
+                                foreach (XmlNode eventXmlNode in events)
                                 {
-                                    var eventString = getNodeString(eventXMLNode);
+                                    var eventString = GetNodeString(eventXmlNode);
                                     if (!System.String.IsNullOrEmpty(eventString))
                                     {
                                         Node eventNode = new Node();
-                                        eventNode.Name = eventXMLNode.Name;
+                                        eventNode.Name = eventXmlNode.Name;
                                         eventNode.Text = eventString;
                                         routeBlockNode.Nodes.Add(eventNode);
                                     }
@@ -115,7 +115,7 @@ namespace ISBLScan.ViewCode
                                     var propertyStringNode = property.SelectSingleNode("Value/Value");
                                     if (propertyStringNode != null)
                                     {
-                                        var propertyString = getNodeString(propertyStringNode);
+                                        var propertyString = GetNodeString(propertyStringNode);
                                         if (!System.String.IsNullOrEmpty(propertyString))
                                         {
                                             Node blockStringNode = new Node();
@@ -135,7 +135,7 @@ namespace ISBLScan.ViewCode
 			return listNode;
 		}
 
-        private string getNodeString(XmlNode node)
+        private string GetNodeString(XmlNode node)
         {
             string parsedString = "";
             parsedString = node.InnerText;

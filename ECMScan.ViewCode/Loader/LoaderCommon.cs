@@ -16,7 +16,7 @@ namespace ISBLScan.ViewCode
 		/// <summary>
 		///Соединение с БД 
 		/// </summary>
-		protected SqlConnection connection;
+		protected SqlConnection Connection;
 		
 		/// <summary>
 		/// Конструктор базового класса для всех загрузчиков прикладной разработки.
@@ -26,7 +26,7 @@ namespace ISBLScan.ViewCode
 		/// </param>
 		public LoaderCommon(SqlConnection sqlConnect)
 		{
-			this.connection = sqlConnect;
+			this.Connection = sqlConnect;
 		}
 		
 		/// <summary>
@@ -38,12 +38,12 @@ namespace ISBLScan.ViewCode
 		/// <returns>
 		/// true - таблица, с указанным именем есть в базы данных; false - таблицы с указанным именем нет в базы данных.
 		/// </returns>
-		public bool checkTableExist(string tableName)
+		public bool CheckTableExist(string tableName)
 		{
 			bool flagTableExist;
 			
 			SqlCommand command = new SqlCommand();
-			command.Connection = connection;
+			command.Connection = Connection;
 			command.CommandText = "select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME = @tableName";
 			SqlParameter paramTableName = new SqlParameter("@tableName", SqlDbType.NVarChar, 255);
 			paramTableName.Value = tableName;
@@ -75,13 +75,13 @@ namespace ISBLScan.ViewCode
 		/// <returns>
 		/// null - аналитика с указанным кодом не найдена, либо ИД аналитики
 		/// </returns>
-		public int getVidAnalitID(string vidAnalitKod)
+		public int GetVidAnalitId(string vidAnalitKod)
 		{
-			int vidAnalitID = -1;
-			if(this.checkTableExist("MBVidAn"))
+			int vidAnalitId = -1;
+			if(this.CheckTableExist("MBVidAn"))
 			{
 				SqlCommand command = new SqlCommand();
-				command.Connection = connection;
+				command.Connection = Connection;
 				command.CommandText = "select Vid from MBVidAn where Kod = @vidAnalitKod";
 				SqlParameter paramVidAnalitKod = new SqlParameter("@vidAnalitKod", SqlDbType.NVarChar, 255);
 				paramVidAnalitKod.Value = vidAnalitKod;
@@ -94,16 +94,16 @@ namespace ISBLScan.ViewCode
 					{
 						if(!reader.IsDBNull(0))
 						{
-							vidAnalitID = reader.GetInt32(0);
+							vidAnalitId = reader.GetInt32(0);
 						}
 					}
 				}
 				reader.Close();
 			}
-			return vidAnalitID;
+			return vidAnalitId;
 		}
 
-        public string commentStrings(string comment)
+        public string CommentStrings(string comment)
         {
             string[] delimeters = { "\n\r" };
             string[] commentArray = comment.Split(delimeters, StringSplitOptions.None);

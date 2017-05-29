@@ -1,11 +1,6 @@
-﻿/*
- * Date: 30.09.2012
- * Time: 14:59
- */
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Data.SqlTypes;
 
 namespace ISBLScan.ViewCode
 {
@@ -18,20 +13,20 @@ namespace ISBLScan.ViewCode
 		{
 		}
 		
-		private SqlConnection connection;
+		private SqlConnection _connection;
 
-		public EDocType			    loaderEDocType;
-		public Function			    loaderFunction;
-		public Reference			loaderReference;
-		public Report				loaderReport;
-		public ReportIntegrate		loaderReportInt;
-		public Route				loaderRoute;
-		public RouteBlock			loaderRouteBlock;
-		public Script				loaderScript;
-		public Wizard				loaderWizard;
-        public CustomCalculations   loaderCustom;
+		public EDocType			    LoaderEDocType;
+		public Function			    LoaderFunction;
+		public Reference			LoaderReference;
+		public Report				LoaderReport;
+		public ReportIntegrate		LoaderReportInt;
+		public Route				LoaderRoute;
+		public RouteBlock			LoaderRouteBlock;
+		public Script				LoaderScript;
+		public Wizard				LoaderWizard;
+        public CustomCalculations   LoaderCustom;
 
-        public string errorText;
+        public string ErrorText;
 		
 		/// <summary>
 		/// Установка соединения с системой 
@@ -58,48 +53,23 @@ namespace ISBLScan.ViewCode
 				connBuilder.Password = password;
 			}
 			try {
-				this.connection = new SqlConnection(connBuilder.ConnectionString);
-				this.connection.Open();
-				this.errorText = null;
+				this._connection = new SqlConnection(connBuilder.ConnectionString);
+				this._connection.Open();
+				this.ErrorText = null;
                 //tryLoadAndExecuteDebugSQLScript(connection);
 				return true;
 			} catch (Exception e) {
-				this.errorText = e.Message;
+				this.ErrorText = e.Message;
 				return false;
 			}
 		}
 
-        /// <summary>
-        /// Отладочный метод. Вариант того, как вывести SQL-скрипты из тела утилиты в SQL-файлы, которые проще править и поддерживать.
-        /// TODO: отладить такой способ выполнения скриптов, перевести работу с SQL на такой вариант выполнения или отказаться, выпилить метод.
-        /// </summary>
-        /// <param name="sqlConnection"></param>
-        //void tryLoadAndExecuteDebugSQLScript(SqlConnection sqlConnection)
-        //{
-        //    try
-        //    {
-        //        string debugSQLScript = System.IO.File.ReadAllText(string.Format("ISBLScan.ViewCode.DebugScript.{0}.sql", sqlConnection.Database));
-        //        SqlCommand command = new SqlCommand();
-        //        command.Connection = sqlConnection;
-        //        command.CommandText = debugSQLScript;
-        //        command.ExecuteNonQuery();
-        //    }
-        //    catch (SqlException ex)
-        //    {
-        //        //TODO: добавить обработку исключений
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        //TODO: добавить обработку исключений
-        //    }
-        //}
-
 		/// <summary>
 		///Отключиться от базы данных 
 		/// </summary>
-		public void disconnect()
+		public void Disconnect()
 		{
-			this.connection.Close();
+			this._connection.Close();
 		}
 		
 		/// <summary>
@@ -111,56 +81,56 @@ namespace ISBLScan.ViewCode
 			List<Node> isblList = new List<Node>();
 			Node isblNode;
 			
-			loaderEDocType				= new EDocType(this.connection);
-			loaderFunction				= new Function(this.connection);
-			loaderReference				= new Reference(this.connection);
-			loaderReport				= new Report(this.connection);
-			loaderReportInt				= new ReportIntegrate(this.connection);
-			loaderRoute				    = new Route(this.connection);
-			loaderRouteBlock			= new RouteBlock(this.connection);
-			loaderScript				= new Script(this.connection);
-			loaderWizard				= new Wizard(this.connection);
-            loaderCustom                = new CustomCalculations(this.connection);
+			LoaderEDocType				= new EDocType(this._connection);
+			LoaderFunction				= new Function(this._connection);
+			LoaderReference				= new Reference(this._connection);
+			LoaderReport				= new Report(this._connection);
+			LoaderReportInt				= new ReportIntegrate(this._connection);
+			LoaderRoute				    = new Route(this._connection);
+			LoaderRouteBlock			= new RouteBlock(this._connection);
+			LoaderScript				= new Script(this._connection);
+			LoaderWizard				= new Wizard(this._connection);
+            LoaderCustom                = new CustomCalculations(this._connection);
 
 
             //Загрузка типов карточке электронных документов
-            isblNode = loaderEDocType.Load();
+            isblNode = LoaderEDocType.Load();
             isblList.Add(isblNode);
 
             //Загрузка текстов функций
-            isblNode = loaderFunction.Load();
+            isblNode = LoaderFunction.Load();
             isblList.Add(isblNode);
 
             //Загрузка текстов событий справочников, вычислений реквизитов, расчётов на форме
-            isblNode = loaderReference.Load();
+            isblNode = LoaderReference.Load();
             isblList.Add(isblNode);
 
             //Загрузка отчётов (шаблонов и расчётов)
-            isblNode = loaderReport.Load();
+            isblNode = LoaderReport.Load();
             isblList.Add(isblNode);
 
             //Загрузка интегрированных отчётов (шаблонов и расчётов)
-            isblNode = loaderReportInt.Load();
+            isblNode = LoaderReportInt.Load();
             isblList.Add(isblNode);
 
             //Загрузка типовых маршрутов(событий маршрутов)
-            isblNode = loaderRoute.Load();
+            isblNode = LoaderRoute.Load();
             isblList.Add(isblNode);
 
             //Загрузка вычислений блоков типовых маршрутов
-            isblNode = loaderRouteBlock.Load();
+            isblNode = LoaderRouteBlock.Load();
             isblList.Add(isblNode);
 
             //Загрузка текстов расчётов (сценариев)
-            isblNode = loaderScript.Load();
+            isblNode = LoaderScript.Load();
             isblList.Add(isblNode);
 
             //Загрузка вычислений мастеров действий
-            isblNode = loaderWizard.Load();
+            isblNode = LoaderWizard.Load();
             isblList.Add(isblNode);
 
             //Загрузка вычислений из справочников
-            isblNode = loaderCustom.Load();
+            isblNode = LoaderCustom.Load();
             isblList.Add(isblNode);
 
             return isblList;

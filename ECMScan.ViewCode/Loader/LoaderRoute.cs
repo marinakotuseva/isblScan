@@ -24,7 +24,7 @@ namespace ISBLScan.ViewCode
         {
             List<Node> listGroups = new List<Node>();
             SqlCommand command = new SqlCommand();
-            command.Connection = this.connection;
+            command.Connection = this.Connection;
             command.CommandText = @"
 select Analit, NameAn
 from MbAnalitSpr 
@@ -62,7 +62,7 @@ order by NameAn";
             foreach (Node groupNode in listGroups)
             {
                 SqlCommand command = new SqlCommand();
-                command.Connection = connection;
+                command.Connection = Connection;
                 command.CommandText = @"
 select MBAnalit.Analit
     , MBAnalit.NameAn + ' (' + ltrim(MBAnalit.Kod) + ')'
@@ -72,9 +72,9 @@ from MBAnalit
 where MBAnalit.HighLvl=@groupID
     and MBAnalit.Vid = (select Vid from MBVidAn where Kod = 'STANDARD_ROUTES' or Kod = 'ТМТ') 
 order by MBAnalit.NameAn";
-                SqlParameter paramGroupID = new SqlParameter("@groupID", SqlDbType.Int);
-                paramGroupID.Value = groupNode.Id;
-                command.Parameters.Add(paramGroupID);
+                SqlParameter paramGroupId = new SqlParameter("@groupID", SqlDbType.Int);
+                paramGroupId.Value = groupNode.Id;
+                command.Parameters.Add(paramGroupId);
                 command.Prepare();
                 SqlDataReader reader = command.ExecuteReader();
                 if (reader.HasRows)
@@ -104,13 +104,13 @@ order by MBAnalit.NameAn";
                                 {"TaskAbortPossibility", "Возможность прекращения"},
                                 {"TaskAbort", "Прекращение"}
                             };
-                            foreach (XmlNode eventXMLNode in events)
+                            foreach (XmlNode eventXmlNode in events)
                             {
-                                var eventString = getNodeString(eventXMLNode);
+                                var eventString = GetNodeString(eventXmlNode);
                                 if (!System.String.IsNullOrEmpty(eventString))
                                 {
                                     Node eventNode = new Node();
-                                    eventNode.Name = eventNameToTitle.ContainsKey(eventXMLNode.Name) ? eventNameToTitle[eventXMLNode.Name] : eventXMLNode.Name;
+                                    eventNode.Name = eventNameToTitle.ContainsKey(eventXmlNode.Name) ? eventNameToTitle[eventXmlNode.Name] : eventXmlNode.Name;
                                     eventNode.Text = eventString;
                                     routeNode.Nodes.Add(eventNode);
                                 }
@@ -121,7 +121,7 @@ order by MBAnalit.NameAn";
                                 var propertyStringNode = property.SelectSingleNode("Value/Value");
                                 if (propertyStringNode != null)
                                 {
-                                    var propertyString = getNodeString(propertyStringNode);
+                                    var propertyString = GetNodeString(propertyStringNode);
                                     if (!System.String.IsNullOrEmpty(propertyString))
                                     {
                                         Node routeStringNode = new Node();
@@ -137,7 +137,7 @@ order by MBAnalit.NameAn";
                             {
                                 Node blockNode = new Node();
                                 var nameProperty = block.SelectSingleNode("Properties/Property[@Type = '2' and @Name = 'Name']/Value/Value");
-                                if (nameProperty != null) blockNode.Name = block.Attributes["ID"].Value + ". " + getNodeString(nameProperty);
+                                if (nameProperty != null) blockNode.Name = block.Attributes["ID"].Value + ". " + GetNodeString(nameProperty);
                                 else blockNode.Name = block.Attributes["ID"].Value;
                                 
                                 blockNode.Nodes = new List<Node>();
@@ -148,7 +148,7 @@ order by MBAnalit.NameAn";
                                     var propertyStringNode = property.SelectSingleNode("Value/Value");
                                     if (propertyStringNode != null)
                                     {
-                                        var propertyString = getNodeString(propertyStringNode);
+                                        var propertyString = GetNodeString(propertyStringNode);
                                         if (!System.String.IsNullOrEmpty(propertyString))
                                         {
                                             Node blockStringNode = new Node();
@@ -175,7 +175,7 @@ order by MBAnalit.NameAn";
             return listNode;
         }
 
-        private string getNodeString(XmlNode node)
+        private string GetNodeString(XmlNode node)
         {
             string parsedString = "";
             parsedString = node.InnerText;

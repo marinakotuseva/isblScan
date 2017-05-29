@@ -21,7 +21,7 @@ namespace ISBLScan.ViewCode
 		public Node Load()
 		{
 			Node listNode = null;
-			if(this.checkTableExist("MBReports"))
+			if(this.CheckTableExist("MBReports"))
 			{
 				listNode = new Node();
 				listNode.Name = "Интегрированный отчёт";
@@ -30,7 +30,7 @@ namespace ISBLScan.ViewCode
 				
 				{
 					SqlCommand command = new SqlCommand();
-					command.Connection = connection;
+					command.Connection = Connection;
 					command.CommandText = "select XRecID, NameRpt, Comment, Exprn, Report, Viewer from MBReports where TypeRpt='MBAnalitV' order by NameRpt ASC";
 					SqlDataReader reader = command.ExecuteReader();
 					if(reader.HasRows)

@@ -22,10 +22,10 @@ namespace ISBLScan.ViewCode
 		private List<Node> LoadGroups (Node rootNode, char charSysFunc)
 		{
 			List<Node> listGroups = new List<Node> ();
-			if (this.checkTableExist ("MBRegUnit")) 
+			if (this.CheckTableExist ("MBRegUnit")) 
 			{
 				SqlCommand command = new SqlCommand ();
-				command.Connection = this.connection;
+				command.Connection = this.Connection;
 				//command.CommandText = "select t.id, t.name from (select MBGrFunc.NGroup [id], Max(MBGrFunc.GrName) [name] from MBGrFunc join MBFunc on (MBGrFunc.NGroup = MBFunc.NGroup) where MBFunc.SysFunc=@funcCategory and not(Txt is null) group by MBGrFunc.NGroup) t order by t.name";
 				command.CommandText = @"
 select t.id, t.name, t.Comment, t.LastUpd
@@ -127,10 +127,10 @@ order by t.name";
 		/// </param>
 		private void LoadRecvisites (Node rootNode)
 		{
-			if (this.checkTableExist ("MBFuncRecv")) 
+			if (this.CheckTableExist ("MBFuncRecv")) 
 			{
 				SqlCommand command = new SqlCommand ();
-				command.Connection = this.connection;
+				command.Connection = this.Connection;
 				command.CommandText = "SELECT [NumPar], [Ident], [Name], [Type], [ValueDef] FROM [MBFuncRecv] WHERE [FName] = @funcName";
 				SqlParameter paramFuncName = new SqlParameter ("@funcName", SqlDbType.NVarChar, 512);
 				paramFuncName.Value = rootNode.Name;
@@ -169,7 +169,7 @@ order by t.name";
 		public Node Load ()
 		{
 			Node listNode = null;
-			if (this.checkTableExist ("MBFunc")) {
+			if (this.CheckTableExist ("MBFunc")) {
 				listNode = new Node ();
 				listNode.Name = "Функция";
 				listNode.Text = null;
@@ -191,14 +191,14 @@ order by t.name";
 					foreach (Node groupNode in listGroups) 
 					{
 						SqlCommand command = new SqlCommand ();
-						command.Connection = connection;
+						command.Connection = Connection;
 						//command.CommandText = "select XRecID, FName, Comment, Help, Txt from MBFunc where NGroup=@groupID and SysFunc=@sysFunc and not(Txt is null) order by FName";
 						command.CommandText = "select XRecID, FName, Comment, Help, Txt, LastUpd from MBFunc where NGroup=@groupID and SysFunc=@sysFunc order by FName";
-						SqlParameter paramGroupID = new SqlParameter ("@groupID", SqlDbType.Int);
+						SqlParameter paramGroupId = new SqlParameter ("@groupID", SqlDbType.Int);
 						SqlParameter paramSysFunc = new SqlParameter ("@sysFunc", SqlDbType.NChar, 1);
-						paramGroupID.Value = groupNode.Id;
+						paramGroupId.Value = groupNode.Id;
 						paramSysFunc.Value = charSysFunc;
-						command.Parameters.Add (paramGroupID);
+						command.Parameters.Add (paramGroupId);
 						command.Parameters.Add (paramSysFunc);
 						command.Prepare ();
 						SqlDataReader reader = command.ExecuteReader ();

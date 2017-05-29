@@ -21,10 +21,10 @@ namespace ISBLScan.ViewCode
 		private List<Node> LoadGroups(Node rootNode)
 		{
 			List<Node> listGroups = new List<Node>();
-			if(this.checkTableExist("MBRegUnit"))
+			if(this.CheckTableExist("MBRegUnit"))
 			{
 				SqlCommand command = new SqlCommand();
-				command.Connection = connection;
+				command.Connection = Connection;
 				command.CommandText = "select t.id, t.name from (select MBRegUnit.RegUnit [id], Max(MBRegUnit.Name) [name] from MBRegUnit join MBReports on (MBRegUnit.RegUnit = MBReports.RegUnit) where MBReports.TypeRpt='MBAnAccRpt' group by MBRegUnit.RegUnit) t order by t.name";
 				SqlDataReader reader = command.ExecuteReader();
 				if(reader.HasRows)
@@ -50,7 +50,7 @@ namespace ISBLScan.ViewCode
 		public Node Load()
 		{
 			Node listNode = null;
-			if(this.checkTableExist("MBReports"))
+			if(this.CheckTableExist("MBReports"))
 			{
 				listNode = new Node();
 				listNode.Name = "Аналитический отчёт";
@@ -61,11 +61,11 @@ namespace ISBLScan.ViewCode
 				foreach(Node groupNode in listGroups)
 				{
 					SqlCommand command = new SqlCommand();
-					command.Connection = connection;
+					command.Connection = Connection;
 					command.CommandText = "select XRecID, NameRpt, Comment, Exprn, Report, Viewer from MBReports where TypeRpt='MBAnAccRpt' and RegUnit=@groupID order by NameRpt ASC";
-					SqlParameter paramGroupID = new SqlParameter("@groupID", SqlDbType.Int);
-					paramGroupID.Value = groupNode.Id;
-					command.Parameters.Add(paramGroupID);
+					SqlParameter paramGroupId = new SqlParameter("@groupID", SqlDbType.Int);
+					paramGroupId.Value = groupNode.Id;
+					command.Parameters.Add(paramGroupId);
 					command.Prepare();
 					SqlDataReader reader = command.ExecuteReader();
 					if(reader.HasRows)
