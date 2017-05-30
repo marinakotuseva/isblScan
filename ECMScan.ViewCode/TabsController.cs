@@ -25,7 +25,7 @@ namespace ISBLScan.ViewCode
             return search;
         }
 
-        public class Search : IDisposable
+        public class Search
         {
             private SearchController _controller;
             private MainForm Form { get { return _controller._form; } }
@@ -154,16 +154,30 @@ namespace ISBLScan.ViewCode
                 Form.AddCheckBox(CheckBoxFindCaseSensitive);
             }
 
+            public void Clear()
+            {
+                IsblNodes = null;
+                Form.RemoveCheckBox(CheckBoxFindCaseSensitive);
+                CheckBoxFindCaseSensitive = null;
+                Form.RemoveCheckBox(CheckBoxFindAll);
+                CheckBoxFindAll = null;
+                Form.RemoveCheckBox(CheckBoxFindRegExp);
+                CheckBoxFindRegExp = null;
+                Form.RemoveTreeView(TreeViewResults);
+                TreeViewResults = null;
+                Tab.Controls.Remove(SearchCriteriaTextEditor);
+                SearchCriteriaTextEditor = null;
+                Form.RemoveTextEditor(TextEditor);
+                TextEditor = null;
+                Form.RemoveTreeFilter(TextBoxFilter);
+                TextBoxFilter = null;
+                Tab = null;
+            }
+
             public void Refresh()
             {
                 IsblNodes = new List<Node>(_controller.SourceIsblNodes);
                 BuildDisplayTree();
-            }
-
-
-            public void Dispose()
-            {
-                IsblNodes = null;
             }
 
             public void Process()

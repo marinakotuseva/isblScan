@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 
 namespace ISBLScan.ViewCode
 {
@@ -15,15 +16,16 @@ namespace ISBLScan.ViewCode
 		private static string _nameIsWinAuth = "IsWinAuth:";
 		
 		private static string _configFilePath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData) + "/ISBLScan.ViewCode.cfg";
-		
 
-		public static bool Load(out string sqlServer, out string dataBase, out string login, out bool isWinAuth)
+
+        public static bool Load(out string sqlServer, out string dataBase, out string login, out bool isWinAuth)
 		{
 			sqlServer = "";
 			dataBase = "";
 			login = "";
 			isWinAuth = true;
-			if(System.IO.File.Exists(_configFilePath))
+
+            if (System.IO.File.Exists(_configFilePath))
 			{
 				string[] configStrings = System.IO.File.ReadAllLines(_configFilePath);
 				foreach(string configString in configStrings)

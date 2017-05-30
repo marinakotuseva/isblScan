@@ -30,19 +30,36 @@ namespace ISBLScan.ViewCode
             panelTree.TabIndex = 212;
         }
 
+        public void RemoveTreeView(TreeView treeViewResults)
+        {
+            panelTree.Controls.Remove(treeViewResults);
+        }
+
         public void AddTextEditor(ICSharpCode.TextEditor.TextEditorControl textEditorControlIsbl)
         {
             panelISBLResult.Controls.Add(textEditorControlIsbl);
+        }
+        public void RemoveTextEditor(ICSharpCode.TextEditor.TextEditorControl textEditorControlIsbl)
+        {
+            panelISBLResult.Controls.Remove(textEditorControlIsbl);
         }
 
         public void AddTreeFilter(TextBox textBoxFilter)
         {
             panelFilterTree.Controls.Add(textBoxFilter);
         }
+        public void RemoveTreeFilter(TextBox textBoxFilter)
+        {
+            panelFilterTree.Controls.Remove(textBoxFilter);
+        }
 
         public void AddCheckBox(CheckBox checkBox)
         {
             panelSearchButtons.Controls.Add(checkBox);
+        }
+        public void RemoveCheckBox(CheckBox checkBox)
+        {
+            panelSearchButtons.Controls.Remove(checkBox);
         }
 
         /// <summary>
@@ -84,21 +101,59 @@ namespace ISBLScan.ViewCode
             string sqlServer;
             string dataBase;
             string login;
-            bool isWinAuth;
-            if (Configuration.Load(out sqlServer, out dataBase, out login, out isWinAuth))
+            string password;
+            bool isWinAuth = false;
+
+
+            var namedArguments = new Dictionary<string, string>();
+            String[] arguments = Environment.GetCommandLineArgs();
+
+            foreach (string argument in arguments)
             {
+                string[] splitted = argument.Split('=');
+
+                if (splitted.Length == 2)
+                {
+                    namedArguments[splitted[0]] = splitted[1];
+                }
+            }
+            if (namedArguments.Count > 0)
+            {
+                string isWinAuthString = "false";
+                namedArguments.TryGetValue("-S", out sqlServer);
+                namedArguments.TryGetValue("-D", out dataBase);
+                namedArguments.TryGetValue("-N", out login);
+                namedArguments.TryGetValue("-W", out password);
+                namedArguments.TryGetValue("-IsOSAuth", out isWinAuthString);
+                isWinAuth = isWinAuthString?.ToLower() == "true";
+
                 textBoxSQLServer.Text = sqlServer;
                 textBoxDB.Text = dataBase;
                 textBoxLogin.Text = login;
-                if (isWinAuth)
+                checkBoxWinAuth.Checked = isWinAuth;
+                textBoxPassword.Text = password;
+
+                ConnectAndGetIsbl();
+            }
+            else
+            {
+                if (Configuration.Load(out sqlServer, out dataBase, out login, out isWinAuth))
                 {
-                    checkBoxWinAuth.Checked = isWinAuth;
-                }
-                else
-                {
-                    textBoxPassword.Text = "";
+                    textBoxSQLServer.Text = sqlServer;
+                    textBoxDB.Text = dataBase;
+                    textBoxLogin.Text = login;
+                    if (isWinAuth)
+                    {
+                        textBoxPassword.Text = "";
+                        checkBoxWinAuth.Checked = isWinAuth;
+                    }
+                    else
+                    {
+                        textBoxPassword.Text = "";
+                    }
                 }
             }
+            
         }
 
         /// <summary>
@@ -387,9 +442,9 @@ namespace ISBLScan.ViewCode
                 TabPage tabPageForClose = tabControlSearchText.SelectedTab;
                 tabControlSearchText.SelectedIndex = tabControlSearchText.SelectedIndex > 0 ?
                     tabControlSearchText.SelectedIndex - 1 : 0;
-                var search = (SearchController.Search)tabPageForClose.Tag;
+                ((SearchController.Search) tabPageForClose.Tag).Clear();
                 tabControlSearchText.Controls.Remove(tabPageForClose);
-                search.Dispose();
+                GC.Collect();
             }
         }
 
