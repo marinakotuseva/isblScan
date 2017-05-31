@@ -76,9 +76,8 @@ namespace ISBLScan.ViewCode
 		///Зарузка списка узлов, для их отображения в дереве элементов 
 		/// </summary>
 		/// <returns>Список узлов</returns>
-		public List<Node> Load()
+		public List<Node> Load(List<Node> isblList)
 		{
-			List<Node> isblList = new List<Node>();
 			Node isblNode;
 			
 			LoaderEDocType				= new EDocType(this._connection);

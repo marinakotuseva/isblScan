@@ -42,11 +42,18 @@ namespace ISBLScan.ViewCode
             public System.Windows.Forms.CheckBox CheckBoxFindRegExp { get; set; }
             public System.Windows.Forms.CheckBox CheckBoxFindAll { get; set; }
             public System.Windows.Forms.CheckBox CheckBoxFindCaseSensitive { get; set; }
+            /// <summary>
+            /// Словарь поисковых фраз и соотвествующих регулярных выражений
+            /// </summary>
+            Dictionary<string, Regex> _dictRegEx = new Dictionary<string, Regex>();
+
+            string[] _searchStrs;
             public Search(SearchController controller, string name)
             {
                 _controller = controller;
                 Tab = new TabPage(name);
-                IsblNodes = new List<Node>(_controller.SourceIsblNodes);
+                IsblNodes = new List<Node>();
+                CopyIsblNodes(IsblNodes, _controller.SourceIsblNodes); 
                 SearchCriteriaTextEditor = new ICSharpCode.TextEditor.TextEditorControl();
                 TextEditor = new ICSharpCode.TextEditor.TextEditorControl();
                 TreeViewResults = new TreeView();
@@ -158,26 +165,39 @@ namespace ISBLScan.ViewCode
             {
                 IsblNodes = null;
                 Form.RemoveCheckBox(CheckBoxFindCaseSensitive);
+                CheckBoxFindCaseSensitive.Dispose();
                 CheckBoxFindCaseSensitive = null;
                 Form.RemoveCheckBox(CheckBoxFindAll);
+                CheckBoxFindAll.Dispose();
                 CheckBoxFindAll = null;
                 Form.RemoveCheckBox(CheckBoxFindRegExp);
+                CheckBoxFindRegExp.Dispose();
                 CheckBoxFindRegExp = null;
                 Form.RemoveTreeView(TreeViewResults);
+                TreeViewResults.Dispose();
                 TreeViewResults = null;
                 Tab.Controls.Remove(SearchCriteriaTextEditor);
+                SearchCriteriaTextEditor.Dispose();
                 SearchCriteriaTextEditor = null;
                 Form.RemoveTextEditor(TextEditor);
+                TextEditor.Dispose();
                 TextEditor = null;
                 Form.RemoveTreeFilter(TextBoxFilter);
+                TextBoxFilter.Dispose();
                 TextBoxFilter = null;
+                Tab.Dispose();
                 Tab = null;
+                _dictRegEx = null;
+                _searchStrs = null;
+                GC.Collect();
             }
 
             public void Refresh()
             {
-                IsblNodes = new List<Node>(_controller.SourceIsblNodes);
+                IsblNodes.Clear();
+                CopyIsblNodes(IsblNodes, _controller.SourceIsblNodes);
                 BuildDisplayTree();
+                GC.Collect();
             }
 
             public void Process()
@@ -190,6 +210,7 @@ namespace ISBLScan.ViewCode
                 BuildTabIsblNodes();
                 BuildDisplayTree();
                 Activate();
+                GC.Collect();
             }
             public void Activate()
             {
@@ -339,7 +360,9 @@ namespace ISBLScan.ViewCode
             {
                 FilterIsblNodesByName();
                 TreeViewResults.Nodes.Clear();
+                TreeViewResults.BeginUpdate();
                 CopyIsblNodesToTreeNodes(IsblNodes, TreeViewResults.Nodes);
+                TreeViewResults.EndUpdate();
             }
 
             void FilterIsblNodesByName()
@@ -462,12 +485,6 @@ namespace ISBLScan.ViewCode
                 }
             }
 
-            /// <summary>
-            /// Словарь поисковых фраз и соотвествующих регулярных выражений
-            /// </summary>
-            Dictionary<string, Regex> _dictRegEx = new Dictionary<string, Regex>();
-
-            string[] _searchStrs;
 
             /// <summary>
             /// Проверка списка регулярных выражений на корректность и возврат списка строк корректных регулярных выражений.
@@ -630,6 +647,22 @@ namespace ISBLScan.ViewCode
                             }
                             targetNodes.Add(nodeCopy);
                         }
+                    }
+                }
+            }
+            void CopyIsblNodes(List<Node> targetNodes, List<Node> sourceNodes)
+            {
+                if (sourceNodes != null)
+                {
+                    foreach (Node isblNode in sourceNodes)
+                    {
+                        var nodeCopy = isblNode.Clone();
+                        if (isblNode.Nodes != null)
+                        {
+                            nodeCopy.Nodes = new List<Node>();
+                            CopyIsblNodes(nodeCopy.Nodes, isblNode.Nodes);
+                        }
+                        targetNodes.Add(nodeCopy);
                     }
                 }
             }

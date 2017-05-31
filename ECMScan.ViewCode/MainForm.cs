@@ -72,7 +72,7 @@ namespace ISBLScan.ViewCode
             if (e.Node.Tag != null)
             {
                 Node node = e.Node.Tag as Node;
-                _controller.ActiveSearch.TextEditor.Document.TextContent = node.Text;
+                _controller.ActiveSearch.TextEditor.Document.TextContent = node.SourceNode.Text;
                 toolStripStatusLabelSelectedElement.Text = node.Name;
                 _controller.ActiveSearch.MarkSearchStrings();
             }
@@ -192,7 +192,9 @@ namespace ISBLScan.ViewCode
         /// </summary>
         bool GetIsbl()
         {
-            _controller.SourceIsblNodes = _isblLoader.Load();
+            _controller.SourceIsblNodes.Clear();
+            _isblLoader.Load(_controller.SourceIsblNodes);
+
             bool isblNodesIsEmpty = true;
             foreach (Node node in _controller.SourceIsblNodes)
             {
@@ -394,26 +396,6 @@ namespace ISBLScan.ViewCode
             }
         }
 
-        void CopyMatchedIsblNodes(List<Node> targetNodes, List<Node> sourceNodes)
-        {
-            if (sourceNodes != null)
-            {
-                foreach (Node isblNode in sourceNodes)
-                {
-                    if (isblNode.IsMatch || isblNode.IsContainsMatchedNode)
-                    {
-                        var nodeCopy = isblNode.Clone();
-                        if (isblNode.Nodes != null)
-                        {
-                            nodeCopy.Nodes = new List<Node>();
-                            CopyMatchedIsblNodes(nodeCopy.Nodes, isblNode.Nodes);
-                        }
-                        targetNodes.Add(nodeCopy);
-                    }
-                }
-            }
-        }
-
         /// <summary>
         /// Изменение текста в поле фильтрации дерева проекта
         /// </summary>
@@ -482,10 +464,13 @@ namespace ISBLScan.ViewCode
 
         private void buttonExpand_Click(object sender, EventArgs e)
         {
-            foreach (TreeNode node in _controller.ActiveSearch.TreeViewResults.Nodes)
+            var treeViewResults = _controller.ActiveSearch.TreeViewResults;
+            treeViewResults.BeginUpdate();
+            foreach (TreeNode node in treeViewResults.Nodes)
             {
                 node.ExpandAll();
             }
+            treeViewResults.EndUpdate();
         }
     }
 }

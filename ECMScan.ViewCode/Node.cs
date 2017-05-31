@@ -43,6 +43,11 @@ namespace ISBLScan.ViewCode
         public List<Node> Nodes { get; set; }
 
         /// <summary>
+        /// Source Node
+        /// </summary>
+        public Node SourceNode { get; set; }
+
+        /// <summary>
         /// Gets or sets Признак того, что узел соотвествует поисковому запросу
         /// </summary>
         public bool IsMatch { get; set; }
@@ -68,9 +73,10 @@ namespace ISBLScan.ViewCode
             node.Name = this.Name;
             node.IsContainsMatchedNode = this.IsContainsMatchedNode;
             node.IsMatch = this.IsMatch;
-            node.Text = this.Text;
+            //node.Text = this.Text;
             node.Id = this.Id;
             node.Code = this.Code;
+            node.SourceNode = this;
             return node;
         }
     }
