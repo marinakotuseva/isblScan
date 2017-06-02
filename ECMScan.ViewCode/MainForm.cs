@@ -35,11 +35,11 @@ namespace ISBLScan.ViewCode
             panelTree.Controls.Remove(treeViewResults);
         }
 
-        public void AddTextEditor(ICSharpCode.TextEditor.TextEditorControl textEditorControlIsbl)
+        public void AddTextEditor(Control textEditorControlIsbl)
         {
             panelISBLResult.Controls.Add(textEditorControlIsbl);
         }
-        public void RemoveTextEditor(ICSharpCode.TextEditor.TextEditorControl textEditorControlIsbl)
+        public void RemoveTextEditor(Control textEditorControlIsbl)
         {
             panelISBLResult.Controls.Remove(textEditorControlIsbl);
         }
@@ -72,13 +72,13 @@ namespace ISBLScan.ViewCode
             if (e.Node.Tag != null)
             {
                 Node node = e.Node.Tag as Node;
-                _controller.ActiveSearch.TextEditor.Document.TextContent = node.SourceNode.Text;
+                _controller.ActiveSearch.TextEditor.Text = node.SourceNode.Text;
                 toolStripStatusLabelSelectedElement.Text = node.Name;
                 _controller.ActiveSearch.MarkSearchStrings();
             }
             else
             {
-                textEditorControlISBL.Document.TextContent = "";
+                _controller.ActiveSearch.TextEditor.Text = "";
             }
         }
 

@@ -2,8 +2,12 @@
 using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using ICSharpCode.TextEditor.Document;
+using ICSharpCode.AvalonEdit;
 using System.Drawing;
+using System.Windows.Media;
+using ICSharpCode.AvalonEdit.Document;
+using ICSharpCode.AvalonEdit.Highlighting;
+using Color = System.Drawing.Color;
 
 namespace ISBLScan.ViewCode
 {
@@ -31,8 +35,8 @@ namespace ISBLScan.ViewCode
             private MainForm Form { get { return _controller._form; } }
             private List<Node> IsblNodes { get; set; }
             public TabPage Tab { get; set; }
-            public ICSharpCode.TextEditor.TextEditorControl SearchCriteriaTextEditor { get; set; }
-            public ICSharpCode.TextEditor.TextEditorControl TextEditor { get; set; }
+            public ICSharpCode.AvalonEdit.TextEditor SearchCriteriaTextEditor { get; set; }
+            public ICSharpCode.AvalonEdit.TextEditor TextEditor { get; set; }
             public TreeView TreeViewResults { get; set; }
             public System.Windows.Forms.TextBox TextBoxFilter { get; set; }
             public string FilterText { get; set; }
@@ -42,6 +46,8 @@ namespace ISBLScan.ViewCode
             public System.Windows.Forms.CheckBox CheckBoxFindRegExp { get; set; }
             public System.Windows.Forms.CheckBox CheckBoxFindAll { get; set; }
             public System.Windows.Forms.CheckBox CheckBoxFindCaseSensitive { get; set; }
+            public System.Windows.Forms.Integration.ElementHost TextEditorHost { get; set; }
+            public System.Windows.Forms.Integration.ElementHost SearchCriteriaTextEditorHost { get; set; }
             /// <summary>
             /// Словарь поисковых фраз и соотвествующих регулярных выражений
             /// </summary>
@@ -54,22 +60,25 @@ namespace ISBLScan.ViewCode
                 Tab = new TabPage(name);
                 IsblNodes = new List<Node>();
                 CopyIsblNodes(IsblNodes, _controller.SourceIsblNodes); 
-                SearchCriteriaTextEditor = new ICSharpCode.TextEditor.TextEditorControl();
-                TextEditor = new ICSharpCode.TextEditor.TextEditorControl();
+                
                 TreeViewResults = new TreeView();
 
-                SearchCriteriaTextEditor.Dock = DockStyle.Fill;
-                SearchCriteriaTextEditor.IsReadOnly = false;
-                SearchCriteriaTextEditor.Location = new Point(0, 0);
-                SearchCriteriaTextEditor.ShowEOLMarkers = true;
-                SearchCriteriaTextEditor.ShowSpaces = true;
-                SearchCriteriaTextEditor.ShowTabs = true;
-                SearchCriteriaTextEditor.TabIndex = 1;
-                SearchCriteriaTextEditor.TextChanged += new System.EventHandler(Form.textEditorControlRegExp_TextChanged);
-                Tab.Tag = this;
-                Tab.Controls.Add(SearchCriteriaTextEditor);
-                Tab.UseVisualStyleBackColor = true;
+                SearchCriteriaTextEditorHost = new System.Windows.Forms.Integration.ElementHost();
+                SearchCriteriaTextEditorHost.Dock = DockStyle.Fill;
+                SearchCriteriaTextEditorHost.Location = new Point(0, 0);
+                SearchCriteriaTextEditorHost.TabIndex = 1;
 
+                SearchCriteriaTextEditor = new ICSharpCode.AvalonEdit.TextEditor();
+                SearchCriteriaTextEditor.Options.ShowEndOfLine = true;
+                SearchCriteriaTextEditor.Options.ShowSpaces = true;
+                SearchCriteriaTextEditor.Options.ShowTabs = true; 
+                SearchCriteriaTextEditor.TextChanged += new System.EventHandler(Form.textEditorControlRegExp_TextChanged);
+
+                SearchCriteriaTextEditorHost.Child = SearchCriteriaTextEditor;
+                Tab.Tag = this;
+                Tab.Controls.Add(SearchCriteriaTextEditorHost);
+                Tab.UseVisualStyleBackColor = true;
+               
                 TreeViewResults.CheckBoxes = false;
                 TreeViewResults.Dock = DockStyle.Fill;
                 TreeViewResults.HideSelection = false;
@@ -81,35 +90,27 @@ namespace ISBLScan.ViewCode
                 BuildDisplayTree();
                 Form.AddTreeViewResults(TreeViewResults);
 
+                TextEditorHost = new System.Windows.Forms.Integration.ElementHost();
+                TextEditorHost.Dock = DockStyle.Fill;
+                TextEditorHost.Location = new Point(0, 0);
+                TextEditorHost.Margin = new System.Windows.Forms.Padding(4);
+                TextEditorHost.TabIndex = 150;
 
-                TextEditor.BracketMatchingStyle = ICSharpCode.TextEditor.Document.BracketMatchingStyle.Before;
-                TextEditor.ConvertTabsToSpaces = true;
-                TextEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-                TextEditor.EnableFolding = false;
-                TextEditor.IsIconBarVisible = true;
-                TextEditor.IsReadOnly = false;
-                TextEditor.Location = new Point(0, 0); 
-                TextEditor.Margin = new System.Windows.Forms.Padding(4);
-                TextEditor.Name = "textEditorControlISBL";
-                TextEditor.ShowEOLMarkers = true;
-                TextEditor.ShowSpaces = true;
-                TextEditor.ShowTabs = true;
-                TextEditor.Size = new System.Drawing.Size(759, 529);
-                TextEditor.TabIndex = 150;
-                TextEditor.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-                TextEditor.VRulerRow = 100;
-                TextEditor.Document.TextContent = "";
-                TextEditor.Document.HighlightingStrategy =
-                    HighlightingStrategyFactory.CreateHighlightingStrategy("ISBL");
-                TextEditor.Document.FoldingManager.FoldingStrategy =
-                    new IndentFoldingStrategy();
+                TextEditor = new ICSharpCode.AvalonEdit.TextEditor();
+                TextEditor.Options.ConvertTabsToSpaces = true;
+                TextEditor.Options.ShowEndOfLine = true;
+                TextEditor.Options.ShowSpaces = true;
+                TextEditor.Options.ShowTabs = true;
+                TextEditor.Options.AllowScrollBelowDocument = false;
+                TextEditor.Options.EnableRectangularSelection = true;
+                TextEditor.ShowLineNumbers = true;
+                TextEditor.Text = "";
+                TextEditor.SyntaxHighlighting =
+                    HighlightingManager.Instance.GetDefinition("ISBL");
 
-                ITextEditorProperties prop = TextEditor.Document.TextEditorProperties;
-                prop.AllowCaretBeyondEOL = prop.AllowCaretBeyondEOL;
-                prop.IsIconBarVisible = true;
-                TextEditor.Document.TextEditorProperties = prop;
-                TextEditor.Document.ReadOnly = true;
-                Form.AddTextEditor(TextEditor);
+                TextEditor.IsReadOnly = true;
+                TextEditorHost.Child = TextEditor;
+                Form.AddTextEditor(TextEditorHost);
 
                 TextBoxFilter = new System.Windows.Forms.TextBox();
                 TextBoxFilter.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -176,11 +177,9 @@ namespace ISBLScan.ViewCode
                 Form.RemoveTreeView(TreeViewResults);
                 TreeViewResults.Dispose();
                 TreeViewResults = null;
-                Tab.Controls.Remove(SearchCriteriaTextEditor);
-                SearchCriteriaTextEditor.Dispose();
+                Tab.Controls.Remove(SearchCriteriaTextEditorHost);
                 SearchCriteriaTextEditor = null;
-                Form.RemoveTextEditor(TextEditor);
-                TextEditor.Dispose();
+                Form.RemoveTextEditor(TextEditorHost);
                 TextEditor = null;
                 Form.RemoveTreeFilter(TextBoxFilter);
                 TextBoxFilter.Dispose();
@@ -216,7 +215,7 @@ namespace ISBLScan.ViewCode
             {
                 _controller.ActiveSearch = this;
                 TreeViewResults.BringToFront();
-                TextEditor.BringToFront();
+                TextEditorHost.BringToFront();
                 TextBoxFilter.BringToFront();
                 CheckBoxFindRegExp.BringToFront();
                 CheckBoxFindAll.BringToFront();
@@ -228,8 +227,8 @@ namespace ISBLScan.ViewCode
             public void MarkSearchStrings()
             {
                 GetSearchStrArray();
-                TextEditor.Document.MarkerStrategy.RemoveAll((marker) => { return true; });
-                TextEditor.Document.BookmarkManager.RemoveMarks((bookmark) => { return true; });
+                //TextEditor.Document.MarkerStrategy.RemoveAll((marker) => { return true; });
+                //TextEditor.Document.BookmarkManager.RemoveMarks((bookmark) => { return true; });
 
                 if (RegExp)
                 {
@@ -239,7 +238,7 @@ namespace ISBLScan.ViewCode
                 {
                     MarkSearchStrings(_searchStrs, CaseSensitive);
                 }
-                TextEditor.Refresh();
+                SearchCriteriaTextEditor.TextArea.TextView.Redraw();
             }
 
             public void MarkSearchStringsRegExp(string[] regExpArray, bool caseSensitive)
@@ -249,7 +248,7 @@ namespace ISBLScan.ViewCode
                 //Подсветка искомого текста
                 if (regExpArray.Length > 0)
                 {
-                    String text = TextEditor.Document.TextContent;
+                    String text = TextEditor.Text;
                     bool isCentered = false;
 
                     for (int indexRegExpStrings = 0; indexRegExpStrings < regExpArray.Length; indexRegExpStrings++)
@@ -262,28 +261,28 @@ namespace ISBLScan.ViewCode
 
                             foreach (Match match in regExpFindResults)
                             {
-                                TextMarker marker = new TextMarker(
-                                    match.Index
-                                    , match.Length
-                                    , TextMarkerType.SolidBlock
-                                    , Color.FromArgb(255, 156, 255, 156) // светло-зелёный
-                                    , Color.FromArgb(255, 18, 10, 143) // ультрамарин
-                                    );
-                                marker.ToolTip = hlStr;
-                                TextEditor.Document.MarkerStrategy.AddMarker(marker);
+                                //TextMarker marker = new TextMarker(
+                                //    match.Index
+                                //    , match.Length
+                                //    , TextMarkerType.SolidBlock
+                                //    , Color.FromArgb(255, 156, 255, 156) // светло-зелёный
+                                //    , Color.FromArgb(255, 18, 10, 143) // ультрамарин
+                                //    );
+                                //marker.ToolTip = hlStr;
+                                //TextEditor.Document.MarkerStrategy.AddMarker(marker);
 
-                                Bookmark mark = new Bookmark(
-                                    TextEditor.Document
-                                    , TextEditor.Document.OffsetToPosition(match.Index)
-                                    , false);
-                                TextEditor.Document.BookmarkManager.AddMark(mark);
+                                //Bookmark mark = new Bookmark(
+                                //    TextEditor.Document
+                                //    , TextEditor.Document.OffsetToPosition(match.Index)
+                                //    , false);
+                                //TextEditor.Document.BookmarkManager.AddMark(mark);
 
-                                if (!isCentered)
-                                {
-                                    var lineNumber = TextEditor.Document.GetLineNumberForOffset(match.Index);
-                                    TextEditor.ActiveTextAreaControl.CenterViewOn(lineNumber, 0);
-                                    isCentered = true;
-                                }
+                                //if (!isCentered)
+                                //{
+                                //    var lineNumber = TextEditor.Document.GetLineNumberForOffset(match.Index);
+                                //    TextEditor.ActiveTextAreaControl.CenterViewOn(lineNumber, 0);
+                                //    isCentered = true;
+                                //}
                             }
                         }
                     }
@@ -298,7 +297,7 @@ namespace ISBLScan.ViewCode
                 //Подсветка искомого текста
                 if (findArray.Length > 0)
                 {
-                    String text = TextEditor.Document.TextContent;
+                    String text = TextEditor.Text;
 
                     foreach (string findStr in findArray)
                     {
@@ -320,28 +319,28 @@ namespace ISBLScan.ViewCode
                                     posEnd = posStart + hlStr.Length - 1;
                                     if (posEnd >= 0)
                                     {
-                                        TextMarker marker = new TextMarker(
-                                            posStart
-                                            , posEnd - posStart + 1
-                                            , TextMarkerType.SolidBlock
-                                            , Color.FromArgb(255, 156, 255, 156) // светло-зелёный
-                                            , Color.FromArgb(255, 18, 10, 143) // ультрамарин
-                                            );
-                                        marker.ToolTip = hlStr;
-                                        TextEditor.Document.MarkerStrategy.AddMarker(marker);
+                                        //TextMarker marker = new TextMarker(
+                                        //    posStart
+                                        //    , posEnd - posStart + 1
+                                        //    , TextMarkerType.SolidBlock
+                                        //    , Color.FromArgb(255, 156, 255, 156) // светло-зелёный
+                                        //    , Color.FromArgb(255, 18, 10, 143) // ультрамарин
+                                        //    );
+                                        //marker.ToolTip = hlStr;
+                                        //TextEditor.Document.MarkerStrategy.AddMarker(marker);
 
-                                        Bookmark mark = new Bookmark(
-                                            TextEditor.Document
-                                            , TextEditor.Document.OffsetToPosition(posStart)
-                                            , false);
-                                        TextEditor.Document.BookmarkManager.AddMark(mark);
+                                        //Bookmark mark = new Bookmark(
+                                        //    TextEditor.Document
+                                        //    , TextEditor.Document.OffsetToPosition(posStart)
+                                        //    , false);
+                                        //TextEditor.Document.BookmarkManager.AddMark(mark);
 
-                                        if (!isCentered)
-                                        {
-                                            var lineNumber = TextEditor.Document.GetLineNumberForOffset(posStart);
-                                            TextEditor.ActiveTextAreaControl.CenterViewOn(lineNumber, 0);
-                                            isCentered = true;
-                                        }
+                                        //if (!isCentered)
+                                        //{
+                                        //    var lineNumber = TextEditor.Document.GetLineNumberForOffset(posStart);
+                                        //    TextEditor.ActiveTextAreaControl.CenterViewOn(lineNumber, 0);
+                                        //    isCentered = true;
+                                        //}
 
                                         posStart = text.IndexOf(hlStr, posEnd + 1, comparation);
                                     }
@@ -465,11 +464,11 @@ namespace ISBLScan.ViewCode
                 }
                 else
                 {
-                    SearchCriteriaTextEditor.Document.MarkerStrategy.RemoveAll((marker) => { return true; });
-                    SearchCriteriaTextEditor.Document.BookmarkManager.RemoveMarks((bookmark) => { return true; });
-                    SearchCriteriaTextEditor.Refresh();
+                   // SearchCriteriaTextEditor.Document.MarkerStrategy.RemoveAll((marker) => { return true; });
+                    //SearchCriteriaTextEditor.Document.BookmarkManager.RemoveMarks((bookmark) => { return true; });
+                    SearchCriteriaTextEditor.TextArea.TextView.Redraw();
                     string[] searchLineStrs = SearchCriteriaTextEditor.Text.Split(
-                    new string[] { SearchCriteriaTextEditor.TextEditorProperties.LineTerminator }
+                    new string[] { "\n" }
                     , StringSplitOptions.RemoveEmptyEntries
                     );
                     char[] delimeters = { ' ', '\t', '\n', '\r' };
@@ -493,12 +492,13 @@ namespace ISBLScan.ViewCode
             string[] CheckRegExpFormat()
             {
                 List<string> regExpResultList = new List<string>();
-                SearchCriteriaTextEditor.Document.MarkerStrategy.RemoveAll((marker) => { return true; });
-                SearchCriteriaTextEditor.Document.BookmarkManager.RemoveMarks((bookmark) => { return true; });
+                //SearchCriteriaTextEditor.Document.MarkerStrategy.RemoveAll((marker) => { return true; });
+                //SearchCriteriaTextEditor.Document.BookmarkManager.RemoveMarks((bookmark) => { return true; });
                 bool errorExist = false;
-                for (int indexRegExpCandidate = 0; indexRegExpCandidate < SearchCriteriaTextEditor.Document.TotalNumberOfLines; indexRegExpCandidate++)
+                for (int indexRegExpCandidate = 0; indexRegExpCandidate < SearchCriteriaTextEditor.Document.LineCount; indexRegExpCandidate++)
                 {
-                    LineSegment segment = SearchCriteriaTextEditor.Document.GetLineSegment(indexRegExpCandidate);
+                    var line = SearchCriteriaTextEditor.Document.GetLineByNumber(indexRegExpCandidate);
+                    ISegment segment = new TextSegment { StartOffset = line.Offset, EndOffset = line.EndOffset };
                     string regExpCandidateString = SearchCriteriaTextEditor.Document.GetText(segment);
                     try
                     {
@@ -510,27 +510,27 @@ namespace ISBLScan.ViewCode
                     }
                     catch (System.ArgumentException ex)
                     {
-                        TextMarker marker = new TextMarker(
-                            segment.Offset
-                            , segment.Length
-                            , TextMarkerType.WaveLine
-                            , Color.Red
-                            , Color.DarkRed
-                            );
-                        marker.ToolTip = ex.Message;
-                        SearchCriteriaTextEditor.Document.MarkerStrategy.AddMarker(marker);
+                        //TextMarker marker = new TextMarker(
+                        //    segment.Offset
+                        //    , segment.Length
+                        //    , TextMarkerType.WaveLine
+                        //    , Color.Red
+                        //    , Color.DarkRed
+                        //    );
+                        //marker.ToolTip = ex.Message;
+                        //SearchCriteriaTextEditor.Document.MarkerStrategy.AddMarker(marker);
 
-                        Bookmark mark = new Bookmark(
-                            SearchCriteriaTextEditor.Document
-                            , SearchCriteriaTextEditor.Document.OffsetToPosition(segment.Offset)
-                            , true);
-                        SearchCriteriaTextEditor.Document.BookmarkManager.AddMark(mark);
+                        //Bookmark mark = new Bookmark(
+                        //    SearchCriteriaTextEditor.Document
+                        //    , SearchCriteriaTextEditor.Document.OffsetToPosition(segment.Offset)
+                        //    , true);
+                        //SearchCriteriaTextEditor.Document.BookmarkManager.AddMark(mark);
                         errorExist = true;
                     }
                 }
                 if (errorExist)
                 {
-                    SearchCriteriaTextEditor.Refresh();
+                    SearchCriteriaTextEditor.TextArea.TextView.Redraw();
                 }
                 return regExpResultList.ToArray();
             }

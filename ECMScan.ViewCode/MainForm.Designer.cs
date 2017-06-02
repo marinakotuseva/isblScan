@@ -55,7 +55,6 @@ namespace ISBLScan.ViewCode
             this.panelTree = new System.Windows.Forms.Panel();
             this.panelFilterTree = new System.Windows.Forms.Panel();
             this.panelISBLResult = new System.Windows.Forms.Panel();
-            this.textEditorControlISBL = new ICSharpCode.TextEditor.TextEditorControl();
             this.splitContainerMain = new System.Windows.Forms.SplitContainer();
             this.timerRegExpFind = new System.Windows.Forms.Timer(this.components);
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -373,14 +372,6 @@ namespace ISBLScan.ViewCode
             this.panelISBLResult.Size = new System.Drawing.Size(759, 517);
             this.panelISBLResult.TabIndex = 220;
             // 
-            // textEditorControlISBL
-            // 
-            this.textEditorControlISBL.IsReadOnly = false;
-            this.textEditorControlISBL.Location = new System.Drawing.Point(0, 0);
-            this.textEditorControlISBL.Name = "textEditorControlISBL";
-            this.textEditorControlISBL.Size = new System.Drawing.Size(100, 100);
-            this.textEditorControlISBL.TabIndex = 0;
-            // 
             // splitContainerMain
             // 
             this.splitContainerMain.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -495,7 +486,6 @@ namespace ISBLScan.ViewCode
             this.PerformLayout();
 
 		}
-		private ICSharpCode.TextEditor.TextEditorControl textEditorControlISBL;
 		private System.Windows.Forms.CheckBox checkBoxWinAuth;
         private System.Windows.Forms.Button buttonConnect;
 
