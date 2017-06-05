@@ -18,15 +18,15 @@ namespace ISBLScan.ViewCode
 		{
 		}
 
-		public Node Load()
+		public IsbNode Load()
 		{
-			Node listNode = null;
+		    IsbNode listNode = null;
 			if(this.CheckTableExist("MBReports"))
 			{
-				listNode = new Node();
+				listNode = new IsbNode();
 				listNode.Name = "Интегрированный отчёт";
 				listNode.Text = null;
-				listNode.Nodes = new List<Node>();
+				listNode.Nodes = new List<IsbNode>();
 				
 				{
 					SqlCommand command = new SqlCommand();
@@ -37,7 +37,7 @@ namespace ISBLScan.ViewCode
 					{
 						while(reader.Read())
 						{
-							Node reportNode = new Node();
+							var reportNode = new IsbNode();
 							//ИД отчёта
 							reportNode.Id = reader.GetInt32(0);
 							//Имя отчёта
@@ -50,14 +50,14 @@ namespace ISBLScan.ViewCode
 							{
 								reportNode.Text = reader.GetString(2);
 							}
-							reportNode.Nodes = new List<Node>();
+							reportNode.Nodes = new List<IsbNode>();
 							//Шаблон отчёта
 							if(! reader.IsDBNull(4))
 							{
 								SqlBytes sqlbytes = reader.GetSqlBytes(4);
 								System.Text.Encoding win1251 = System.Text.Encoding.GetEncoding(1251);
 								string scriptText = win1251.GetString(sqlbytes.Value);
-								Node reportTextNode = new Node();
+								var reportTextNode = new IsbNode();
 								reportTextNode.Name = "-=[ Шаблон ]=-";
 								reportTextNode.Text = scriptText;
 								reportNode.Nodes.Add(reportTextNode);
@@ -66,7 +66,7 @@ namespace ISBLScan.ViewCode
 							if(! reader.IsDBNull(3))
 							{
 								string templateText = reader.GetString(3);
-								Node reportTemplateNode = new Node();
+								var reportTemplateNode = new IsbNode();
 								reportTemplateNode.Name = "-=[ Расчёт ]=-";
 								reportTemplateNode.Text = templateText;
 								reportNode.Nodes.Add(reportTemplateNode);

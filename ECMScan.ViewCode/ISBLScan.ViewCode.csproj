@@ -62,8 +62,8 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TabsController.cs" />
-    <Compile Include="Node.cs" />
+    <Compile Include="Search.cs" />
+    <Compile Include="IsbDev.cs" />
     <Compile Include="Loader\LoaderCommon.cs" />
     <Compile Include="Loader\LoaderEDocType.cs" />
     <Compile Include="Loader\LoaderFunction.cs" />
@@ -113,6 +113,9 @@
     <None Include="MainForm.resources" />
     <None Include="Resources.resources" />
     <None Include="Resources.resx" />
+    <None Include="ISBL.xshd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="test.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -186,15 +189,14 @@
     </MonoDevelop>
   </ProjectExtensions>
   <ItemGroup>
-    <None Include="Resources\close.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="isbTest.ico" />
-    <None Include="CustomCalculationConfig.json" />
+    <None Include="CustomCalculationConfig.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

@@ -11,81 +11,144 @@ namespace ISBLScan.ViewCode
     public partial class MainForm : Form
     {
         Loader _isblLoader = new Loader();
+        public IsbDev SourceDev = new IsbDev();
+        class SearchControls : IDisposable
+        {
+            public System.Windows.Forms.CheckBox CheckBoxFindRegExp { get; set; }
+            public System.Windows.Forms.CheckBox CheckBoxFindAll { get; set; }
+            public System.Windows.Forms.CheckBox CheckBoxFindCaseSensitive { get; set; }
+            public System.Windows.Forms.Integration.ElementHost TextEditorHost { get; set; }
+            public System.Windows.Forms.Integration.ElementHost SearchCriteriaTextEditorHost { get; set; }
+            public System.Windows.Forms.TextBox TextBoxFilter { get; set; }
+            public TreeView TreeViewResults  = new TreeView();
+            public Search Search { get; set; }
+            private MainForm _form { get; set; }
+            private TabPage _tab { get; set; }
 
-        SearchController _controller;
+            public SearchControls(MainForm form, TabPage tab)
+            {
+                _form = form;
+                _tab = tab;
+                Search = new Search(form.SourceDev);
+
+                SearchCriteriaTextEditorHost = new System.Windows.Forms.Integration.ElementHost();
+                SearchCriteriaTextEditorHost.Dock = DockStyle.Fill;
+                SearchCriteriaTextEditorHost.Location = new Point(0, 0);
+                SearchCriteriaTextEditorHost.TabIndex = 1;
+                SearchCriteriaTextEditorHost.Child = Search.SearchCriteriaTextEditor;
+
+                tab.Tag = this;
+                tab.Controls.Add(SearchCriteriaTextEditorHost);
+                tab.UseVisualStyleBackColor = true;
+
+                Search.FillTreeView(TreeViewResults);
+                TreeViewResults.CheckBoxes = false;
+                TreeViewResults.Dock = DockStyle.Fill;
+                TreeViewResults.HideSelection = false;
+                TreeViewResults.Location = new Point(0, 0);
+                TreeViewResults.Margin = new Padding(4);
+                TreeViewResults.Name = "treeViewResults";
+                TreeViewResults.TabIndex = 2121;
+                TreeViewResults.AfterSelect += new TreeViewEventHandler(form.TreeViewResultsAfterSelect);
+                _form.panelTree.Controls.Add(TreeViewResults);
+
+                TextEditorHost = new System.Windows.Forms.Integration.ElementHost();
+                TextEditorHost.Dock = DockStyle.Fill;
+                TextEditorHost.Location = new Point(0, 0);
+                TextEditorHost.Margin = new System.Windows.Forms.Padding(4);
+                TextEditorHost.TabIndex = 150;
+                TextEditorHost.Child = Search.TextEditor;
+                _form.panelISBLResult.Controls.Add(TextEditorHost);
+
+                TextBoxFilter = new System.Windows.Forms.TextBox();
+                TextBoxFilter.Dock = System.Windows.Forms.DockStyle.Fill;
+                TextBoxFilter.Location = new System.Drawing.Point(0, 0);
+                TextBoxFilter.Margin = new System.Windows.Forms.Padding(4);
+                TextBoxFilter.Name = "textBoxFilter";
+                TextBoxFilter.Size = new System.Drawing.Size(280, 22);
+                TextBoxFilter.TabIndex = 2111;
+                TextBoxFilter.TextChanged += new System.EventHandler(form.TextBoxFilter_TextChanged);
+                _form.panelFilterTree.Controls.Add(TextBoxFilter);
+
+                CheckBoxFindAll = new System.Windows.Forms.CheckBox();
+                CheckBoxFindAll.AutoSize = true;
+                CheckBoxFindAll.Dock = System.Windows.Forms.DockStyle.None;
+                CheckBoxFindAll.Location = new System.Drawing.Point(320, 4);
+                CheckBoxFindAll.Margin = new System.Windows.Forms.Padding(4);
+                CheckBoxFindAll.Name = "checkBoxFindAll";
+                CheckBoxFindAll.Size = new System.Drawing.Size(146, 28);
+                CheckBoxFindAll.TabIndex = 1226;
+                CheckBoxFindAll.Text = "satisfies all criteria";
+                CheckBoxFindAll.UseVisualStyleBackColor = true;
+                CheckBoxFindAll.CheckedChanged += new System.EventHandler(form.checkBoxFindAll_CheckedChanged);
+                _form.panelSearchButtons.Controls.Add(CheckBoxFindAll);
+
+                CheckBoxFindRegExp = new System.Windows.Forms.CheckBox();
+                CheckBoxFindRegExp.AutoSize = true;
+                CheckBoxFindRegExp.Dock = System.Windows.Forms.DockStyle.None;
+                CheckBoxFindRegExp.Location = new System.Drawing.Point(150, 4);
+                CheckBoxFindRegExp.Margin = new System.Windows.Forms.Padding(4);
+                CheckBoxFindRegExp.Name = "CheckBoxFindRegExp";
+                CheckBoxFindRegExp.Size = new System.Drawing.Size(170, 28);
+                CheckBoxFindRegExp.TabIndex = 1225;
+                CheckBoxFindRegExp.Text = ".* (regular expression)";
+                CheckBoxFindRegExp.UseVisualStyleBackColor = true;
+                CheckBoxFindRegExp.CheckedChanged += new System.EventHandler(form.checkBoxFindRegExp_CheckedChanged);
+                _form.panelSearchButtons.Controls.Add(CheckBoxFindRegExp);
+
+                CheckBoxFindCaseSensitive = new System.Windows.Forms.CheckBox();
+                CheckBoxFindCaseSensitive.AutoSize = true;
+                CheckBoxFindCaseSensitive.Dock = System.Windows.Forms.DockStyle.None;
+                CheckBoxFindCaseSensitive.Location = new System.Drawing.Point(2, 4);
+                CheckBoxFindCaseSensitive.Margin = new System.Windows.Forms.Padding(4);
+                CheckBoxFindCaseSensitive.Name = "checkBoxFindCaseSensitive";
+                CheckBoxFindCaseSensitive.Size = new System.Drawing.Size(150, 28);
+                CheckBoxFindCaseSensitive.TabIndex = 1224;
+                CheckBoxFindCaseSensitive.Text = "Aa (case sensitive)";
+                CheckBoxFindCaseSensitive.UseVisualStyleBackColor = true;
+                CheckBoxFindCaseSensitive.CheckedChanged += new System.EventHandler(form.checkBoxFindCaseSensitive_CheckedChanged);
+                _form.panelSearchButtons.Controls.Add(CheckBoxFindCaseSensitive);
+            }
+
+            public void Activate()
+            {
+                TreeViewResults.BringToFront();
+                TextEditorHost.BringToFront();
+                TextBoxFilter.BringToFront();
+                CheckBoxFindRegExp.BringToFront();
+                CheckBoxFindAll.BringToFront();
+                CheckBoxFindCaseSensitive.BringToFront();
+            }
+
+            public void Dispose()
+            {
+                TextEditorHost.Child = null;
+                SearchCriteriaTextEditorHost.Child = null;
+                _tab.Controls.Remove(SearchCriteriaTextEditorHost);
+                _form.panelTree.Controls.Remove(TreeViewResults);
+                _form.panelISBLResult.Controls.Remove(TextEditorHost);
+                _form.panelFilterTree.Controls.Remove(TextBoxFilter);
+                _form.panelSearchButtons.Controls.Remove(CheckBoxFindCaseSensitive);
+                _form.panelSearchButtons.Controls.Remove(CheckBoxFindAll);
+                _form.panelSearchButtons.Controls.Remove(CheckBoxFindRegExp);
+                Search.Nodes.Clear();
+                Search.Dispose();
+                TreeViewResults.Nodes.Clear();
+                TreeViewResults.Dispose();
+                TextEditorHost.Dispose();
+                SearchCriteriaTextEditorHost.Dispose();
+                TextBoxFilter.Dispose();
+                CheckBoxFindCaseSensitive.Dispose();
+                CheckBoxFindAll.Dispose();
+                CheckBoxFindRegExp.Dispose();
+            }
+        }
+        
 
         public void textEditorControlRegExp_TextChanged(object sender, EventArgs e)
         {
             timerRegExpFind.Enabled = false;
             timerRegExpFind.Enabled = true;
-        }
-
-        public void AddTreeViewResults(TreeView treeViewResults)
-        {
-            panelTree.Controls.Add(treeViewResults);
-            panelTree.Dock = DockStyle.Fill;
-            panelTree.Location = new Point(0, 25);
-            panelTree.Margin = new Padding(4);
-            panelTree.Name = "panelTree";
-            panelTree.TabIndex = 212;
-        }
-
-        public void RemoveTreeView(TreeView treeViewResults)
-        {
-            panelTree.Controls.Remove(treeViewResults);
-        }
-
-        public void AddTextEditor(Control textEditorControlIsbl)
-        {
-            panelISBLResult.Controls.Add(textEditorControlIsbl);
-        }
-        public void RemoveTextEditor(Control textEditorControlIsbl)
-        {
-            panelISBLResult.Controls.Remove(textEditorControlIsbl);
-        }
-
-        public void AddTreeFilter(TextBox textBoxFilter)
-        {
-            panelFilterTree.Controls.Add(textBoxFilter);
-        }
-        public void RemoveTreeFilter(TextBox textBoxFilter)
-        {
-            panelFilterTree.Controls.Remove(textBoxFilter);
-        }
-
-        public void AddCheckBox(CheckBox checkBox)
-        {
-            panelSearchButtons.Controls.Add(checkBox);
-        }
-        public void RemoveCheckBox(CheckBox checkBox)
-        {
-            panelSearchButtons.Controls.Remove(checkBox);
-        }
-
-        /// <summary>
-        /// Выбор узла в дереве разработки
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void TreeViewResultsAfterSelect(object sender, TreeViewEventArgs e)
-        {
-            if (e.Node.Tag != null)
-            {
-                Node node = e.Node.Tag as Node;
-                _controller.ActiveSearch.TextEditor.Text = node.SourceNode.Text;
-                toolStripStatusLabelSelectedElement.Text = node.Name;
-                _controller.ActiveSearch.MarkSearchStrings();
-            }
-            else
-            {
-                _controller.ActiveSearch.TextEditor.Text = "";
-            }
-        }
-
-        public void AddTab(TabPage tab)
-        {
-            tabControlSearchText.Controls.Add(tab);
-            tabControlSearchText.SelectedTab = tab;
         }
 
         public MainForm()
@@ -95,8 +158,7 @@ namespace ISBLScan.ViewCode
             //
             InitializeComponent();
             groupBoxSearch_Resize(null, null);
-            _controller = new SearchController(this);
-            _controller.AddSearch("Search Criteria");
+            AddNewTab();
 
             string sqlServer;
             string dataBase;
@@ -192,11 +254,11 @@ namespace ISBLScan.ViewCode
         /// </summary>
         bool GetIsbl()
         {
-            _controller.SourceIsblNodes.Clear();
-            _isblLoader.Load(_controller.SourceIsblNodes);
+            SourceDev.Nodes.Clear();
+            _isblLoader.Load(SourceDev.Nodes);
 
             bool isblNodesIsEmpty = true;
-            foreach (Node node in _controller.SourceIsblNodes)
+            foreach (var node in SourceDev.Nodes)
             {
                 if (node != null)
                 {
@@ -245,7 +307,9 @@ namespace ISBLScan.ViewCode
                 {
                     if (GetIsbl())
                     {
-                        _controller.ActiveSearch.Refresh();
+                        var searchControls = (SearchControls)tabControlSearchText.SelectedTab.Tag;
+                        searchControls.Search.Process();
+                        searchControls.Search.FillTreeView(searchControls.TreeViewResults);
                         buttonSearch.Enabled = true;
                     }
                 }
@@ -293,10 +357,6 @@ namespace ISBLScan.ViewCode
             ConnectAndGetIsbl();
         }
 
-        
-
-       
-
         /// <summary>
         /// Нажатие кнопки "Find"
         /// </summary>
@@ -305,7 +365,10 @@ namespace ISBLScan.ViewCode
 		void ButtonFilterClick(object sender, EventArgs e)
 		{
             buttonSearch.Enabled = false;
-            _controller.ActiveSearch.Process();
+		    var searchControls = (SearchControls) tabControlSearchText.SelectedTab.Tag;
+		    searchControls.Search.Process();
+		    searchControls.Search.FillTreeView(searchControls.TreeViewResults);
+
             buttonSearch.Enabled = true;
         }
 
@@ -329,80 +392,13 @@ namespace ISBLScan.ViewCode
             (sender as TextBox).ForeColor = this.textBoxPassword.ForeColor;
 		}
 
-        bool FilterNodeByName(Node node, string nameFilter)
-        {
-            if (node == null)
-                return false;
-
-            bool isFound = false;
-            //Пропуск пустых поисковых строк
-            if (node.Name.ToUpper().Contains(nameFilter.ToUpper()))
-            {
-                SetVisible(node);
-                isFound = true;
-            }
-            else
-            {
-                if (node.Nodes != null)
-                {
-                    foreach (Node subNode in node.Nodes)
-                    {
-                        if (FilterNodeByName(subNode, nameFilter))
-                        {
-                            isFound = true;
-                        }
-                    }
-                }
-            }
-            node.Visible = isFound;
-            return isFound;
-        }
-        void SetVisible(Node node)
-        {
-            node.Visible = true;
-            if (node.Nodes != null)
-            {
-                foreach (Node childNode in node.Nodes)
-                {
-                    SetVisible(childNode);
-                }
-            }
-        }
-        void CopyIsblNodesToTreeNodes(List<Node> isblNodes, TreeNodeCollection treeNodes)
-        {
-            foreach (Node isblNode in isblNodes)
-            {
-                if (isblNode.Visible)
-                {
-                    TreeNode treeNode = treeNodes.Add(isblNode.Name);
-                    treeNode.Tag = isblNode;
-
-                    if (isblNode.IsMatch)
-                    {
-                        treeNode.Checked = true;
-                        treeNode.ForeColor = Color.Black;
-                    }
-                    else
-                    {
-                        treeNode.Checked = false;
-                        treeNode.ForeColor = Color.Gray;
-                    }
-
-                    if (isblNode.Nodes != null)
-                    {
-                        CopyIsblNodesToTreeNodes(isblNode.Nodes, treeNode.Nodes);
-                    }
-                }
-            }
-        }
-
         /// <summary>
         /// Изменение текста в поле фильтрации дерева проекта
         /// </summary>
         public void TextBoxFilter_TextChanged (object sender, System.EventArgs e)
 		{
-		    _controller.ActiveSearch.FilterText = ((TextBox)sender).Text;
-            _controller.ActiveSearch.BuildDisplayTree();
+		    var searchControls = (SearchControls)tabControlSearchText.SelectedTab.Tag;
+		    searchControls.Search.FillTreeView(searchControls.TreeViewResults, ((TextBox)sender).Text);
         }
 		
 		void CheckBoxWinAuthCheckedChanged(object sender, EventArgs e)
@@ -411,49 +407,52 @@ namespace ISBLScan.ViewCode
 			textBoxPassword.Enabled = textBoxLogin.Enabled;
 		}
 
-        private void timerRegExpFind_Tick(object sender, EventArgs e)
-        {
-            timerRegExpFind.Enabled = false;
-            _controller.ActiveSearch.MarkSearchStrings();
-        }
-
         private void buttonCloseCurrentTab_Click(object sender, EventArgs e)
         {
             if (tabControlSearchText.TabCount > 1)
             {
-                TabPage tabPageForClose = tabControlSearchText.SelectedTab;
+                var tabPageForClose = tabControlSearchText.SelectedTab;
+                ((SearchControls) tabPageForClose.Tag).Dispose();
+                tabPageForClose.Tag = null;
+                
                 tabControlSearchText.SelectedIndex = tabControlSearchText.SelectedIndex > 0 ?
                     tabControlSearchText.SelectedIndex - 1 : 0;
-                ((SearchController.Search) tabPageForClose.Tag).Clear();
                 tabControlSearchText.Controls.Remove(tabPageForClose);
+                tabPageForClose.Dispose();
                 GC.Collect();
             }
         }
 
         private void buttonAddNewTab_Click(object sender, EventArgs e)
         {
-            _controller.AddSearch(string.Format("Search {0}", tabControlSearchText.TabCount + 1));
+            AddNewTab();
+        }
+
+        private void AddNewTab()
+        {
+            var tab = new TabPage(string.Format("Search {0}", tabControlSearchText.TabCount + 1));
+            new SearchControls(this, tab);
+            tabControlSearchText.Controls.Add(tab);
+            tabControlSearchText.SelectedTab = tab;
         }
         public void checkBoxFindRegExp_CheckedChanged(object sender, EventArgs e)
         {
-            _controller.ActiveSearch.RegExp = ((CheckBox)sender).Checked;
-            _controller.ActiveSearch.MarkSearchStrings();
+            ((SearchControls)tabControlSearchText.SelectedTab.Tag).Search.RegExp = ((CheckBox)sender).Checked;
         }
 
         public void checkBoxFindAll_CheckedChanged(object sender, EventArgs e)
         {
-            _controller.ActiveSearch.FindAll = ((CheckBox)sender).Checked;
+            ((SearchControls)tabControlSearchText.SelectedTab.Tag).Search.FindAll = ((CheckBox)sender).Checked;
         }
 
         public void tabControlSearchText_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ((SearchController.Search) tabControlSearchText.SelectedTab.Tag).Activate();
+            ((SearchControls) tabControlSearchText.SelectedTab.Tag).Activate();
         }
 
         public void checkBoxFindCaseSensitive_CheckedChanged(object sender, EventArgs e)
         {
-            _controller.ActiveSearch.CaseSensitive = ((CheckBox)sender).Checked;
-            _controller.ActiveSearch.MarkSearchStrings();
+            ((SearchControls) tabControlSearchText.SelectedTab.Tag).Search.CaseSensitive = ((CheckBox)sender).Checked;
         }
 	
 	    void groupBoxSearch_Resize (object sender, System.EventArgs e)
@@ -464,13 +463,31 @@ namespace ISBLScan.ViewCode
 
         private void buttonExpand_Click(object sender, EventArgs e)
         {
-            var treeViewResults = _controller.ActiveSearch.TreeViewResults;
+            var treeViewResults = ((SearchControls)tabControlSearchText.SelectedTab.Tag).TreeViewResults;
             treeViewResults.BeginUpdate();
             foreach (TreeNode node in treeViewResults.Nodes)
             {
                 node.ExpandAll();
             }
             treeViewResults.EndUpdate();
+        }
+        /// <summary>
+        /// Выбор узла в дереве разработки
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TreeViewResultsAfterSelect(object sender, TreeViewEventArgs e)
+        {
+            if (e.Node.Tag != null)
+            {
+                var node = (IsbNode)e.Node.Tag;
+                ((SearchControls)tabControlSearchText.SelectedTab.Tag).Search.TextEditor.Text = node.Text;
+                toolStripStatusLabelSelectedElement.Text = node.Name;
+            }
+            else
+            {
+                ((SearchControls)tabControlSearchText.SelectedTab.Tag).Search.TextEditor.Text = "";
+            }
         }
     }
 }

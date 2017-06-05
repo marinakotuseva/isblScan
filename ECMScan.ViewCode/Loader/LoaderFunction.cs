@@ -19,9 +19,9 @@ namespace ISBLScan.ViewCode
 		{
 		}
 		
-		private List<Node> LoadGroups (Node rootNode, char charSysFunc)
+		private List<IsbNode> LoadGroups (IsbNode rootNode, char charSysFunc)
 		{
-			List<Node> listGroups = new List<Node> ();
+			var listGroups = new List<IsbNode> ();
 			if (this.CheckTableExist ("MBRegUnit")) 
 			{
 				SqlCommand command = new SqlCommand ();
@@ -47,7 +47,7 @@ order by t.name";
 				{
 					while (reader.Read()) 
 					{
-						Node node = new Node ();
+						var node = new IsbNode();
 						//Номер группы функций
 						node.Id = reader.GetInt32 (0);
 						//Имя группы функций
@@ -63,7 +63,7 @@ order by t.name";
 							node.LastUpdate = reader.GetDateTime (3);
 						}
 
-						node.Nodes = new List<Node> ();
+						node.Nodes = new List<IsbNode> ();
 						rootNode.Nodes.Add (node);
 						listGroups.Add (node);
 					}
@@ -125,7 +125,7 @@ order by t.name";
 		/// Узел дерева элементов, соотвествующий функции.
 		/// A <see cref="Node"/>
 		/// </param>
-		private void LoadRecvisites (Node rootNode)
+		private void LoadRecvisites (IsbNode rootNode)
 		{
 			if (this.CheckTableExist ("MBFuncRecv")) 
 			{
@@ -139,7 +139,7 @@ order by t.name";
 				SqlDataReader reader = command.ExecuteReader ();
 				if (reader.HasRows) 
 				{
-					Node funcRecvNode = new Node ();
+					var funcRecvNode = new IsbNode();
 					funcRecvNode.Name = "-=[ Параметры функции ]=-";
 					rootNode.Nodes.Add (funcRecvNode);
 					while (reader.Read ()) 
@@ -166,29 +166,29 @@ order by t.name";
 			}
 		}
 
-		public Node Load ()
+		public IsbNode Load ()
 		{
-			Node listNode = null;
+		    IsbNode listNode = null;
 			if (this.CheckTableExist ("MBFunc")) {
-				listNode = new Node ();
+				listNode = new IsbNode();
 				listNode.Name = "Функция";
 				listNode.Text = null;
-				listNode.Nodes = new List<Node> ();
+				listNode.Nodes = new List<IsbNode> ();
 				char[] charsSysUserFunc = {'P', 'S'};
 				foreach (char charSysFunc in charsSysUserFunc) 
 				{
-					Node systemFuncNode = new Node ();
+					var systemFuncNode = new IsbNode();
 					if (charSysFunc == 'P') {
 						systemFuncNode.Name = "Пользовательская";
 					} else {
 						systemFuncNode.Name = "Системная";
 					}
 					systemFuncNode.Text = null;
-					systemFuncNode.Nodes = new List<Node> ();
+					systemFuncNode.Nodes = new List<IsbNode> ();
 					listNode.Nodes.Add (systemFuncNode);
 					
-					List<Node> listGroups = LoadGroups (systemFuncNode, charSysFunc);
-					foreach (Node groupNode in listGroups) 
+					var listGroups = LoadGroups(systemFuncNode, charSysFunc);
+					foreach (var groupNode in listGroups) 
 					{
 						SqlCommand command = new SqlCommand ();
 						command.Connection = Connection;
@@ -206,8 +206,8 @@ order by t.name";
 						{
 							while (reader.Read()) 
 							{
-								Node functionNode = new Node ();
-								functionNode.Nodes = new List<Node> ();
+								var functionNode = new IsbNode();
+								functionNode.Nodes = new List<IsbNode> ();
 								//ИД
 								functionNode.Id = reader.GetInt32 (0);
 								//Имя функции
@@ -216,7 +216,7 @@ order by t.name";
 								}
 								//Комментарий к функции
 								if (! reader.IsDBNull (2)) {
-									Node funcDescriptionNode = new Node ();
+									var funcDescriptionNode = new IsbNode();
 									funcDescriptionNode.Name = "-=[ Описание функции ]=-";
 									funcDescriptionNode.Text = reader.GetString (2);
 									functionNode.Nodes.Add (funcDescriptionNode);
@@ -234,7 +234,7 @@ order by t.name";
 								*/
 								//Текст функции
 								if (! reader.IsDBNull (4)) {
-									Node funcTextNode = new Node ();
+									var funcTextNode = new IsbNode();
 									funcTextNode.Name = "-=[ Текст функции ]=-";
 									funcTextNode.Text = reader.GetString (4);
 									functionNode.Nodes.Add (funcTextNode);
@@ -243,7 +243,7 @@ order by t.name";
 								if (!reader.IsDBNull (5)) {
 									DateTime lastUpdate = reader.GetDateTime (5);
 									functionNode.LastUpdate = lastUpdate;
-									foreach (Node functionSubNode in functionNode.Nodes) {
+									foreach (var functionSubNode in functionNode.Nodes) {
 										functionSubNode.LastUpdate = lastUpdate;
 									}
 								}
@@ -252,7 +252,7 @@ order by t.name";
 						}
 						reader.Close ();
 						//Загрузка параметров функций для функций текущей группы
-						foreach (Node funcNode in groupNode.Nodes) {
+						foreach (var funcNode in groupNode.Nodes) {
 							this.LoadRecvisites (funcNode);
 						}
 					}				

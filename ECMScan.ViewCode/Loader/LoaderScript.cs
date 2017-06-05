@@ -19,9 +19,9 @@ namespace ISBLScan.ViewCode
 		{
 		}
 
-		private List<Node> LoadGroups(Node rootNode)
+		private List<IsbNode> LoadGroups(IsbNode rootNode)
 		{
-			List<Node> listGroups = new List<Node>();
+			var listGroups = new List<IsbNode>();
 			if(this.CheckTableExist("MBRegUnit"))
 			{
 				SqlCommand command = new SqlCommand();
@@ -32,13 +32,13 @@ namespace ISBLScan.ViewCode
 				{
 					while(reader.Read())
 					{
-						Node node = new Node();
+                        var node = new IsbNode();
 						node.Id = reader.GetInt32(0);
 						if(! reader.IsDBNull(1))
 						{
 							node.Name = reader.GetString(1);
 						}
-						node.Nodes = new List<Node>();
+						node.Nodes = new List<IsbNode>();
 						rootNode.Nodes.Add(node);
 						listGroups.Add(node);
 					}
@@ -48,18 +48,18 @@ namespace ISBLScan.ViewCode
 			return listGroups;
 		}
 
-		public Node Load()
+		public IsbNode Load()
 		{
-			Node listNode = null;
+		    IsbNode listNode = null;
 			if(this.CheckTableExist("MBReports"))
 			{
-				listNode = new Node();
+				listNode = new IsbNode();
 				listNode.Name = "Сценарий (расчёт)";
 				listNode.Text = null;
-				listNode.Nodes = new List<Node>();
+				listNode.Nodes = new List<IsbNode>();
 				
-				List<Node> listGroups = LoadGroups(listNode);
-				foreach(Node groupNode in listGroups)
+				var listGroups = LoadGroups(listNode);
+				foreach(var groupNode in listGroups)
 				{
 					SqlCommand command = new SqlCommand();
 					command.Connection = Connection;
@@ -73,7 +73,7 @@ namespace ISBLScan.ViewCode
 					{
 						while(reader.Read())
 						{
-							Node scriptNode = new Node();
+							var scriptNode = new IsbNode();
 							scriptNode.Id = reader.GetInt32(0);
 							if(! reader.IsDBNull(1))
 							{
@@ -83,14 +83,14 @@ namespace ISBLScan.ViewCode
 							{
 								scriptNode.Text = reader.GetString(2);
 							}
-							scriptNode.Nodes = new List<Node>();
+							scriptNode.Nodes = new List<IsbNode>();
 							
 							if(! reader.IsDBNull(3))
 							{
 								SqlBytes sqlbytes = reader.GetSqlBytes(3);
 								System.Text.Encoding win1251 = System.Text.Encoding.GetEncoding(1251);
 								string scriptText = win1251.GetString(sqlbytes.Value);
-								Node scriptTextNode = new Node();
+								var scriptTextNode = new IsbNode();
 								scriptTextNode.Name = "-=[ Текст сценария ]=-";
 								scriptTextNode.Text = scriptText;
 								scriptNode.Nodes.Add(scriptTextNode);

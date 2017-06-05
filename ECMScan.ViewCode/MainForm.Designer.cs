@@ -348,10 +348,11 @@ namespace ISBLScan.ViewCode
             // 
             // panelTree
             // 
-            this.panelTree.Location = new System.Drawing.Point(0, 0);
+            this.panelTree.Location = new System.Drawing.Point(0, 25);
             this.panelTree.Name = "panelTree";
-            this.panelTree.Size = new System.Drawing.Size(200, 100);
-            this.panelTree.TabIndex = 0;
+		    this.panelTree.Dock = System.Windows.Forms.DockStyle.Fill;
+		    this.panelTree.Margin = new System.Windows.Forms.Padding(4);
+		    this.panelTree.TabIndex = 212;
             // 
             // panelFilterTree
             // 
@@ -392,11 +393,6 @@ namespace ISBLScan.ViewCode
             this.splitContainerMain.SplitterDistance = 213;
             this.splitContainerMain.SplitterWidth = 9;
             this.splitContainerMain.TabIndex = 3;
-            // 
-            // timerRegExpFind
-            // 
-            this.timerRegExpFind.Interval = 500;
-            this.timerRegExpFind.Tick += new System.EventHandler(this.timerRegExpFind_Tick);
             // 
             // statusStrip1
             // 

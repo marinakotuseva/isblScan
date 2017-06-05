@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Data.SqlTypes;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Xml;
 
 namespace ISBLScan.ViewCode
@@ -20,9 +21,9 @@ namespace ISBLScan.ViewCode
 		{
 		}
 
-        private List<Node> LoadGroups(Node rootNode)
+        private List<IsbNode> LoadGroups(IsbNode rootNode)
         {
-            List<Node> listGroups = new List<Node>();
+            var listGroups = new List<IsbNode>();
             SqlCommand command = new SqlCommand();
             command.Connection = this.Connection;
             command.CommandText = @"
@@ -36,12 +37,10 @@ order by NameAn";
             {
                 while (reader.Read())
                 {
-                    Node node = new Node();
+                    var node = new IsbNode(reader.GetString(1));
                     // ИД группы маршрутов
                     node.Id = reader.GetInt32(0);
-                    // Имя группы маршрутов
-                    node.Name = reader.GetString(1);
-                    node.Nodes = new List<Node>();
+
                     rootNode.Nodes.Add(node);
                     listGroups.Add(node);
                 }
@@ -50,16 +49,13 @@ order by NameAn";
             return listGroups;
         }
 
-        public Node Load()
+        public IsbNode Load()
 		{
-            Node listNode = null;
-            listNode = new Node();
-            listNode.Name = "Типовой маршрут";
-            listNode.Text = null;
-            listNode.Nodes = new List<Node>();
+		    IsbNode listNode = null;
+            listNode = new IsbNode("Типовой маршрут");
 
-            List<Node> listGroups = LoadGroups(listNode);
-            foreach (Node groupNode in listGroups)
+           var listGroups = LoadGroups(listNode);
+            foreach (var groupNode in listGroups)
             {
                 SqlCommand command = new SqlCommand();
                 command.Connection = Connection;
@@ -81,13 +77,10 @@ order by MBAnalit.NameAn";
                 {
                     while (reader.Read())
                     {
-                        Node routeNode = new Node();
-                        routeNode.Nodes = new List<Node>();
+                        var routeNode = new IsbNode(reader.GetString(1));
 
                         // ИД
                         routeNode.Id = reader.GetInt32(0);
-                        // Имя
-                        routeNode.Name = reader.GetString(1);
                         // Схема
                         if (!reader.IsDBNull(2))
                         {
@@ -109,7 +102,7 @@ order by MBAnalit.NameAn";
                                 var eventString = GetNodeString(eventXmlNode);
                                 if (!System.String.IsNullOrEmpty(eventString))
                                 {
-                                    Node eventNode = new Node();
+                                    var eventNode = new IsbNode();
                                     eventNode.Name = eventNameToTitle.ContainsKey(eventXmlNode.Name) ? eventNameToTitle[eventXmlNode.Name] : eventXmlNode.Name;
                                     eventNode.Text = eventString;
                                     routeNode.Nodes.Add(eventNode);
@@ -124,8 +117,7 @@ order by MBAnalit.NameAn";
                                     var propertyString = GetNodeString(propertyStringNode);
                                     if (!System.String.IsNullOrEmpty(propertyString))
                                     {
-                                        Node routeStringNode = new Node();
-                                        routeStringNode.Name = property.Attributes["Description"].Value;
+                                        var routeStringNode = new IsbNode(property.Attributes["Description"].Value);
                                         routeStringNode.Text = propertyString;
                                         routeNode.Nodes.Add(routeStringNode);
                                     }
@@ -135,12 +127,12 @@ order by MBAnalit.NameAn";
                             var blocks = schema.SelectNodes("//Block");
                             foreach (XmlNode block in blocks)
                             {
-                                Node blockNode = new Node();
+                                var blockNode = new IsbNode();
                                 var nameProperty = block.SelectSingleNode("Properties/Property[@Type = '2' and @Name = 'Name']/Value/Value");
                                 if (nameProperty != null) blockNode.Name = block.Attributes["ID"].Value + ". " + GetNodeString(nameProperty);
                                 else blockNode.Name = block.Attributes["ID"].Value;
                                 
-                                blockNode.Nodes = new List<Node>();
+                                blockNode.Nodes = new List<IsbNode>();
 
                                 var properties = block.SelectNodes("Properties/Property[@Type = '2' and @Name != 'Name']");
                                 foreach (XmlNode property in properties)
@@ -151,8 +143,7 @@ order by MBAnalit.NameAn";
                                         var propertyString = GetNodeString(propertyStringNode);
                                         if (!System.String.IsNullOrEmpty(propertyString))
                                         {
-                                            Node blockStringNode = new Node();
-                                            blockStringNode.Name = property.Attributes["Description"].Value;
+                                            var blockStringNode = new IsbNode(property.Attributes["Description"].Value);
                                             blockStringNode.Text = propertyString;
                                             blockNode.Nodes.Add(blockStringNode);
                                         }

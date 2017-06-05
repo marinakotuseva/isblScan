@@ -20,9 +20,9 @@ namespace ISBLScan.ViewCode
 		{
 		}
 
-		private List<Node> LoadGroups(Node rootNode)
+		private List<IsbNode> LoadGroups(IsbNode rootNode)
 		{
-			List<Node> listGroups = new List<Node>();
+			var listGroups = new List<IsbNode>();
 			if(this.CheckTableExist("SBRouteBlockGroup"))
 			{
 				SqlCommand command = new SqlCommand();
@@ -33,13 +33,13 @@ namespace ISBLScan.ViewCode
 				{
 					while(reader.Read())
 					{
-						Node node = new Node();
+						var node = new IsbNode();
 						node.Id = reader.GetInt32(0);
 						if(! reader.IsDBNull(1))
 						{
 							node.Name = reader.GetString(1);
 						}
-						node.Nodes = new List<Node>();
+						node.Nodes = new List<IsbNode>();
 						rootNode.Nodes.Add(node);
 						listGroups.Add(node);
 					}
@@ -49,18 +49,15 @@ namespace ISBLScan.ViewCode
 			return listGroups;
 		}
 
-		public Node Load()
+		public IsbNode Load()
 		{
-			Node listNode = null;
+		    IsbNode listNode = null;
 			if(this.CheckTableExist("SBRouteBlock"))
 			{
-				listNode = new Node();
-				listNode.Name = "Блок типового маршрута";
-				listNode.Text = null;
-				listNode.Nodes = new List<Node>();
+				listNode = new IsbNode("Блок типового маршрута");
 				
-				List<Node> listGroups = LoadGroups(listNode);
-				foreach(Node groupNode in listGroups)
+				var listGroups = LoadGroups(listNode);
+				foreach(var groupNode in listGroups)
 				{
 					SqlCommand command = new SqlCommand();
 					command.Connection = Connection;
@@ -74,7 +71,7 @@ namespace ISBLScan.ViewCode
 					{
 						while(reader.Read())
 						{
-							Node routeBlockNode = new Node();
+							var routeBlockNode = new IsbNode();
 							//ИД
 							routeBlockNode.Id = reader.GetInt32(0);
 							//Имя
@@ -87,7 +84,7 @@ namespace ISBLScan.ViewCode
 							{
 								routeBlockNode.Text = reader.GetString(2);
 							}
-							routeBlockNode.Nodes = new List<Node>();
+							routeBlockNode.Nodes = new List<IsbNode>();
 							//Свойства
 							if(! reader.IsDBNull(3))
 							{
@@ -102,7 +99,7 @@ namespace ISBLScan.ViewCode
                                     var eventString = GetNodeString(eventXmlNode);
                                     if (!System.String.IsNullOrEmpty(eventString))
                                     {
-                                        Node eventNode = new Node();
+                                        var eventNode = new IsbNode();
                                         eventNode.Name = eventXmlNode.Name;
                                         eventNode.Text = eventString;
                                         routeBlockNode.Nodes.Add(eventNode);
@@ -118,7 +115,7 @@ namespace ISBLScan.ViewCode
                                         var propertyString = GetNodeString(propertyStringNode);
                                         if (!System.String.IsNullOrEmpty(propertyString))
                                         {
-                                            Node blockStringNode = new Node();
+                                            var blockStringNode = new IsbNode();
                                             blockStringNode.Name = property.Attributes["Description"].Value;
                                             blockStringNode.Text = propertyString;
                                             routeBlockNode.Nodes.Add(blockStringNode);

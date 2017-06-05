@@ -19,9 +19,9 @@ namespace ISBLScan.ViewCode
 		{
 		}
 		
-		private List<Node> LoadGroupRecvisite(Node eDocTypeNode)
+		private List<IsbNode> LoadGroupRecvisite(IsbNode eDocTypeNode)
 		{
-			List<Node> listGroups = new List<Node>();
+			var listGroups = new List<IsbNode>();
 			
 			SqlCommand command = new SqlCommand();
 			command.CommandType = CommandType.Text;
@@ -38,41 +38,10 @@ namespace ISBLScan.ViewCode
 				{
 					if(! reader.IsDBNull(0))
 					{
-						Node groupNode = new Node();
-						groupNode.Nodes = new List<Node>();
-						string recvRazdel = reader.GetString(0);
-						groupNode.Text = recvRazdel;
-						switch (recvRazdel)
-						{
-							case "Ш":
-								groupNode.Name = "Карточка";
-								break;
-							case "Т":
-								groupNode.Name = "Таблица";
-								break;
-							case "С":
-								groupNode.Name = "Таблица 2";
-								break;
-							case "Р":
-								groupNode.Name = "Таблица 3";
-								break;
-							case "О":
-								groupNode.Name = "Таблица 4";
-								break;
-							case "Н":
-								groupNode.Name = "Таблица 5";
-								break;
-							case "М":
-								groupNode.Name = "Таблица 6";
-								break;
-							case "К":
-								groupNode.Name = "Действие";
-								break;
-							default:
-								groupNode.Name = "Неизвестно ["+recvRazdel+"]";
-								break;
-						}
-						eDocTypeNode.Nodes.Add(groupNode);
+					    var sectionCode = reader.GetString(0)[0];
+                        var groupNode = new IsbNode(_sectionCodeToName.ContainsKey(sectionCode) ? _sectionCodeToName[sectionCode] : "Неизвестно [" + sectionCode + "]");
+					    groupNode.Code = sectionCode.ToString();
+                        eDocTypeNode.Nodes.Add(groupNode);
 						listGroups.Add(groupNode);
 					}
 				}
@@ -80,14 +49,14 @@ namespace ISBLScan.ViewCode
 			reader.Close();
 			return listGroups;
 		}
-		private void LoadRecvisite(Node eDocTypeNode)
+		private void LoadRecvisite(IsbNode eDocTypeNode)
 		{
-			if(this.CheckTableExist("MBEDocTypeRecv"))
+			if(CheckTableExist("MBEDocTypeRecv"))
 			{
-				List<Node> listGroups = LoadGroupRecvisite(eDocTypeNode);
-				foreach(Node groupNode in listGroups)
+				List<IsbNode> listGroups = LoadGroupRecvisite(eDocTypeNode);
+				foreach(var groupNode in listGroups)
 				{
-					char charGroup = groupNode.Text.ToCharArray()[0];
+					char charGroup = groupNode.Code[0];
 					groupNode.Text = null;
 
 					SqlCommand command = new SqlCommand();
@@ -106,8 +75,8 @@ namespace ISBLScan.ViewCode
 					{
 						while(reader.Read())
 						{
-							Node eDocRecvNode = new Node();
-							eDocRecvNode.Nodes = new List<Node>();
+							var eDocRecvNode = new IsbNode();
+							eDocRecvNode.Nodes = new List<IsbNode>();
 							//ИД
 							eDocRecvNode.Id = reader.GetInt32(0);
 							//Имя
@@ -124,7 +93,7 @@ namespace ISBLScan.ViewCode
 							//Вычисление для реквизита и действия
 							if(!reader.IsDBNull(3))
 							{
-								Node exprnEDocRecvNode = new Node();
+								var exprnEDocRecvNode = new IsbNode();
 								exprnEDocRecvNode.Name = "-=[ Вычисление ]=-";
 								exprnEDocRecvNode.Text = reader.GetString(3);
 								eDocRecvNode.Nodes.Add(exprnEDocRecvNode);
@@ -132,7 +101,7 @@ namespace ISBLScan.ViewCode
 							//Выбор из справочника для реквизита типа "справочник" или "строка"
 							if(!reader.IsDBNull(4))
 							{
-								Node eventEDocRecvNode = new Node();
+								var eventEDocRecvNode = new IsbNode();
 								eventEDocRecvNode.Name = "-=[ Выбор из справочника ]=-";
 								eventEDocRecvNode.Text = reader.GetString(4);
 								eDocRecvNode.Nodes.Add(eventEDocRecvNode);
@@ -215,9 +184,9 @@ namespace ISBLScan.ViewCode
 			return parseResult;
 		}
 		
-		public Node Load()
+		public IsbNode Load()
 		{
-			Node listNode = null;
+		    IsbNode listNode = null;
 			if(this.CheckTableExist("MBEDocType"))
 			{
 				SqlCommand command = new SqlCommand();
@@ -226,15 +195,15 @@ namespace ISBLScan.ViewCode
 				SqlDataReader reader = command.ExecuteReader();
 				if(reader.HasRows)
 				{
-					listNode = new Node();
+					listNode = new IsbNode();
 					listNode.Name = "Тип карточки электронного документа";
 					listNode.Text = null;
-					listNode.Nodes = new List<Node>();
+					listNode.Nodes = new List<IsbNode>();
 					
 					while(reader.Read())
 					{
-						Node eDocNode = new Node();
-						eDocNode.Nodes = new List<Node>();
+					    var eDocNode = new IsbNode();
+						eDocNode.Nodes = new List<IsbNode>();
 						//ИД 
 						eDocNode.Id = reader.GetInt32(0);
 						//Имя 
@@ -245,7 +214,8 @@ namespace ISBLScan.ViewCode
 						//Текст событий
 						if(! reader.IsDBNull(2))
 						{
-							eDocNode.Text = ParseEventText(reader.GetString(2));
+						    eDocNode.Text = reader.GetString(2).Trim(); //ParseEventText(reader.GetString(2));
+
 						}
 						//Дата последнего изменения
 						if(!reader.IsDBNull(3))
@@ -257,7 +227,7 @@ namespace ISBLScan.ViewCode
 					}
 				}
 				reader.Close();
-				foreach(Node eDocNode in listNode.Nodes)
+				foreach(var eDocNode in listNode.Nodes)
 				{
 					LoadRecvisite(eDocNode);
 				}

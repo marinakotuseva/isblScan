@@ -5,6 +5,7 @@
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Collections.Generic;
 
 namespace ISBLScan.ViewCode
 {
@@ -17,14 +18,52 @@ namespace ISBLScan.ViewCode
 		///Соединение с БД 
 		/// </summary>
 		protected SqlConnection Connection;
-		
-		/// <summary>
-		/// Конструктор базового класса для всех загрузчиков прикладной разработки.
-		/// </summary>
-		/// <param name="sqlConnect">
-		/// Соединение с базой данных (должно быть предварительно открыто)
-		/// </param>
-		public LoaderCommon(SqlConnection sqlConnect)
+
+	    protected readonly Dictionary<Char, String> _sectionCodeToName = new Dictionary<char, string>()
+	    {
+	        {'Ш', "Карточка"},
+	        {'Т', "Таблица"},
+	        {'С', "Таблица 2"},
+	        {'Р', "Таблица 3"},
+	        {'О', "Таблица 4"},
+	        {'Н', "Таблица 5"},
+	        {'М', "Таблица 6"},
+	        {'Q', "Таблица 7"},
+	        {'W', "Таблица 8"},
+	        {'U', "Таблица 9"},
+	        {'R', "Таблица 10"},
+	        {'I', "Таблица 11"},
+	        {'Y', "Таблица 12"},
+	        {'B', "Таблица 13"},
+	        {'H', "Таблица 14"},
+	        {'L', "Таблица 15"},
+	        {'M', "Таблица 16"},
+	        {'N', "Таблица 17"},
+	        {'P', "Таблица 18"},
+	        {'O', "Таблица 19"},
+	        {'S', "Таблица 20"},
+	        {'T', "Таблица 21"},
+	        {'V', "Таблица 22"},
+	        {'X', "Таблица 23"},
+	        {'Z', "Таблица 24"},
+	        {'К', "Действие"},
+	        {'A', "Action"},
+	        {'C', "Card"},
+	        {'D', "Table"},
+	        {'E', "Table 2"},
+	        {'F', "Table 3"},
+	        {'G', "Table 4"},
+	        {'J', "Table 5"},
+	        {'K', "Table 6"}
+	    };
+
+        /// <summary>
+        /// Конструктор базового класса для всех загрузчиков прикладной разработки.
+        /// </summary>
+        /// <param name="sqlConnect">
+        /// Соединение с базой данных (должно быть предварительно открыто)
+        /// </param>
+        public LoaderCommon(SqlConnection sqlConnect)
 		{
 			this.Connection = sqlConnect;
 		}

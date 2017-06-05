@@ -42,13 +42,10 @@ namespace ISBLScan.ViewCode
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Config>(jsonSettings);
         }
 
-        public Node Load()
+        public IsbNode Load()
 		{
-            Node listNode = null;
-            listNode = new Node();
-            listNode.Name = "Custom Calculations";
-            listNode.Text = null;
-            listNode.Nodes = new List<Node>();
+		    IsbNode listNode = null;
+            listNode = new IsbNode("Custom Calculations");
 
             var config = LoadConfig();
 
@@ -80,9 +77,7 @@ where ref.Vid = (select Vid from MBVidAn where Kod = '" + setting.ReferenceName 
                 SqlDataReader reader = command.ExecuteReader();
                 if (reader.HasRows)
                 {
-                    Node refNode = new Node();
-                    refNode.Nodes = new List<Node>();
-                    refNode.Name = setting.CalculationName;
+                    var refNode = new IsbNode(setting.CalculationName);
                     while (reader.Read())
                     {
                         if (!reader.IsDBNull(1))
@@ -98,9 +93,8 @@ where ref.Vid = (select Vid from MBVidAn where Kod = '" + setting.ReferenceName 
                                 calculation = reader.GetString(1);
                             }
 
-                            Node recordNode = new Node();
+                            var recordNode = new IsbNode(reader.GetString(0));
                             recordNode.Text = calculation;
-                            recordNode.Name = reader.GetString(0);
                             refNode.Nodes.Add(recordNode);
                         }
                     }
