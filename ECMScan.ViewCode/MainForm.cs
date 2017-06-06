@@ -12,7 +12,7 @@ namespace ISBLScan.ViewCode
     {
         Loader _isblLoader = new Loader();
         public IsbDev SourceDev = new IsbDev();
-        class SearchControls : IDisposable
+        public class SearchControls : IDisposable
         {
             public System.Windows.Forms.CheckBox CheckBoxFindRegExp { get; set; }
             public System.Windows.Forms.CheckBox CheckBoxFindAll { get; set; }
@@ -30,6 +30,7 @@ namespace ISBLScan.ViewCode
                 _form = form;
                 _tab = tab;
                 Search = new Search(form.SourceDev);
+                Search.searchControls = this;
 
                 SearchCriteriaTextEditorHost = new System.Windows.Forms.Integration.ElementHost();
                 SearchCriteriaTextEditorHost.Dock = DockStyle.Fill;
@@ -40,6 +41,7 @@ namespace ISBLScan.ViewCode
                 tab.Tag = this;
                 tab.Controls.Add(SearchCriteriaTextEditorHost);
                 tab.UseVisualStyleBackColor = true;
+                Search.SearchCriteriaTextEditor.Focus();
 
                 Search.FillTreeView(TreeViewResults);
                 TreeViewResults.CheckBoxes = false;
@@ -157,6 +159,7 @@ namespace ISBLScan.ViewCode
             // The InitializeComponent() call is required for Windows Forms designer support.
             //
             InitializeComponent();
+            this.Load += TestWindow_Loaded;
             groupBoxSearch_Resize(null, null);
             AddNewTab();
 
@@ -310,6 +313,7 @@ namespace ISBLScan.ViewCode
                         var searchControls = (SearchControls)tabControlSearchText.SelectedTab.Tag;
                         searchControls.Search.Process();
                         searchControls.Search.FillTreeView(searchControls.TreeViewResults);
+                        searchControls.Search.SearchCriteriaTextEditor.Focus();
                         buttonSearch.Enabled = true;
                     }
                 }
@@ -345,6 +349,12 @@ namespace ISBLScan.ViewCode
                     textBoxSQLServer.Focus();
                 }
             }
+        }
+
+        private void TestWindow_Loaded(object sender, EventArgs eventArgs)
+        {
+            var searchControls = (SearchControls)tabControlSearchText.SelectedTab.Tag;
+            searchControls.Search.SearchCriteriaTextEditor.Focus();
         }
 
         /// <summary>
@@ -483,10 +493,13 @@ namespace ISBLScan.ViewCode
                 var node = (IsbNode)e.Node.Tag;
                 ((SearchControls)tabControlSearchText.SelectedTab.Tag).Search.TextEditor.Text = node.Text;
                 toolStripStatusLabelSelectedElement.Text = node.Name;
+                toolStripStatusLabelLastUpd.Text = node.LastUpdate.ToString();
             }
             else
             {
                 ((SearchControls)tabControlSearchText.SelectedTab.Tag).Search.TextEditor.Text = "";
+                toolStripStatusLabelSelectedElement.Text = "";
+                toolStripStatusLabelLastUpd.Text = "";
             }
         }
     }

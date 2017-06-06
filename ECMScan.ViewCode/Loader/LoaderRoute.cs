@@ -62,7 +62,10 @@ order by NameAn";
                 command.CommandText = @"
 select MBAnalit.Analit
     , MBAnalit.NameAn + ' (' + ltrim(MBAnalit.Kod) + ')'
-    , MBText.SearchCondition  
+    , MBText.SearchCondition 
+    , (select max(prot.DateAct)
+        from XProtokol prot 
+        where prot.SrcObjID = 119 and prot.SrcRecID = MBAnalit.Analit) as LastUpd
 from MBAnalit
     join MBText on MBAnalit.Analit = MBText.SrcRecID and MBText.SrcObjID = 119
 where MBAnalit.HighLvl=@groupID
@@ -157,6 +160,10 @@ order by MBAnalit.NameAn";
                                 else blockNode = null;
 
                             }
+                        }
+                        if (!reader.IsDBNull(3))
+                        {
+                            routeNode.LastUpdate = reader.GetDateTime(3);
                         }
                         groupNode.Nodes.Add(routeNode);
                     }

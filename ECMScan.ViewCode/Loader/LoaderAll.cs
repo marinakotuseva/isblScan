@@ -76,6 +76,7 @@ namespace ISBLScan.ViewCode
 		    var loaderScript = new Script(_connection);
 		    var loaderWizard = new Wizard(_connection);
 		    var loaderCustom = new CustomCalculations(_connection);
+            var loaderDialog = new Dialog(_connection);
 
 
             //Загрузка типов карточке электронных документов
@@ -117,6 +118,10 @@ namespace ISBLScan.ViewCode
             //Загрузка вычислений из справочников
             isblNode = loaderCustom.Load();
             isblList.Add(isblNode);
+
+            //Загрузка текстов событий диалогов, вычислений реквизитов, расчётов на форме
+            isblNode = loaderDialog.Load();
+		    isblList.Add(isblNode);
 
             return isblList;
 		}

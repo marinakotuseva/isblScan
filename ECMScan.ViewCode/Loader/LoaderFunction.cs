@@ -237,15 +237,11 @@ order by t.name";
 									var funcTextNode = new IsbNode();
 									funcTextNode.Name = "-=[ Текст функции ]=-";
 									funcTextNode.Text = reader.GetString (4);
-									functionNode.Nodes.Add (funcTextNode);
+									functionNode.Nodes.Add(funcTextNode);
 								}
 								//Дата и время последнего изменения
 								if (!reader.IsDBNull (5)) {
-									DateTime lastUpdate = reader.GetDateTime (5);
-									functionNode.LastUpdate = lastUpdate;
-									foreach (var functionSubNode in functionNode.Nodes) {
-										functionSubNode.LastUpdate = lastUpdate;
-									}
+									functionNode.LastUpdate = reader.GetDateTime(5);
 								}
 								groupNode.Nodes.Add (functionNode);
 							}

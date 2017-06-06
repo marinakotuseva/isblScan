@@ -31,7 +31,7 @@ namespace ISBLScan.ViewCode
 				{
 					SqlCommand command = new SqlCommand();
 					command.Connection = Connection;
-					command.CommandText = "select XRecID, NameRpt, Comment, Exprn, Report, Viewer from MBReports where TypeRpt='MBAnalitV' order by NameRpt ASC";
+					command.CommandText = "select XRecID, NameRpt, Comment, Exprn, Report, Viewer, LastUpd from MBReports where TypeRpt='MBAnalitV' order by NameRpt ASC";
 					SqlDataReader reader = command.ExecuteReader();
 					if(reader.HasRows)
 					{
@@ -71,7 +71,11 @@ namespace ISBLScan.ViewCode
 								reportTemplateNode.Text = templateText;
 								reportNode.Nodes.Add(reportTemplateNode);
 							}
-							listNode.Nodes.Add(reportNode);
+						    if (!reader.IsDBNull(6))
+						    {
+						        reportNode.LastUpdate = reader.GetDateTime(6);
+						    }
+                            listNode.Nodes.Add(reportNode);
 						}
 					}
 					reader.Close();

@@ -266,7 +266,16 @@ namespace ISBLScan.ViewCode
 				{
 					SqlCommand command = new SqlCommand();
 					command.Connection = Connection;
-					command.CommandText = "select Analit, NameAn, Soder from MBAnalit where Vid=@vidAnalit and HighLvl=@groupID";
+					command.CommandText = @"
+select Analit
+    , NameAn
+    , Soder 
+    , (select max(prot.DateAct)
+        from XProtokol prot 
+        where prot.SrcObjID = 119 and prot.SrcRecID = MBAnalit.Analit) as LastUpd
+from MBAnalit 
+where Vid=@vidAnalit 
+    and HighLvl=@groupID";
 					SqlParameter paramVidAnalit = new SqlParameter("@vidAnalit", SqlDbType.Int);
 					SqlParameter paramGroupId = new SqlParameter("@groupID", SqlDbType.Int);
 					paramVidAnalit.Value = vidAnalitId;
@@ -289,8 +298,11 @@ namespace ISBLScan.ViewCode
 							{
 								wizardNode.Text = reader.GetString(2);
 							}
-							wizardNode.Nodes = new List<IsbNode>();
-							groupNode.Nodes.Add(wizardNode);
+						    if (!reader.IsDBNull(3))
+						    {
+						        wizardNode.LastUpdate = reader.GetDateTime(3);
+						    }
+                            groupNode.Nodes.Add(wizardNode);
 						}
 					}
 					reader.Close();

@@ -1,7 +1,3 @@
-/*
- * Date: 10.08.2012
- * Time: 21:23
- */
 using System;
 using System.Data;
 using System.Data.SqlTypes;
@@ -11,31 +7,31 @@ using System.Collections.Generic;
 namespace ISBLScan.ViewCode
 {
 	/// <summary>
-	/// Справочник (аналитика).
+	/// Прикладные диалоги.
 	/// </summary>
-	public class Reference : LoaderCommon
+	public class Dialog : LoaderCommon
 	{
-		public Reference(SqlConnection sqlConnect) : base(sqlConnect)
+		public Dialog(SqlConnection sqlConnect) : base(sqlConnect)
 		{
 		}
 
         /// <summary>
-        /// Загрузка реквизитов справочника
+        /// Загрузка реквизитов диалога
         /// </summary>
-        /// <param name="refNode">
-        /// Ссылка на узел справочника
-        /// A <see cref="Node"/>
+        /// <param name="recvGroupNode">
+        /// Ссылка на узел диалога
+        /// A <see cref="IsbNode"/>
         /// </param>
         void LoadRecvisite(IsbNode recvGroupNode)
 		{
-			if(this.CheckTableExist("MBVidAnRecv"))
+			if(this.CheckTableExist("SBDialogRequisiteLink"))
 			{
 				SqlCommand command = new SqlCommand();
 				command.Connection = this.Connection;
-				command.CommandText = "SELECT [Name], [Kod], [Exprn], [InpExprn] FROM [MBVidAnRecv] WHERE [Vid]=@Vid AND [Razd]=@Razd AND ([Exprn] IS NOT NULL OR [InpExprn] IS NOT NULL) ORDER BY [NumRecv]";
-				SqlParameter paramVid = new SqlParameter("@Vid", SqlDbType.Int);
+				command.CommandText = "SELECT [Name], [Code], [ChangeEventHandlerText], [LookupEventHandlerText] FROM [SBDialogRequisiteLink] WHERE [DialogID]=@DialogID AND [Section]=@Section AND ([ChangeEventHandlerText] IS NOT NULL OR [LookupEventHandlerText] IS NOT NULL) ORDER BY [RequisiteNumber]";
+				SqlParameter paramVid = new SqlParameter("@DialogID", SqlDbType.Int);
 				paramVid.Value = recvGroupNode.Id;
-				SqlParameter paramRazd = new SqlParameter("@Razd", SqlDbType.NChar, 1);
+				SqlParameter paramRazd = new SqlParameter("@Section", SqlDbType.NChar, 1);
 				paramRazd.Value = recvGroupNode.Code;
 				command.Parameters.Add(paramVid);
 				command.Parameters.Add(paramRazd);
@@ -84,17 +80,17 @@ namespace ISBLScan.ViewCode
 		/// </param>
 		void LoadGroupRecv(IsbNode refNode)
 		{
-			if(this.CheckTableExist("MBVidAnRecv"))
+			if(this.CheckTableExist("SBDialogRequisiteLink"))
 			{
 				SqlCommand command = new SqlCommand();
 				command.Connection = this.Connection;
-				command.CommandText = "SELECT DISTINCT [Razd] FROM [MBVidAnRecv] WHERE [Vid] = @Vid AND ([Exprn] IS NOT NULL OR [InpExprn] IS NOT NULL) ORDER BY [Razd] DESC";
-				SqlParameter paramVid = new SqlParameter("@Vid", SqlDbType.Int);
+				command.CommandText = "SELECT DISTINCT [Section] FROM [SBDialogRequisiteLink] WHERE [DialogID] = @DialogID AND ([LookupEventHandlerText] IS NOT NULL OR [ChangeEventHandlerText] IS NOT NULL) ORDER BY [Section] DESC";
+				SqlParameter paramVid = new SqlParameter("@DialogID", SqlDbType.Int);
 				paramVid.Value = refNode.Id;
 				command.Parameters.Add(paramVid);
 				command.Prepare();
 				SqlDataReader reader = command.ExecuteReader();
-			    var refRecvNode = new IsbNode("-=[ Реквизиты и действия типа справочника ]=-");
+			    var refRecvNode = new IsbNode("-=[ Реквизиты и действия диалога ]=-");
 
                 if (reader.HasRows)
 				{
@@ -119,12 +115,12 @@ namespace ISBLScan.ViewCode
 
 		public IsbNode Load()
 		{
-		    var rootRefNode = new IsbNode("Тип справочника");
-            if (this.CheckTableExist("MBVidAn"))
+		    var rootRefNode = new IsbNode("Диалог");
+            if (this.CheckTableExist("SBDialog"))
 			{
 				SqlCommand command = new SqlCommand();
 				command.Connection = Connection;
-				command.CommandText = "select Vid, Name, Kod, Exprn, LastUpd from MBVidAn order by Name ASC";
+				command.CommandText = "select XRecID, Name, Code, EventHandlersText, LastUpd from SBDialog order by Name ASC";
 				SqlDataReader reader = command.ExecuteReader();
 				if(reader.HasRows)
 				{

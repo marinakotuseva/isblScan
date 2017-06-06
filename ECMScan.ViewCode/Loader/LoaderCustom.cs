@@ -58,6 +58,9 @@ namespace ISBLScan.ViewCode
                     command.CommandText = @"
 select ref.NameAn + '(' + cast(ref.Analit as varchar) + ')'
     , MBText." + setting.RequisiteName + @"
+    , (select max(prot.DateAct)
+        from XProtokol prot 
+        where prot.SrcObjID = 119 and prot.SrcRecID = ref.Analit) as LastUpd
 from MBAnalitSpr ref
     join " + setting.TableName + @" tbl on tbl.Analit = ref.Analit
     join MBText on tbl.XRecID = MBText.SrcRecID and MBText.SrcObjID = (select XRecID from XObj where TblName like '" + setting.TableName + @"')
@@ -68,6 +71,9 @@ where ref.Vid = (select Vid from MBVidAn where Kod = '" + setting.ReferenceName 
                     command.CommandText = @"
 select ref.NameAn + '(' + cast(ref.Analit as varchar) + ')'
     , tbl." + setting.RequisiteName + @"
+    , (select max(prot.DateAct)
+        from XProtokol prot 
+        where prot.SrcObjID = 119 and prot.SrcRecID = ref.Analit) as LastUpd
 from MBAnalitSpr ref
     join " + setting.TableName + @" tbl on tbl.Analit = ref.Analit
 where ref.Vid = (select Vid from MBVidAn where Kod = '" + setting.ReferenceName + "')";
@@ -95,8 +101,13 @@ where ref.Vid = (select Vid from MBVidAn where Kod = '" + setting.ReferenceName 
 
                             var recordNode = new IsbNode(reader.GetString(0));
                             recordNode.Text = calculation;
+                            if (!reader.IsDBNull(2))
+                            {
+                                refNode.LastUpdate = reader.GetDateTime(2);
+                            }
                             refNode.Nodes.Add(recordNode);
                         }
+                        
                     }
                     listNode.Nodes.Add(refNode);
                 }

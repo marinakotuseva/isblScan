@@ -63,7 +63,7 @@ namespace ISBLScan.ViewCode
 				{
 					SqlCommand command = new SqlCommand();
 					command.Connection = Connection;
-					command.CommandText = "select XRecID, NameRpt, Comment, Report from MBReports where TypeRpt='Function' and RegUnit=@groupID order by NameRpt";
+					command.CommandText = "select XRecID, NameRpt, Comment, Report, LastUpd from MBReports where TypeRpt='Function' and RegUnit=@groupID order by NameRpt";
 					SqlParameter paramGroupId = new SqlParameter("@groupID", SqlDbType.Int);
 					paramGroupId.Value = groupNode.Id;
 					command.Parameters.Add(paramGroupId);
@@ -95,7 +95,11 @@ namespace ISBLScan.ViewCode
 								scriptTextNode.Text = scriptText;
 								scriptNode.Nodes.Add(scriptTextNode);
 							}
-							groupNode.Nodes.Add(scriptNode);
+						    if (!reader.IsDBNull(4))
+						    {
+						        scriptNode.LastUpdate = reader.GetDateTime(4);
+						    }
+                            groupNode.Nodes.Add(scriptNode);
 						}
 					}
 					reader.Close();

@@ -4,11 +4,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Media;
 using System.Xml;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
+using ICSharpCode.AvalonEdit.Rendering;
 using Color = System.Drawing.Color;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
 namespace ISBLScan.ViewCode
 {
@@ -59,6 +64,7 @@ namespace ISBLScan.ViewCode
         public ICSharpCode.AvalonEdit.TextEditor TextEditor { get; set; }
         private bool regExp { get; set; }
         private bool caseSensitive { get; set; }
+        public MainForm.SearchControls searchControls { get; set; }
 
         public bool RegExp
         {
@@ -66,7 +72,7 @@ namespace ISBLScan.ViewCode
             set
             {
                 regExp = value;
-                MarkSearchStrings();
+                TextEditor.TextArea.TextView.Redraw();
             }
         }
 
@@ -76,7 +82,7 @@ namespace ISBLScan.ViewCode
             set
             {
                 caseSensitive = value;
-                MarkSearchStrings();
+                TextEditor.TextArea.TextView.Redraw();
             }
         }
 
@@ -100,6 +106,8 @@ namespace ISBLScan.ViewCode
             };
 
             SearchCriteriaTextEditor.TextChanged += SearchCriteriaChanged;
+            SearchCriteriaTextEditor.TextArea.KeyUp += new System.Windows.Input.KeyEventHandler(SearchCriteriaTextArea_KeyUp);
+            SearchCriteriaTextEditor.TextArea.TextView.LineTransformers.Add(new HighlightIncorrectRegExp(this));
 
             TextEditor = new ICSharpCode.AvalonEdit.TextEditor
             {
@@ -116,6 +124,7 @@ namespace ISBLScan.ViewCode
                 Text = "",
                 IsReadOnly = true
             };
+            TextEditor.TextArea.TextView.LineTransformers.Add(new HighlightSearchedStrings(this));
 
             var syntaxHighlightingFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ISBL.xshd");
             using (Stream s = File.OpenRead(syntaxHighlightingFilePath))
@@ -127,6 +136,14 @@ namespace ISBLScan.ViewCode
             }
         }
 
+        public void SearchCriteriaTextArea_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter && (e.KeyboardDevice.Modifiers & ModifierKeys.Control) != 0)
+            {
+                Process();
+                FillTreeView(searchControls.TreeViewResults);
+            }
+        }
         public void Process()
         {
             if (_searchStrs.Length > 0)
@@ -145,125 +162,109 @@ namespace ISBLScan.ViewCode
         /// <summary>
         /// Подсветка строк поиска в текущем тексте разработки
         /// </summary>
-        public void MarkSearchStrings()
+        public class HighlightSearchedStrings : DocumentColorizingTransformer
         {
-            if (regExp)
+            private Search Search { get; set; }
+            public HighlightSearchedStrings(Search search)
             {
-                MarkSearchStringsRegExp(_searchStrs);
+                Search = search;
             }
-            else
+            protected override void ColorizeLine(DocumentLine line)
             {
-                MarkSearchStrings(_searchStrs);
-            }
-            SearchCriteriaTextEditor.TextArea.TextView.Redraw();
-        }
-
-        public void MarkSearchStringsRegExp(string[] regExpArray)
-        {
-            RegexOptions regExpOptions = caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
-
-            //Подсветка искомого текста
-            if (regExpArray.Length > 0)
-            {
-                var text = TextEditor.Text;
-
-                for (int indexRegExpStrings = 0; indexRegExpStrings < regExpArray.Length; indexRegExpStrings++)
+                if (Search._searchStrs.Length > 0)
                 {
-                    string hlStr = regExpArray[indexRegExpStrings];
-                    if (hlStr != "")
+                    int lineStartOffset = line.Offset;
+                    string text = CurrentContext.Document.GetText(line);
+                    Brush brush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 156, 255, 156));
+
+                    if (!Search.regExp)
                     {
-                        var regEx = new Regex(hlStr, regExpOptions);
-                        var regExpFindResults = regEx.Matches(text);
-
-                        foreach (var match in regExpFindResults)
+                        StringComparison comparation = Search.caseSensitive
+                            ? StringComparison.CurrentCulture
+                            : StringComparison.CurrentCultureIgnoreCase;
+                        
+                        int start;
+                        int index;
+                        foreach (var word in Search._searchStrs)
                         {
-                            //TextMarker marker = new TextMarker(
-                            //    match.Index
-                            //    , match.Length
-                            //    , TextMarkerType.SolidBlock
-                            //    , Color.FromArgb(255, 156, 255, 156) // светло-зелёный
-                            //    , Color.FromArgb(255, 18, 10, 143) // ультрамарин
-                            //    );
-                            //marker.ToolTip = hlStr;
-                            //TextEditor.Document.MarkerStrategy.AddMarker(marker);
-
-                            //Bookmark mark = new Bookmark(
-                            //    TextEditor.Document
-                            //    , TextEditor.Document.OffsetToPosition(match.Index)
-                            //    , false);
-                            //TextEditor.Document.BookmarkManager.AddMark(mark);
-
-                            //if (!isCentered)
-                            //{
-                            //    var lineNumber = TextEditor.Document.GetLineNumberForOffset(match.Index);
-                            //    isCentered = true;
-                            //}
+                            start = 0;
+                            while ((index = text.IndexOf(word, start, comparation)) >= 0)
+                            {
+                                base.ChangeLinePart(
+                                    lineStartOffset + index, // startOffset
+                                    lineStartOffset + index + word.Length, // endOffset
+                                    (VisualLineElement element) =>
+                                    {
+                                        element.BackgroundBrush = brush;
+                                    });
+                                start = index + 1; // search for next occurrence
+                            }
                         }
                     }
-                }
-            }
-
-        }
-
-        public void MarkSearchStrings(string[] findArray)
-        {
-            StringComparison comparation = caseSensitive ? StringComparison.CurrentCulture : StringComparison.CurrentCultureIgnoreCase;
-
-            //Подсветка искомого текста
-            if (findArray.Length > 0)
-            {
-                String text = TextEditor.Text;
-
-                foreach (string findStr in findArray)
-                {
-                    //Подстветка строк
-
-                    char[] charsDelimeters = { '\n', '\t', ' ', '\r' };
-                    string[] strs = findStr.Split(charsDelimeters, StringSplitOptions.RemoveEmptyEntries);
-
-                    foreach (string str in strs)
+                    else
                     {
-                        string hlStr = str.Trim();
-                        if (hlStr != "")
+                        RegexOptions regExpOptions = Search.caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
+                        for (int indexRegExpStrings = 0; indexRegExpStrings < Search._searchStrs.Length; indexRegExpStrings++)
                         {
-                            var posEnd = 0;
-                            var posStart = text.IndexOf(hlStr, 0, comparation);
-                            while (posStart >= 0)
+                            string hlStr = Search._searchStrs[indexRegExpStrings];
+                            if (hlStr != "")
                             {
-                                posEnd = posStart + hlStr.Length - 1;
-                                if (posEnd >= 0)
+                                var regEx = new Regex(hlStr, regExpOptions);
+                                var regExpFindResults = regEx.Matches(text);
+
+                                foreach (Match match in regExpFindResults)
                                 {
-                                    //TextMarker marker = new TextMarker(
-                                    //    posStart
-                                    //    , posEnd - posStart + 1
-                                    //    , TextMarkerType.SolidBlock
-                                    //    , Color.FromArgb(255, 156, 255, 156) // светло-зелёный
-                                    //    , Color.FromArgb(255, 18, 10, 143) // ультрамарин
-                                    //    );
-                                    //marker.ToolTip = hlStr;
-                                    //TextEditor.Document.MarkerStrategy.AddMarker(marker);
-
-                                    //Bookmark mark = new Bookmark(
-                                    //    TextEditor.Document
-                                    //    , TextEditor.Document.OffsetToPosition(posStart)
-                                    //    , false);
-                                    //TextEditor.Document.BookmarkManager.AddMark(mark);
-
-                                    //if (!isCentered)
-                                    //{
-                                    //    var lineNumber = TextEditor.Document.GetLineNumberForOffset(posStart);
-                                    //    TextEditor.ActiveTextAreaControl.CenterViewOn(lineNumber, 0);
-                                    //    isCentered = true;
-                                    //}
-
-                                    posStart = text.IndexOf(hlStr, posEnd + 1, comparation);
-                                }
-                                else
-                                {
-                                    posStart = -1;
+                                    base.ChangeLinePart(
+                                        lineStartOffset + match.Index, // startOffset
+                                        lineStartOffset + match.Index + match.Length, // endOffset
+                                        (VisualLineElement element) =>
+                                        {
+                                            element.BackgroundBrush = brush;
+                                        });
                                 }
                             }
                         }
+                    }
+                } 
+            }
+        }
+
+        /// <summary>
+        /// Подсветка строк поиска в текущем тексте разработки
+        /// </summary>
+        public class HighlightIncorrectRegExp : DocumentColorizingTransformer
+        {
+            private Search Search { get; set; }
+            public HighlightIncorrectRegExp(Search search)
+            {
+                Search = search;
+            }
+            protected override void ColorizeLine(DocumentLine line)
+            {
+                int lineStartOffset = line.Offset;
+                string text = CurrentContext.Document.GetText(line).Trim();
+                Brush brush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 255, 0, 0));
+
+                if (text != "")
+                {
+                    if (Search.regExp)
+                    {
+                        RegexOptions regExpOptions = Search.caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
+                    
+                        try
+                        {
+                            new Regex(text, regExpOptions);
+                        }
+                        catch (ArgumentException)
+                        {
+                            base.ChangeLinePart(
+                                lineStartOffset, // startOffset
+                                lineStartOffset + line.Length, // endOffset
+                                (VisualLineElement element) =>
+                                {
+                                    element.BackgroundBrush = brush;
+                                });
+                        } 
                     }
                 }
             }
@@ -383,7 +384,7 @@ namespace ISBLScan.ViewCode
                 _searchStrs = searchWords.ToArray();
             }
 
-            MarkSearchStrings();
+            TextEditor.TextArea.TextView.Redraw();
         }
 
 
@@ -395,7 +396,7 @@ namespace ISBLScan.ViewCode
         {
             List<string> regExpResultList = new List<string>();
             bool errorExist = false;
-            for (int indexRegExpCandidate = 0; indexRegExpCandidate < SearchCriteriaTextEditor.Document.LineCount; indexRegExpCandidate++)
+            for (int indexRegExpCandidate = 1; indexRegExpCandidate <= SearchCriteriaTextEditor.Document.LineCount; indexRegExpCandidate++)
             {
                 var line = SearchCriteriaTextEditor.Document.GetLineByNumber(indexRegExpCandidate);
                 ISegment segment = new TextSegment { StartOffset = line.Offset, EndOffset = line.EndOffset };
@@ -410,7 +411,6 @@ namespace ISBLScan.ViewCode
                 }
                 catch (ArgumentException)
                 {
-                    // TODO Highlight incorrect reg expressions
                     errorExist = true;
                 }
             }

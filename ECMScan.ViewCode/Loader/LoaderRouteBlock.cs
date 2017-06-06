@@ -61,7 +61,7 @@ namespace ISBLScan.ViewCode
 				{
 					SqlCommand command = new SqlCommand();
 					command.Connection = Connection;
-					command.CommandText = "select XRecID, Name, Comment, Properties from SBRouteBlock where BlockGroup=@groupID order by Name";
+					command.CommandText = "select XRecID, Name, Comment, Properties, LastUpdate from SBRouteBlock where BlockGroup=@groupID order by Name";
 					SqlParameter paramGroupId = new SqlParameter("@groupID", SqlDbType.Int);
 					paramGroupId.Value = groupNode.Id;
 					command.Parameters.Add(paramGroupId);
@@ -123,7 +123,11 @@ namespace ISBLScan.ViewCode
                                     }
                                 }
                             }
-							groupNode.Nodes.Add(routeBlockNode);
+						    if (!reader.IsDBNull(4))
+						    {
+						        routeBlockNode.LastUpdate = reader.GetDateTime(4);
+						    }
+                            groupNode.Nodes.Add(routeBlockNode);
 						}
 					}
 					reader.Close();
