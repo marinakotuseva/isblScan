@@ -1,7 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
+using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Input;
+using CheckBox = System.Windows.Forms.CheckBox;
+using FontStyle = System.Drawing.FontStyle;
+using MessageBox = System.Windows.Forms.MessageBox;
+using Point = System.Drawing.Point;
+using TextBox = System.Windows.Forms.TextBox;
+using TreeView = System.Windows.Forms.TreeView;
 
 namespace ISBLScan.ViewCode
 {
@@ -24,13 +33,14 @@ namespace ISBLScan.ViewCode
             public Search Search { get; set; }
             private MainForm _form { get; set; }
             private TabPage _tab { get; set; }
+            private List<TreeNode> AlreadyAutoSelectedTreeNodes { get; set; } = new List<TreeNode>();
 
             public SearchControls(MainForm form, TabPage tab)
             {
                 _form = form;
                 _tab = tab;
                 Search = new Search(form.SourceDev);
-                Search.searchControls = this;
+                Search.SearchControls = this;
 
                 SearchCriteriaTextEditorHost = new System.Windows.Forms.Integration.ElementHost();
                 SearchCriteriaTextEditorHost.Dock = DockStyle.Fill;
@@ -144,13 +154,53 @@ namespace ISBLScan.ViewCode
                 CheckBoxFindAll.Dispose();
                 CheckBoxFindRegExp.Dispose();
             }
-        }
-        
 
-        public void textEditorControlRegExp_TextChanged(object sender, EventArgs e)
-        {
-            timerRegExpFind.Enabled = false;
-            timerRegExpFind.Enabled = true;
+            public void Process()
+            {
+                _form.buttonSearch.Enabled = false;
+                Search.Process();
+                Search.FillTreeView(TreeViewResults);
+                AlreadyAutoSelectedTreeNodes.Clear();
+                TreeSelectNextMatched(TreeViewResults.Nodes);
+                _form.buttonSearch.Enabled = true;
+            }
+
+            public bool TreeSelectNextMatched(TreeNodeCollection treeNodes)
+            {
+                bool isFound = false;
+                foreach (TreeNode node in treeNodes)
+                {
+                    var searchNode = (SearchNode) node.Tag;
+                    if (searchNode.IsMatch && !AlreadyAutoSelectedTreeNodes.Contains(node))
+                    {
+                        TreeViewResults.SelectedNode = node;
+                        AlreadyAutoSelectedTreeNodes.Add(node);
+                        isFound = true;
+                        break;
+                    }
+                    else
+                    {
+                        isFound = TreeSelectNextMatched(node.Nodes);
+                        if (isFound)
+                        {
+                            break;
+                        }
+                    }
+                }
+                return isFound;
+            }
+
+            public void TextEditorShowNextMatchedString()
+            {
+                var matchedPos = Search.GetMatchedWordPositions(Search.TextEditor.Text, Search.TextEditor.TextArea.Caret.Offset).FirstOrDefault();
+                if (matchedPos != null)
+                {
+                    Search.TextEditor.TextArea.Caret.Offset = matchedPos.Start + matchedPos.Length;
+                    Search.TextEditor.TextArea.Caret.BringCaretToView();
+                    Search.TextEditor.SelectionStart = matchedPos.Start;
+                    Search.TextEditor.SelectionLength = matchedPos.Length;
+                }
+            }
         }
 
         public MainForm()
@@ -159,7 +209,7 @@ namespace ISBLScan.ViewCode
             // The InitializeComponent() call is required for Windows Forms designer support.
             //
             InitializeComponent();
-            this.Load += TestWindow_Loaded;
+            this.Load += Window_Loaded;
             groupBoxSearch_Resize(null, null);
             AddNewTab();
 
@@ -351,7 +401,7 @@ namespace ISBLScan.ViewCode
             }
         }
 
-        private void TestWindow_Loaded(object sender, EventArgs eventArgs)
+        private void Window_Loaded(object sender, EventArgs eventArgs)
         {
             var searchControls = (SearchControls)tabControlSearchText.SelectedTab.Tag;
             searchControls.Search.SearchCriteriaTextEditor.Focus();
@@ -374,12 +424,8 @@ namespace ISBLScan.ViewCode
         /// <param name="e"></param>
 		void ButtonFilterClick(object sender, EventArgs e)
 		{
-            buttonSearch.Enabled = false;
 		    var searchControls = (SearchControls) tabControlSearchText.SelectedTab.Tag;
-		    searchControls.Search.Process();
-		    searchControls.Search.FillTreeView(searchControls.TreeViewResults);
-
-            buttonSearch.Enabled = true;
+		    searchControls.Process();
         }
 
 		/// <summary>
@@ -387,7 +433,7 @@ namespace ISBLScan.ViewCode
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>		
-		void TextBoxLoginFormKeyDown(object sender, KeyEventArgs e)
+		void TextBoxLoginFormKeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
 		{
 			if(e.KeyCode == Keys.Enter)
 			{
@@ -490,16 +536,35 @@ namespace ISBLScan.ViewCode
         {
             if (e.Node.Tag != null)
             {
-                var node = (IsbNode)e.Node.Tag;
-                ((SearchControls)tabControlSearchText.SelectedTab.Tag).Search.TextEditor.Text = node.Text;
+                var node = (SearchNode)e.Node.Tag;
+                var searchControls = (SearchControls)tabControlSearchText.SelectedTab.Tag;
+                searchControls.Search.TextEditor.Text = node.IsbNode.Text;
+                searchControls.Search.TextEditor.TextArea.Caret.Offset = 0;
+                searchControls.TextEditorShowNextMatchedString();
                 toolStripStatusLabelSelectedElement.Text = node.Name;
-                toolStripStatusLabelLastUpd.Text = node.LastUpdate.ToString();
+                toolStripStatusLabelLastUpd.Text = node.IsbNode.LastUpdate.ToString();
             }
             else
             {
                 ((SearchControls)tabControlSearchText.SelectedTab.Tag).Search.TextEditor.Text = "";
                 toolStripStatusLabelSelectedElement.Text = "";
                 toolStripStatusLabelLastUpd.Text = "";
+            }
+        }
+
+        public void MainForm_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.F2)
+            {
+                var searchControls = (SearchControls)tabControlSearchText.SelectedTab.Tag;
+                searchControls.TreeSelectNextMatched(searchControls.TreeViewResults.Nodes);
+                e.SuppressKeyPress = true;
+            }
+            if (e.KeyCode == Keys.F3)
+            {
+                var searchControls = (SearchControls)tabControlSearchText.SelectedTab.Tag;
+                searchControls.TextEditorShowNextMatchedString();
+                e.SuppressKeyPress = true;
             }
         }
     }

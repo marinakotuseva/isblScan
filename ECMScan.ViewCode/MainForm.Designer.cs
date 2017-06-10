@@ -56,14 +56,12 @@ namespace ISBLScan.ViewCode
             this.panelFilterTree = new System.Windows.Forms.Panel();
             this.panelISBLResult = new System.Windows.Forms.Panel();
             this.splitContainerMain = new System.Windows.Forms.SplitContainer();
-            this.timerRegExpFind = new System.Windows.Forms.Timer(this.components);
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabelLastUpd = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabelDash = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabelSelectedElement = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabelTest = new System.Windows.Forms.ToolStripStatusLabel();
             this.panelMain = new System.Windows.Forms.Panel();
-            this.backgroundWorkerFind = new System.ComponentModel.BackgroundWorker();
             this.tabPageSimpleSearchText = new System.Windows.Forms.TabPage();
             this.panelOptions.SuspendLayout();
             this.groupBoxSearch.SuspendLayout();
@@ -463,6 +461,8 @@ namespace ISBLScan.ViewCode
             this.Controls.Add(this.statusStrip1);
             this.HelpButton = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.KeyPreview = true;
+		    this.KeyDown += MainForm_KeyDown;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "MainForm";
             this.Text = "ISBLScan ViewCode";
@@ -509,7 +509,6 @@ namespace ISBLScan.ViewCode
         private System.Windows.Forms.Button buttonSearch;
         private System.Windows.Forms.Panel panelSearchText;
         private System.Windows.Forms.SplitContainer splitContainerMain;
-        private System.Windows.Forms.Timer timerRegExpFind;
         private System.Windows.Forms.Button buttonCloseCurrentTab;
         public System.Windows.Forms.ImageList imageListIcons;
         private System.Windows.Forms.ImageList imageList1;
@@ -519,7 +518,6 @@ namespace ISBLScan.ViewCode
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelLastUpd;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelDash;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelSelectedElement;
-        private System.ComponentModel.BackgroundWorker backgroundWorkerFind;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelTest;
         private System.Windows.Forms.Button buttonExpand;
         private System.Windows.Forms.TabControl tabControlSearchText;

@@ -12,8 +12,6 @@ using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using ICSharpCode.AvalonEdit.Rendering;
-using Color = System.Drawing.Color;
-using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
 namespace ISBLScan.ViewCode
 {
@@ -64,7 +62,7 @@ namespace ISBLScan.ViewCode
         public ICSharpCode.AvalonEdit.TextEditor TextEditor { get; set; }
         private bool regExp { get; set; }
         private bool caseSensitive { get; set; }
-        public MainForm.SearchControls searchControls { get; set; }
+        public MainForm.SearchControls SearchControls { get; set; }
 
         public bool RegExp
         {
@@ -118,13 +116,16 @@ namespace ISBLScan.ViewCode
                     ShowSpaces = true,
                     ShowTabs = true,
                     AllowScrollBelowDocument = false,
-                    EnableRectangularSelection = true
+                    EnableRectangularSelection = true,
                 },
                 ShowLineNumbers = true,
                 Text = "",
                 IsReadOnly = true
             };
             TextEditor.TextArea.TextView.LineTransformers.Add(new HighlightSearchedStrings(this));
+            TextEditor.FontSize = 12;
+            TextEditor.FontStretch = FontStretch.FromOpenTypeStretch(2);
+            TextEditor.TextArea.KeyUp += new System.Windows.Input.KeyEventHandler(TextEditorTextArea_KeyUp);
 
             var syntaxHighlightingFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ISBL.xshd");
             using (Stream s = File.OpenRead(syntaxHighlightingFilePath))
@@ -140,8 +141,30 @@ namespace ISBLScan.ViewCode
         {
             if (e.Key == Key.Enter && (e.KeyboardDevice.Modifiers & ModifierKeys.Control) != 0)
             {
-                Process();
-                FillTreeView(searchControls.TreeViewResults);
+                SearchControls.Process();
+            }
+            if (e.Key == Key.F2)
+            {
+                SearchControls.TreeSelectNextMatched(SearchControls.TreeViewResults.Nodes);
+            }
+            if (e.Key == Key.F3)
+            {
+                SearchControls.TextEditorShowNextMatchedString();
+            }
+        }
+        public void TextEditorTextArea_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter && (e.KeyboardDevice.Modifiers & ModifierKeys.Control) != 0)
+            {
+                SearchControls.Process();
+            }
+            if (e.Key == Key.F2)
+            {
+                SearchControls.TreeSelectNextMatched(SearchControls.TreeViewResults.Nodes);
+            }
+            if (e.Key == Key.F3)
+            {
+                SearchControls.TextEditorShowNextMatchedString();
             }
         }
         public void Process()
@@ -155,8 +178,54 @@ namespace ISBLScan.ViewCode
             {
                 BuildSearchNodes(true);
             }
-            System.Diagnostics.Debug.WriteLine(Nodes.Count);
             GC.Collect();
+        }
+
+        public class MatchedWordPosition
+        {
+            public int Start;
+            public int Length;
+        }
+
+        public IEnumerable<MatchedWordPosition> GetMatchedWordPositions(string text, int searchStartPos = 0)
+        {
+            text = text.Substring(searchStartPos);
+            if (!regExp)
+            {
+                StringComparison comparation = caseSensitive
+                    ? StringComparison.CurrentCulture
+                    : StringComparison.CurrentCultureIgnoreCase;
+
+                int start;
+                int index;
+                foreach (var word in _searchStrs)
+                {
+                    start = 0;
+                    while ((index = text.IndexOf(word, start, comparation)) >= 0)
+                    {
+                        yield return new MatchedWordPosition() { Length = word.Length, Start = searchStartPos + index };
+                        start = index + 1; // search for next occurrence
+                    }
+                }
+            }
+            else
+            {
+                RegexOptions regExpOptions = caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
+                for (int indexRegExpStrings = 0; indexRegExpStrings < _searchStrs.Length; indexRegExpStrings++)
+                {
+                    string hlStr = _searchStrs[indexRegExpStrings];
+                    if (hlStr != "")
+                    {
+                        var regEx = new Regex(hlStr, regExpOptions);
+                        var regExpFindResults = regEx.Matches(text);
+
+                        foreach (Match match in regExpFindResults)
+                        {
+                            yield return new MatchedWordPosition() { Length = match.Length, Start = searchStartPos + match.Index};
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -169,6 +238,7 @@ namespace ISBLScan.ViewCode
             {
                 Search = search;
             }
+
             protected override void ColorizeLine(DocumentLine line)
             {
                 if (Search._searchStrs.Length > 0)
@@ -177,60 +247,22 @@ namespace ISBLScan.ViewCode
                     string text = CurrentContext.Document.GetText(line);
                     Brush brush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 156, 255, 156));
 
-                    if (!Search.regExp)
+                    foreach (MatchedWordPosition pos in Search.GetMatchedWordPositions(text))
                     {
-                        StringComparison comparation = Search.caseSensitive
-                            ? StringComparison.CurrentCulture
-                            : StringComparison.CurrentCultureIgnoreCase;
-                        
-                        int start;
-                        int index;
-                        foreach (var word in Search._searchStrs)
-                        {
-                            start = 0;
-                            while ((index = text.IndexOf(word, start, comparation)) >= 0)
+                        base.ChangeLinePart(
+                            lineStartOffset + pos.Start, // startOffset
+                            lineStartOffset + pos.Start + pos.Length, // endOffset
+                            (VisualLineElement element) =>
                             {
-                                base.ChangeLinePart(
-                                    lineStartOffset + index, // startOffset
-                                    lineStartOffset + index + word.Length, // endOffset
-                                    (VisualLineElement element) =>
-                                    {
-                                        element.BackgroundBrush = brush;
-                                    });
-                                start = index + 1; // search for next occurrence
-                            }
-                        }
-                    }
-                    else
-                    {
-                        RegexOptions regExpOptions = Search.caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
-                        for (int indexRegExpStrings = 0; indexRegExpStrings < Search._searchStrs.Length; indexRegExpStrings++)
-                        {
-                            string hlStr = Search._searchStrs[indexRegExpStrings];
-                            if (hlStr != "")
-                            {
-                                var regEx = new Regex(hlStr, regExpOptions);
-                                var regExpFindResults = regEx.Matches(text);
-
-                                foreach (Match match in regExpFindResults)
-                                {
-                                    base.ChangeLinePart(
-                                        lineStartOffset + match.Index, // startOffset
-                                        lineStartOffset + match.Index + match.Length, // endOffset
-                                        (VisualLineElement element) =>
-                                        {
-                                            element.BackgroundBrush = brush;
-                                        });
-                                }
-                            }
-                        }
-                    }
+                                element.BackgroundBrush = brush;
+                            });
+                    } 
                 } 
             }
         }
 
         /// <summary>
-        /// Подсветка строк поиска в текущем тексте разработки
+        /// Подсветка некорректных регулярных выражений
         /// </summary>
         public class HighlightIncorrectRegExp : DocumentColorizingTransformer
         {
@@ -338,15 +370,15 @@ namespace ISBLScan.ViewCode
                 if (node.Visible)
                 {
                     TreeNode treeNode = treeNodes.Add(node.Name);
-                    treeNode.Tag = node.IsbNode;
+                    treeNode.Tag = node;
 
                     if (node.IsMatch)
                     {
-                        treeNode.ForeColor = Color.Black;
+                        treeNode.ForeColor = System.Drawing.Color.Black;
                     }
                     else
                     {
-                        treeNode.ForeColor = Color.Gray;
+                        treeNode.ForeColor = System.Drawing.Color.Gray;
                     }
 
                     CopySearchNodesToTreeNodes(node.Nodes, treeNode.Nodes);
