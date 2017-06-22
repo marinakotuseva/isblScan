@@ -121,7 +121,7 @@ namespace ISBLScan.ViewCode
 
             //Загрузка текстов событий диалогов, вычислений реквизитов, расчётов на форме
             isblNode = loaderDialog.Load();
-		    isblList.Add(isblNode);
+            isblList.Add(isblNode);
 
             return isblList;
 		}

@@ -90,7 +90,6 @@ namespace ISBLScan.ViewCode
 				command.Parameters.Add(paramVid);
 				command.Prepare();
 				SqlDataReader reader = command.ExecuteReader();
-			    var refRecvNode = new IsbNode("-=[ Реквизиты и действия диалога ]=-");
 
                 if (reader.HasRows)
 				{
@@ -101,12 +100,11 @@ namespace ISBLScan.ViewCode
 					    recvGroupNode.Code = sectionCode.ToString();
 					    recvGroupNode.Id = refNode.Id;
 
-						refRecvNode.Nodes.Add(recvGroupNode);
+                        refNode.Nodes.Add(recvGroupNode);
                     }
-				    refNode.Nodes.Add(refRecvNode);
                 }
 				reader.Close();
-			    foreach (var node in refRecvNode.Nodes)
+			    foreach (var node in refNode.Nodes)
 			    {
 			        LoadRecvisite(node);
                 }

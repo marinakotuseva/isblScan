@@ -92,6 +92,7 @@
     <Compile Include="SynchronizedScrollRichTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Tools\DFMParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

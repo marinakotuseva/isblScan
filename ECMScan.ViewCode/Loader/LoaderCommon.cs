@@ -47,7 +47,7 @@ namespace ISBLScan.ViewCode
 	        {'X', "Таблица 23"},
 	        {'Z', "Таблица 24"},
 	        {'К', "Действие"},
-	        {'A', "Action"},
+	        {'A', "Действие"},
 	        {'C', "Карточка"},
 	        {'D', "Таблица"},
 	        {'E', "Таблица 2"},
@@ -56,6 +56,15 @@ namespace ISBLScan.ViewCode
 	        {'J', "Таблица 5"},
 	        {'K', "Таблица 6"}
 	    };
+
+        protected readonly Dictionary<String, String> _wizardEventCodeToName = new Dictionary<string, string>()
+        {
+            {"wetWizardBeforeSelection", "До выбора"},
+            {"wetWizardStart", "Старт"},
+            {"wetWizardFinish", "Завершение"},
+            {"wetStepStart", "Старт"},
+            {"wetStepFinish", "Завершение"},
+        };
 
         /// <summary>
         /// Конструктор базового класса для всех загрузчиков прикладной разработки.

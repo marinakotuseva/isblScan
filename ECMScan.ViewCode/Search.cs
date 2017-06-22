@@ -106,6 +106,9 @@ namespace ISBLScan.ViewCode
             SearchCriteriaTextEditor.TextChanged += SearchCriteriaChanged;
             SearchCriteriaTextEditor.TextArea.KeyUp += new System.Windows.Input.KeyEventHandler(SearchCriteriaTextArea_KeyUp);
             SearchCriteriaTextEditor.TextArea.TextView.LineTransformers.Add(new HighlightIncorrectRegExp(this));
+            SearchCriteriaTextEditor.FontFamily = new FontFamily("Courier New, Courier, monospace");
+            SearchCriteriaTextEditor.FontSize = 13;
+            SearchCriteriaTextEditor.FontStretch = FontStretch.FromOpenTypeStretch(5);
 
             TextEditor = new ICSharpCode.AvalonEdit.TextEditor
             {
@@ -123,8 +126,9 @@ namespace ISBLScan.ViewCode
                 IsReadOnly = true
             };
             TextEditor.TextArea.TextView.LineTransformers.Add(new HighlightSearchedStrings(this));
-            TextEditor.FontSize = 12;
-            TextEditor.FontStretch = FontStretch.FromOpenTypeStretch(2);
+            TextEditor.FontFamily = new FontFamily("Courier New, Courier, monospace");
+            TextEditor.FontSize = 13;
+            TextEditor.FontStretch = FontStretch.FromOpenTypeStretch(1);
             TextEditor.TextArea.KeyUp += new System.Windows.Input.KeyEventHandler(TextEditorTextArea_KeyUp);
 
             var syntaxHighlightingFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ISBL.xshd");
