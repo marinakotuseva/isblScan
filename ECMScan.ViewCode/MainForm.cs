@@ -28,17 +28,21 @@ namespace ISBLScan.ViewCode
             public System.Windows.Forms.CheckBox CheckBoxFindCaseSensitive { get; set; }
             public System.Windows.Forms.Integration.ElementHost TextEditorHost { get; set; }
             public System.Windows.Forms.Integration.ElementHost SearchCriteriaTextEditorHost { get; set; }
-            public System.Windows.Forms.TextBox TextBoxFilter { get; set; }
-            public TreeView TreeViewResults  = new TreeView();
+            public System.Windows.Forms.TextBox TextBoxFilterName { get; set; }
+            public System.Windows.Forms.DateTimePicker TextBoxFilterStartDate { get; set; }
+            public System.Windows.Forms.DateTimePicker TextBoxFilterEndDate { get; set; }
+            public TreeView TreeViewResults = new TreeView();
             public Search Search { get; set; }
-            private MainForm _form { get; set; }
+            public MainForm _form { get; set; }
             private TabPage _tab { get; set; }
             private List<TreeNode> AlreadyAutoSelectedTreeNodes { get; set; } = new List<TreeNode>();
 
-            public SearchControls(MainForm form, TabPage tab)
+            public SearchControls(MainForm form)
             {
                 _form = form;
-                _tab = tab;
+                _tab = new TabPage(string.Format("Search {0}", _form.tabControlSearchText.TabCount + 1));
+                _form.tabControlSearchText.Controls.Add(_tab);
+                _form.tabControlSearchText.SelectedTab = _tab;
                 Search = new Search(form.SourceDev);
                 Search.SearchControls = this;
 
@@ -48,9 +52,9 @@ namespace ISBLScan.ViewCode
                 SearchCriteriaTextEditorHost.TabIndex = 1;
                 SearchCriteriaTextEditorHost.Child = Search.SearchCriteriaTextEditor;
 
-                tab.Tag = this;
-                tab.Controls.Add(SearchCriteriaTextEditorHost);
-                tab.UseVisualStyleBackColor = true;
+                _tab.Tag = this;
+                _tab.Controls.Add(SearchCriteriaTextEditorHost);
+                _tab.UseVisualStyleBackColor = true;
                 Search.SearchCriteriaTextEditor.Focus();
 
                 Search.FillTreeView(TreeViewResults);
@@ -72,15 +76,39 @@ namespace ISBLScan.ViewCode
                 TextEditorHost.Child = Search.TextEditor;
                 _form.panelISBLResult.Controls.Add(TextEditorHost);
 
-                TextBoxFilter = new System.Windows.Forms.TextBox();
-                TextBoxFilter.Dock = System.Windows.Forms.DockStyle.Fill;
-                TextBoxFilter.Location = new System.Drawing.Point(0, 0);
-                TextBoxFilter.Margin = new System.Windows.Forms.Padding(4);
-                TextBoxFilter.Name = "textBoxFilter";
-                TextBoxFilter.Size = new System.Drawing.Size(280, 22);
-                TextBoxFilter.TabIndex = 2111;
-                TextBoxFilter.TextChanged += new System.EventHandler(form.TextBoxFilter_TextChanged);
-                _form.panelFilterTree.Controls.Add(TextBoxFilter);
+                TextBoxFilterName = new System.Windows.Forms.TextBox();
+                TextBoxFilterName.Dock = System.Windows.Forms.DockStyle.Fill;
+                TextBoxFilterName.Location = new System.Drawing.Point(0, 0);
+                TextBoxFilterName.Margin = new System.Windows.Forms.Padding(4);
+                TextBoxFilterName.Name = "textBoxFilter";
+                TextBoxFilterName.Size = new System.Drawing.Size(280, 22);
+                TextBoxFilterName.TabIndex = 2111;
+                TextBoxFilterName.TextChanged += new System.EventHandler(form.TextBoxFilter_TextChanged);
+                _form.panelFilterTreeName.Controls.Add(TextBoxFilterName);
+
+                TextBoxFilterStartDate = new System.Windows.Forms.DateTimePicker();
+                TextBoxFilterStartDate.Format = DateTimePickerFormat.Custom;
+                TextBoxFilterStartDate.CustomFormat = "yyyy-MM-dd HH:mm";
+                TextBoxFilterStartDate.Location = new System.Drawing.Point(0, 0);
+                TextBoxFilterStartDate.Margin = new System.Windows.Forms.Padding(4);
+                TextBoxFilterStartDate.Name = "textBoxFilterStartDate";
+                TextBoxFilterStartDate.Size = new System.Drawing.Size(130, 22);
+                TextBoxFilterStartDate.TabIndex = 2112;
+                TextBoxFilterStartDate.TextChanged += new System.EventHandler(form.TextBoxFilterStartDate_TextChanged);
+                TextBoxFilterStartDate.Value = DateTimePicker.MinimumDateTime.Date;
+                _form.panelFilterTreeDate.Controls.Add(TextBoxFilterStartDate);
+
+                TextBoxFilterEndDate = new System.Windows.Forms.DateTimePicker();
+                TextBoxFilterEndDate.Format = DateTimePickerFormat.Custom;
+                TextBoxFilterEndDate.CustomFormat = "yyyy-MM-dd HH:mm";
+                TextBoxFilterEndDate.Location = new System.Drawing.Point(150, 0);
+                TextBoxFilterEndDate.Margin = new System.Windows.Forms.Padding(4);
+                TextBoxFilterEndDate.Name = "textBoxFilterEndDate";
+                TextBoxFilterEndDate.Size = new System.Drawing.Size(130, 22);
+                TextBoxFilterEndDate.TabIndex = 2113;
+                TextBoxFilterEndDate.TextChanged += new System.EventHandler(form.TextBoxFilterEndDate_TextChanged);
+                TextBoxFilterEndDate.Value = DateTimePicker.MaximumDateTime.Date.AddDays(-1).AddHours(23).AddMinutes(59);
+                _form.panelFilterTreeDate.Controls.Add(TextBoxFilterEndDate);
 
                 CheckBoxFindAll = new System.Windows.Forms.CheckBox();
                 CheckBoxFindAll.AutoSize = true;
@@ -120,13 +148,17 @@ namespace ISBLScan.ViewCode
                 CheckBoxFindCaseSensitive.UseVisualStyleBackColor = true;
                 CheckBoxFindCaseSensitive.CheckedChanged += new System.EventHandler(form.checkBoxFindCaseSensitive_CheckedChanged);
                 _form.panelSearchButtons.Controls.Add(CheckBoxFindCaseSensitive);
+
+                this.Activate();
             }
 
             public void Activate()
             {
                 TreeViewResults.BringToFront();
                 TextEditorHost.BringToFront();
-                TextBoxFilter.BringToFront();
+                TextBoxFilterName.BringToFront();
+                TextBoxFilterStartDate.BringToFront();
+                TextBoxFilterEndDate.BringToFront();
                 CheckBoxFindRegExp.BringToFront();
                 CheckBoxFindAll.BringToFront();
                 CheckBoxFindCaseSensitive.BringToFront();
@@ -139,7 +171,9 @@ namespace ISBLScan.ViewCode
                 _tab.Controls.Remove(SearchCriteriaTextEditorHost);
                 _form.panelTree.Controls.Remove(TreeViewResults);
                 _form.panelISBLResult.Controls.Remove(TextEditorHost);
-                _form.panelFilterTree.Controls.Remove(TextBoxFilter);
+                _form.panelFilterTreeName.Controls.Remove(TextBoxFilterName);
+                _form.panelFilterTreeDate.Controls.Remove(TextBoxFilterStartDate);
+                _form.panelFilterTreeDate.Controls.Remove(TextBoxFilterEndDate);
                 _form.panelSearchButtons.Controls.Remove(CheckBoxFindCaseSensitive);
                 _form.panelSearchButtons.Controls.Remove(CheckBoxFindAll);
                 _form.panelSearchButtons.Controls.Remove(CheckBoxFindRegExp);
@@ -149,7 +183,7 @@ namespace ISBLScan.ViewCode
                 TreeViewResults.Dispose();
                 TextEditorHost.Dispose();
                 SearchCriteriaTextEditorHost.Dispose();
-                TextBoxFilter.Dispose();
+                TextBoxFilterName.Dispose();
                 CheckBoxFindCaseSensitive.Dispose();
                 CheckBoxFindAll.Dispose();
                 CheckBoxFindRegExp.Dispose();
@@ -170,7 +204,7 @@ namespace ISBLScan.ViewCode
                 bool isFound = false;
                 foreach (TreeNode node in treeNodes)
                 {
-                    var searchNode = (SearchNode) node.Tag;
+                    var searchNode = (SearchNode)node.Tag;
                     if (searchNode.IsMatch && !AlreadyAutoSelectedTreeNodes.Contains(node))
                     {
                         TreeViewResults.SelectedNode = node;
@@ -200,6 +234,10 @@ namespace ISBLScan.ViewCode
                     Search.TextEditor.SelectionStart = matchedPos.Start;
                     Search.TextEditor.SelectionLength = matchedPos.Length;
                 }
+                else
+                {
+                    TreeSelectNextMatched(TreeViewResults.Nodes);
+                }
             }
         }
 
@@ -211,7 +249,7 @@ namespace ISBLScan.ViewCode
             InitializeComponent();
             this.Load += Window_Loaded;
             groupBoxSearch_Resize(null, null);
-            AddNewTab();
+            new SearchControls(this);
 
             string sqlServer;
             string dataBase;
@@ -268,7 +306,7 @@ namespace ISBLScan.ViewCode
                     }
                 }
             }
-            
+
         }
 
         /// <summary>
@@ -423,54 +461,73 @@ namespace ISBLScan.ViewCode
         /// <param name="sender"></param>
         /// <param name="e"></param>
 		void ButtonFilterClick(object sender, EventArgs e)
-		{
-		    var searchControls = (SearchControls) tabControlSearchText.SelectedTab.Tag;
-		    searchControls.Process();
+        {
+            var searchControls = (SearchControls)tabControlSearchText.SelectedTab.Tag;
+            searchControls.Process();
         }
 
-		/// <summary>
-		/// Обработка нажатия клавиши в форме аутентификации на SQL Server
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>		
-		void TextBoxLoginFormKeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
-		{
-			if(e.KeyCode == Keys.Enter)
-			{
-				ConnectAndGetIsbl();
-			}
-		}
+        /// <summary>
+        /// Обработка нажатия клавиши в форме аутентификации на SQL Server
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>		
+        void TextBoxLoginFormKeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                ConnectAndGetIsbl();
+            }
+        }
 
-		void TextBoxLoginFormTextChanged(object sender, EventArgs e)
-		{
-			(sender as TextBox).Font = new Font((sender as TextBox).Font, FontStyle.Regular);
-			(sender as TextBox).BackColor = this.textBoxPassword.BackColor;
+        void TextBoxLoginFormTextChanged(object sender, EventArgs e)
+        {
+            (sender as TextBox).Font = new Font((sender as TextBox).Font, FontStyle.Regular);
+            (sender as TextBox).BackColor = this.textBoxPassword.BackColor;
             (sender as TextBox).ForeColor = this.textBoxPassword.ForeColor;
-		}
+        }
 
         /// <summary>
         /// Изменение текста в поле фильтрации дерева проекта
         /// </summary>
-        public void TextBoxFilter_TextChanged (object sender, System.EventArgs e)
-		{
-		    var searchControls = (SearchControls)tabControlSearchText.SelectedTab.Tag;
-		    searchControls.Search.FillTreeView(searchControls.TreeViewResults, ((TextBox)sender).Text);
+        public void TextBoxFilter_TextChanged(object sender, System.EventArgs e)
+        {
+            var searchControls = (SearchControls)tabControlSearchText.SelectedTab.Tag;
+            searchControls.Search.FilterName = ((TextBox)sender).Text;
+            searchControls.Search.FillTreeView(searchControls.TreeViewResults);
         }
-		
-		void CheckBoxWinAuthCheckedChanged(object sender, EventArgs e)
-		{
-			textBoxLogin.Enabled = !checkBoxWinAuth.Checked;
-			textBoxPassword.Enabled = textBoxLogin.Enabled;
-		}
+        /// <summary>
+        /// Изменение начальной даты в поле фильтрации дерева проекта
+        /// </summary>
+        public void TextBoxFilterStartDate_TextChanged(object sender, System.EventArgs e)
+        {
+            var searchControls = (SearchControls)tabControlSearchText.SelectedTab.Tag;
+            searchControls.Search.FilterStartDate = ((DateTimePicker)sender).Value;
+            searchControls.Search.FillTreeView(searchControls.TreeViewResults);
+        }
+        /// <summary>
+        /// Изменение конечной даты в поле фильтрации дерева проекта
+        /// </summary>
+        public void TextBoxFilterEndDate_TextChanged(object sender, System.EventArgs e)
+        {
+            var searchControls = (SearchControls)tabControlSearchText.SelectedTab.Tag;
+            searchControls.Search.FilterEndDate = ((DateTimePicker)sender).Value;
+            searchControls.Search.FillTreeView(searchControls.TreeViewResults);
+        }
+
+        void CheckBoxWinAuthCheckedChanged(object sender, EventArgs e)
+        {
+            textBoxLogin.Enabled = !checkBoxWinAuth.Checked;
+            textBoxPassword.Enabled = textBoxLogin.Enabled;
+        }
 
         private void buttonCloseCurrentTab_Click(object sender, EventArgs e)
         {
             if (tabControlSearchText.TabCount > 1)
             {
                 var tabPageForClose = tabControlSearchText.SelectedTab;
-                ((SearchControls) tabPageForClose.Tag).Dispose();
+                ((SearchControls)tabPageForClose.Tag).Dispose();
                 tabPageForClose.Tag = null;
-                
+
                 tabControlSearchText.SelectedIndex = tabControlSearchText.SelectedIndex > 0 ?
                     tabControlSearchText.SelectedIndex - 1 : 0;
                 tabControlSearchText.Controls.Remove(tabPageForClose);
@@ -481,16 +538,9 @@ namespace ISBLScan.ViewCode
 
         private void buttonAddNewTab_Click(object sender, EventArgs e)
         {
-            AddNewTab();
+            new SearchControls(this);
         }
 
-        private void AddNewTab()
-        {
-            var tab = new TabPage(string.Format("Search {0}", tabControlSearchText.TabCount + 1));
-            new SearchControls(this, tab);
-            tabControlSearchText.Controls.Add(tab);
-            tabControlSearchText.SelectedTab = tab;
-        }
         public void checkBoxFindRegExp_CheckedChanged(object sender, EventArgs e)
         {
             ((SearchControls)tabControlSearchText.SelectedTab.Tag).Search.RegExp = ((CheckBox)sender).Checked;
@@ -503,19 +553,19 @@ namespace ISBLScan.ViewCode
 
         public void tabControlSearchText_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ((SearchControls) tabControlSearchText.SelectedTab.Tag).Activate();
+            ((SearchControls)tabControlSearchText.SelectedTab.Tag)?.Activate();
         }
 
         public void checkBoxFindCaseSensitive_CheckedChanged(object sender, EventArgs e)
         {
-            ((SearchControls) tabControlSearchText.SelectedTab.Tag).Search.CaseSensitive = ((CheckBox)sender).Checked;
+            ((SearchControls)tabControlSearchText.SelectedTab.Tag).Search.CaseSensitive = ((CheckBox)sender).Checked;
         }
-	
-	    void groupBoxSearch_Resize (object sender, System.EventArgs e)
-	    {
-		    this.buttonAddNewTab.Left = groupBoxSearch.Width - 36;
-		    this.buttonCloseCurrentTab.Left = groupBoxSearch.Width - 19;
-	    }
+
+        void groupBoxSearch_Resize(object sender, System.EventArgs e)
+        {
+            this.buttonAddNewTab.Left = groupBoxSearch.Width - 36;
+            this.buttonCloseCurrentTab.Left = groupBoxSearch.Width - 19;
+        }
 
         private void buttonExpand_Click(object sender, EventArgs e)
         {
@@ -542,7 +592,7 @@ namespace ISBLScan.ViewCode
                 searchControls.Search.TextEditor.TextArea.Caret.Offset = 0;
                 searchControls.TextEditorShowNextMatchedString();
                 toolStripStatusLabelSelectedElement.Text = node.Name;
-                toolStripStatusLabelLastUpd.Text = node.IsbNode.LastUpdate.ToString();
+                toolStripStatusLabelLastUpd.Text = node.IsbNode.LastUpdate?.ToString("yyyy-MM-dd HH:mm");
             }
             else
             {
@@ -565,6 +615,10 @@ namespace ISBLScan.ViewCode
                 var searchControls = (SearchControls)tabControlSearchText.SelectedTab.Tag;
                 searchControls.TextEditorShowNextMatchedString();
                 e.SuppressKeyPress = true;
+            }
+            if (e.KeyCode == Keys.T && e.Control)
+            {
+                new SearchControls(this);
             }
         }
     }

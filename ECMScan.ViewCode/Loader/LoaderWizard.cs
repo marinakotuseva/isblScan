@@ -118,7 +118,7 @@ namespace ISBLScan.ViewCode
             foreach (var step in parsedWizardDfm.Nodes.Where(n => n.PropertyClass?.EndsWith("StepList") ?? false).First().Nodes.Where(n => n.PropertyClass?.EndsWith("WizardStep") ?? false))
             {
                 var wizardStep = new IsbNode("");
-      
+
                 foreach (var eventNode in step.Nodes.Where(n => n.PropertyName == "Events").First().Nodes)
                 {
                     var stepEventNode = new IsbNode();

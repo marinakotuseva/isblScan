@@ -41,6 +41,11 @@ namespace ISBLScan.ViewCode
         public bool IsMatch { get; set; }
 
         /// <summary>
+        /// Gets or sets Дата последней модификации узла разработки
+        /// </summary>
+        public DateTime? LastUpdate { get; set; }
+
+        /// <summary>
         /// Gets or sets Список подузлов
         /// </summary>
         public List<SearchNode> Nodes { get; set; } = new List<SearchNode>();
@@ -51,6 +56,7 @@ namespace ISBLScan.ViewCode
             IsbNode = isbNode;
             Visible = isbNode.IsMatch || isbNode.IsContainsMatchedNode;
             IsMatch = isbNode.IsMatch;
+            LastUpdate = isbNode.LastUpdate;
         }
     }
 
@@ -85,6 +91,10 @@ namespace ISBLScan.ViewCode
         }
 
         public bool FindAll { get; set; }
+
+        public DateTime FilterStartDate { get; set; } = System.Windows.Forms.DateTimePicker.MinimumDateTime;
+        public DateTime FilterEndDate { get; set; } = System.Windows.Forms.DateTimePicker.MaximumDateTime;
+        public string FilterName { get; set; } = "";
 
         string[] _searchStrs = new string[] { };
 
@@ -147,6 +157,10 @@ namespace ISBLScan.ViewCode
             {
                 SearchControls.Process();
             }
+            if (e.Key == Key.T && (e.KeyboardDevice.Modifiers & ModifierKeys.Control) != 0)
+            {
+                new MainForm.SearchControls(SearchControls._form);
+            }
             if (e.Key == Key.F2)
             {
                 SearchControls.TreeSelectNextMatched(SearchControls.TreeViewResults.Nodes);
@@ -161,6 +175,10 @@ namespace ISBLScan.ViewCode
             if (e.Key == Key.Enter && (e.KeyboardDevice.Modifiers & ModifierKeys.Control) != 0)
             {
                 SearchControls.Process();
+            }
+            if (e.Key == Key.T && (e.KeyboardDevice.Modifiers & ModifierKeys.Control) != 0)
+            {
+                new MainForm.SearchControls(SearchControls._form);
             }
             if (e.Key == Key.F2)
             {
@@ -306,20 +324,28 @@ namespace ISBLScan.ViewCode
             }
         }
 
-        public void FillTreeView(TreeView treeViewResults, string filter = null)
+        public void FillTreeView(TreeView treeViewResults)
         {
-            FilterNodesByName(filter);
+            FilterNodesName();
+            FilterNodesDate();
             treeViewResults.Nodes.Clear();
             treeViewResults.BeginUpdate();
             CopySearchNodesToTreeNodes(Nodes, treeViewResults.Nodes);
             treeViewResults.EndUpdate();
         }
 
-        void FilterNodesByName(string filter)
+        void FilterNodesName()
         {
             foreach (SearchNode node in Nodes)
             {
-                FilterNodeByName(node, filter);
+                FilterNodeName(node);
+            }
+        }
+        void FilterNodesDate()
+        {
+            foreach (SearchNode node in Nodes)
+            {
+                FilterNodeDate(node);
             }
         }
 
@@ -332,21 +358,21 @@ namespace ISBLScan.ViewCode
             }
         }
 
-        bool FilterNodeByName(SearchNode node, string filter)
+        bool FilterNodeName(SearchNode node)
         {
             if (node == null)
                 return false;
 
             bool isFound = false;
             //Пропуск пустых поисковых строк
-            if (string.IsNullOrEmpty(filter))
+            if (string.IsNullOrEmpty(FilterName))
             {
                 SetVisible(node);
                 isFound = true;
             }
             else
             {
-                if (node.Name.ToUpper().Contains(filter.ToUpper()))
+                if (node.Name.ToUpper().Contains(FilterName.ToUpper()))
                 {
                     SetVisible(node);
                     isFound = true;
@@ -355,15 +381,45 @@ namespace ISBLScan.ViewCode
                 {
                     foreach (SearchNode subNode in node.Nodes)
                     {
-                        if (FilterNodeByName(subNode, filter))
+                        if (FilterNodeName(subNode))
+                        {
+                            isFound = true;
+                        }
+                    }
+                }  
+                node.Visible = isFound;
+            }
+
+            return isFound;
+        }
+
+        bool FilterNodeDate(SearchNode node)
+        {
+            if (node == null)
+                return false;
+
+            bool isFound = false;
+
+            if (!(FilterEndDate == System.Windows.Forms.DateTimePicker.MaximumDateTime 
+                && FilterStartDate == System.Windows.Forms.DateTimePicker.MinDateTime)
+                && node.Visible)
+            {
+                if (node.LastUpdate.HasValue)
+                {
+                    isFound = node.LastUpdate >= FilterStartDate && node.LastUpdate <= FilterEndDate;
+                }
+                else
+                {
+                    foreach (SearchNode subNode in node.Nodes)
+                    {
+                        if (FilterNodeDate(subNode))
                         {
                             isFound = true;
                         }
                     }
                 }
-                node.Visible = isFound;
+                node.Visible = node.Visible & isFound;
             }
-
             return isFound;
         }
 

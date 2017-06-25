@@ -9,7 +9,6 @@ namespace ISBLScan.ViewCode
     public class DfmDataNode
     {
         public string PropertyName { get; set; }
-        public string PropertyType { get; set; }
         public string PropertyClass { get; set; }
         public object PropertyValue { get; set; }
         public List<DfmDataNode> Nodes { get; set; } = new List<DfmDataNode>();
@@ -42,23 +41,20 @@ namespace ISBLScan.ViewCode
             var node = new DfmDataNode();
             var s = objectData.ElementAt(0);
             var k1 = s.IndexOf(obj) + obj.Length;
-            node.PropertyType = obj;
             if (k1 == obj.Length - 1)
             {
                 k1 = s.IndexOf(inh) + inh.Length;
-                node.PropertyType = inh;
             }
             var k2 = s.IndexOf(":");
             k2 = k2 > -1 ? k2 : k1 + 1;
             node.PropertyName = s.Substring(k1 + 1, k2 - k1 - 1).Trim();
             node.PropertyClass = s.Substring(k2 + 1, s.Length - k2 - 1).Trim();
-            //node.PropertyValue = node;
 
             var index = 0;
             var count = objectData.Count() - 2;
             while (index < count)
             {
-                index = ReadObjectProperty(index, objectData, node);
+                index = index + ReadObjectProperty(objectData.Skip(index + 1), node);
             }
 
             return node;
@@ -85,63 +81,55 @@ namespace ISBLScan.ViewCode
             if (k > -1)
             {
                 node.PropertyName = s.Substring(0, k - 1).Trim();
-                node.PropertyType = "items";
                 ItemCounter.Reset();
             }
             else
             {
                 node.PropertyName = "item" + ItemCounter.NextValue;
-                node.PropertyType = "item";
             }
-            //node.PropertyValue = node;
 
             var index = 0;
             var count = objectData.Count() - 1;
             while (index < count)
             {
-                index = ReadObjectProperty(index, objectData, node);
+                index = index + ReadObjectProperty(objectData.Skip(index + 1), node);
             }
 
             return node;
         }
-        private static int ReadObjectProperty(int startIndex, IEnumerable<string> objectData, DfmDataNode parent)
+        private static int ReadObjectProperty(IEnumerable<string> objectData, DfmDataNode parent)
         {
-            objectData = objectData.Skip(1).Take(objectData.Count());
-            var s = objectData.ElementAt(startIndex);
-            var endIndex = startIndex;
+            var endIndex = 0;
+            var s = objectData.ElementAt(0);
             DfmDataNode node = null;
             if (s.EndsWith(" item"))
             {
                 var ident = s.Substring(0, s.IndexOf("item"));
-                endIndex = objectData.Skip(startIndex).ToList().IndexOf(
-                                    objectData.Skip(startIndex).First(o => {
+                endIndex = objectData.ToList().IndexOf(
+                                    objectData.First(o => {
                                         return o.EndsWith(ident + "end") || o.EndsWith(ident + "end>");
                                     })
                                 );
-                endIndex = endIndex + startIndex;
                 
                 node = ReadItemsProperties(
-                            objectData.Skip(startIndex)
-                                        .Take(endIndex - startIndex),
+                            objectData.Take(endIndex),
                             parent
                         );
             }
             else if (s.IndexOf("inherited") > -1)
             {
                 var ident = s.Substring(0, s.IndexOf("inherited"));
-                endIndex = objectData.Skip(startIndex).ToList().IndexOf(ident + "end") + startIndex;
+                endIndex = objectData.ToList().IndexOf(ident + "end");
                 node = ReadObjectProperties(
-                            objectData.Skip(startIndex)
-                                        .Take(endIndex - startIndex + 1)
+                            objectData.Take(endIndex + 1)
                         );
             }
             else if (s.IndexOf("object") > -1)
             {
                 var ident = s.Substring(0, s.IndexOf("object"));
-                endIndex = objectData.Skip(startIndex).ToList().IndexOf(ident + "end") + startIndex;
+                endIndex = objectData.ToList().IndexOf(ident + "end");
                 node = ReadObjectProperties(
-                            objectData.Skip(startIndex)
-                                        .Take(endIndex - startIndex + 1)
+                            objectData.Take(endIndex + 1)
                         );
             }
             else
@@ -162,8 +150,8 @@ namespace ISBLScan.ViewCode
                     string endTerm = endTerm1;
                     if (b2) endTerm = endTerm2;
                     if (b3) endTerm = endTerm3;
-                    endIndex = objectData.Skip(startIndex).ToList().IndexOf(
-                                    objectData.Skip(startIndex).First(o => {
+                    endIndex = objectData.ToList().IndexOf(
+                                    objectData.First(o => {
                                         return o.EndsWith(endTerm) && !o.EndsWith("<>");
                                     })
                                 );
@@ -172,65 +160,41 @@ namespace ISBLScan.ViewCode
                         node.PropertyValue = new List<string>();
                         if (b1)
                         {
-                            node.PropertyType = "record";
                             ((List<string>)node.PropertyValue).Add("(");
                         }
                         else
                         {
-                            node.PropertyType = "binary";
                             ((List<string>)node.PropertyValue).Add("{");
                         }
                         ((List<string>)node.PropertyValue).AddRange(
-                            objectData.Skip(startIndex + 1).Take(endIndex - startIndex)
+                            objectData.Skip(1).Take(endIndex)
                         );
                     }
                     else
                     {
                         node = ReadItemsProperties(
-                            objectData.Skip(startIndex).Take(endIndex + 1),
+                            objectData.Take(endIndex + 1),
                             parent
                         );
                     }
-                    endIndex = endIndex + startIndex;
                 }
                 else
                 {
                     if (s.Trim().EndsWith("="))
                     {
-                        node.PropertyType = "string";
-                        endIndex = objectData.Skip(startIndex + 1).ToList().IndexOf(
-                                   objectData.Skip(startIndex + 1).First(o => {
+                        endIndex = objectData.Skip(1).ToList().IndexOf(
+                                   objectData.Skip(1).First(o => {
                                        return !o.EndsWith("+");
                                    })
-                               ) + startIndex + 1;
-                        node.PropertyValue = objectData.Skip(startIndex + 1).Take(endIndex - startIndex).Select(l => ClearDfmString(l)).Aggregate((text, line) => text + line);
+                               ) + 1;
+                        node.PropertyValue = objectData.Skip(1).Take(endIndex).Select(l => ClearDfmString(l)).Aggregate((text, line) => text + line);
                     }
                     else
                     {
                         node.PropertyValue = s.Substring(k + 1, s.Length - k - 1).Trim();
                         if ((s.Contains("'")) || (s.Contains("#")))
                         {
-                            node.PropertyType = "string";
                             node.PropertyValue = ClearDfmString((string)node.PropertyValue);
-                        }
-                        else
-                        {
-                            
-                            var numbers = new string[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
-                            var v = node.PropertyValue.ToString();
-                            var c = v.Substring(v.Length - 1, 1);
-                            if (numbers.Contains(c))
-                            {
-                                node.PropertyType = "number";
-                            }
-                            else if ((node.PropertyType == "True") || (node.PropertyType == "False"))
-                            {
-                                node.PropertyType = "boolean";
-                            }
-                            else
-                            {
-                                node.PropertyType = "unknown";
-                            }
                         }
                     }
                 }

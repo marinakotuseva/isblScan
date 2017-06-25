@@ -28,7 +28,7 @@ namespace ISBLScan.ViewCode
 				command.Connection = this.Connection;
 				//command.CommandText = "select t.id, t.name from (select MBGrFunc.NGroup [id], Max(MBGrFunc.GrName) [name] from MBGrFunc join MBFunc on (MBGrFunc.NGroup = MBFunc.NGroup) where MBFunc.SysFunc=@funcCategory and not(Txt is null) group by MBGrFunc.NGroup) t order by t.name";
 				command.CommandText = @"
-select t.id, t.name, t.Comment, t.LastUpd
+select t.id, t.name, t.Comment
 from
 (
     select MBGrFunc.NGroup [id], Max(MBGrFunc.GrName) [name], Max(MBGrFunc.LastUpd) [LastUpd], Max(CAST(MBGrFunc.Comment as NVARCHAR(MAX))) [Comment]
@@ -57,10 +57,6 @@ order by t.name";
 						//Примечание
 						if (!reader.IsDBNull (2)) {
 							node.Text = reader.GetString (2);
-						}
-						//Дата и время последнего изменения
-						if (!reader.IsDBNull (3)) {
-							node.LastUpdate = reader.GetDateTime (3);
 						}
 
 						node.Nodes = new List<IsbNode> ();
@@ -219,7 +215,7 @@ order by t.name";
 									var funcDescriptionNode = new IsbNode();
 									funcDescriptionNode.Name = "-=[ Описание функции ]=-";
 									funcDescriptionNode.Text = reader.GetString (2);
-									functionNode.Nodes.Add (funcDescriptionNode);
+									functionNode.Nodes.Add(funcDescriptionNode);
 								}
 								//Справка по функции
 								/*
@@ -243,7 +239,7 @@ order by t.name";
 								if (!reader.IsDBNull (5)) {
 									functionNode.LastUpdate = reader.GetDateTime(5);
 								}
-								groupNode.Nodes.Add (functionNode);
+								groupNode.Nodes.Add(functionNode);
 							}
 						}
 						reader.Close ();

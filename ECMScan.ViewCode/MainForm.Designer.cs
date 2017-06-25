@@ -63,6 +63,8 @@ namespace ISBLScan.ViewCode
             this.toolStripStatusLabelTest = new System.Windows.Forms.ToolStripStatusLabel();
             this.panelMain = new System.Windows.Forms.Panel();
             this.tabPageSimpleSearchText = new System.Windows.Forms.TabPage();
+            this.panelFilterTreeName = new System.Windows.Forms.Panel();
+            this.panelFilterTreeDate = new System.Windows.Forms.Panel();
             this.panelOptions.SuspendLayout();
             this.groupBoxSearch.SuspendLayout();
             this.panelSearchText.SuspendLayout();
@@ -74,6 +76,7 @@ namespace ISBLScan.ViewCode
             this.splitContainerResults.Panel1.SuspendLayout();
             this.splitContainerResults.Panel2.SuspendLayout();
             this.splitContainerResults.SuspendLayout();
+            this.panelFilterTree.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
             this.splitContainerMain.Panel2.SuspendLayout();
@@ -328,6 +331,7 @@ namespace ISBLScan.ViewCode
             // splitContainerResults
             // 
             this.splitContainerResults.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainerResults.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitContainerResults.Location = new System.Drawing.Point(4, 19);
             this.splitContainerResults.Margin = new System.Windows.Forms.Padding(4);
             this.splitContainerResults.Name = "splitContainerResults";
@@ -336,7 +340,7 @@ namespace ISBLScan.ViewCode
             // 
             this.splitContainerResults.Panel1.Controls.Add(this.panelTree);
             this.splitContainerResults.Panel1.Controls.Add(this.panelFilterTree);
-            this.splitContainerResults.Panel1MinSize = 0;
+            this.splitContainerResults.Panel1MinSize = 280;
             // 
             // splitContainerResults.Panel2
             // 
@@ -349,19 +353,22 @@ namespace ISBLScan.ViewCode
             // panelTree
             // 
             this.panelTree.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelTree.Location = new System.Drawing.Point(0, 25);
+            this.panelTree.Location = new System.Drawing.Point(0, 52);
             this.panelTree.Margin = new System.Windows.Forms.Padding(4);
             this.panelTree.Name = "panelTree";
-            this.panelTree.Size = new System.Drawing.Size(280, 492);
+            this.panelTree.Padding = new System.Windows.Forms.Padding(0, 3, 0, 0);
+            this.panelTree.Size = new System.Drawing.Size(280, 465);
             this.panelTree.TabIndex = 212;
             // 
             // panelFilterTree
             // 
+            this.panelFilterTree.Controls.Add(this.panelFilterTreeDate);
+            this.panelFilterTree.Controls.Add(this.panelFilterTreeName);
             this.panelFilterTree.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelFilterTree.Location = new System.Drawing.Point(0, 0);
             this.panelFilterTree.Margin = new System.Windows.Forms.Padding(4);
             this.panelFilterTree.Name = "panelFilterTree";
-            this.panelFilterTree.Size = new System.Drawing.Size(280, 25);
+            this.panelFilterTree.Size = new System.Drawing.Size(280, 52);
             this.panelFilterTree.TabIndex = 211;
             // 
             // panelISBLResult
@@ -452,6 +459,22 @@ namespace ISBLScan.ViewCode
             this.tabPageSimpleSearchText.Size = new System.Drawing.Size(200, 100);
             this.tabPageSimpleSearchText.TabIndex = 0;
             // 
+            // panelFilterTreeName
+            // 
+            this.panelFilterTreeName.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelFilterTreeName.Location = new System.Drawing.Point(0, 0);
+            this.panelFilterTreeName.Name = "panelFilterTreeName";
+            this.panelFilterTreeName.Size = new System.Drawing.Size(280, 25);
+            this.panelFilterTreeName.TabIndex = 0;
+            // 
+            // panelFilterTreeDate
+            // 
+            this.panelFilterTreeDate.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panelFilterTreeDate.Location = new System.Drawing.Point(0, 27);
+            this.panelFilterTreeDate.Name = "panelFilterTreeDate";
+            this.panelFilterTreeDate.Size = new System.Drawing.Size(280, 25);
+            this.panelFilterTreeDate.TabIndex = 1;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -462,7 +485,6 @@ namespace ISBLScan.ViewCode
             this.HelpButton = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
-		    this.KeyDown += MainForm_KeyDown;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "MainForm";
             this.Text = "ISBLScan ViewCode";
@@ -478,6 +500,7 @@ namespace ISBLScan.ViewCode
             this.splitContainerResults.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerResults)).EndInit();
             this.splitContainerResults.ResumeLayout(false);
+            this.panelFilterTree.ResumeLayout(false);
             this.splitContainerMain.Panel1.ResumeLayout(false);
             this.splitContainerMain.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).EndInit();
@@ -522,6 +545,8 @@ namespace ISBLScan.ViewCode
         private System.Windows.Forms.Button buttonExpand;
         private System.Windows.Forms.TabControl tabControlSearchText;
         private System.Windows.Forms.TabPage tabPageSimpleSearchText;
+        private System.Windows.Forms.Panel panelFilterTreeName;
+        private System.Windows.Forms.Panel panelFilterTreeDate;
         //Main menu
 
 
