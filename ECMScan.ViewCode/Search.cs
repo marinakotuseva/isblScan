@@ -114,7 +114,7 @@ namespace ISBLScan.ViewCode
             };
 
             SearchCriteriaTextEditor.TextChanged += SearchCriteriaChanged;
-            SearchCriteriaTextEditor.TextArea.KeyUp += new System.Windows.Input.KeyEventHandler(SearchCriteriaTextArea_KeyUp);
+            SearchCriteriaTextEditor.TextArea.KeyUp += new System.Windows.Input.KeyEventHandler(TextArea_KeyUp);
             SearchCriteriaTextEditor.TextArea.TextView.LineTransformers.Add(new HighlightIncorrectRegExp(this));
             SearchCriteriaTextEditor.FontFamily = new FontFamily("Courier New, Courier, monospace");
             SearchCriteriaTextEditor.FontSize = 13;
@@ -139,7 +139,7 @@ namespace ISBLScan.ViewCode
             TextEditor.FontFamily = new FontFamily("Courier New, Courier, monospace");
             TextEditor.FontSize = 13;
             TextEditor.FontStretch = FontStretch.FromOpenTypeStretch(1);
-            TextEditor.TextArea.KeyUp += new System.Windows.Input.KeyEventHandler(TextEditorTextArea_KeyUp);
+            TextEditor.TextArea.KeyUp += new System.Windows.Input.KeyEventHandler(TextArea_KeyUp);
 
             var syntaxHighlightingFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ISBL.xshd");
             using (Stream s = File.OpenRead(syntaxHighlightingFilePath))
@@ -151,7 +151,7 @@ namespace ISBLScan.ViewCode
             }
         }
 
-        public void SearchCriteriaTextArea_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        public void TextArea_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Enter && (e.KeyboardDevice.Modifiers & ModifierKeys.Control) != 0)
             {
@@ -169,24 +169,13 @@ namespace ISBLScan.ViewCode
             {
                 SearchControls.TextEditorShowNextMatchedString();
             }
-        }
-        public void TextEditorTextArea_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter && (e.KeyboardDevice.Modifiers & ModifierKeys.Control) != 0)
+            if (e.Key == Key.O && (e.KeyboardDevice.Modifiers & ModifierKeys.Control) != 0)
             {
-                SearchControls.Process();
-            }
-            if (e.Key == Key.T && (e.KeyboardDevice.Modifiers & ModifierKeys.Control) != 0)
-            {
-                new MainForm.SearchControls(SearchControls._form);
-            }
-            if (e.Key == Key.F2)
-            {
-                SearchControls.TreeSelectNextMatched(SearchControls.TreeViewResults.Nodes);
-            }
-            if (e.Key == Key.F3)
-            {
-                SearchControls.TextEditorShowNextMatchedString();
+                var selectedNode = SearchControls.TreeViewResults.SelectedNode;
+                if (selectedNode != null)
+                {
+                    ((SearchNode)selectedNode.Tag).IsbNode.OpenInSbrte(IsbDev.ConnectionParams);
+                }
             }
         }
         public void Process()

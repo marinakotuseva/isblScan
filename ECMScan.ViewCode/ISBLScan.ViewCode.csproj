@@ -96,7 +96,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="Loader\WizardTextSample.txt" />
     <None Include="packages.config" />
     <None Include="README.md" />
     <None Include="Images\Filter.16.png" />

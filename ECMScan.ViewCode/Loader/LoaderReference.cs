@@ -6,6 +6,7 @@ using System;
 using System.Data;
 using System.Data.SqlTypes;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace ISBLScan.ViewCode
@@ -108,7 +109,7 @@ namespace ISBLScan.ViewCode
                     }
                 }
 				reader.Close();
-			    foreach (var node in refNode.Nodes)
+			    foreach (var node in refNode.Nodes.Where(n => n.Id != 0))
 			    {
 			        LoadRecvisite(node);
                 }
@@ -122,15 +123,16 @@ namespace ISBLScan.ViewCode
 			{
 				SqlCommand command = new SqlCommand();
 				command.Connection = Connection;
-				command.CommandText = "select Vid, Name, Kod, Exprn, LastUpd from MBVidAn order by Name ASC";
+				command.CommandText = "select Vid, Name, Kod, Exprn, LastUpd, Comment from MBVidAn order by Name ASC";
 				SqlDataReader reader = command.ExecuteReader();
 				if(reader.HasRows)
 				{
 					while(reader.Read())
 					{
 						var refNode = new IsbNode();
-						//ИД 
-						refNode.Id = reader.GetInt32(0);
+                        refNode.Type = IsbNodeType.ReferenceType;
+                        //ИД 
+                        refNode.Id = reader.GetInt32(0);
 						//Имя (Код)
 						if((! reader.IsDBNull(1))&&(! reader.IsDBNull(2)))
 						{
@@ -138,12 +140,17 @@ namespace ISBLScan.ViewCode
 						}
 						if(! reader.IsDBNull(3))
 						{
-							refNode.Text = reader.GetString(3).Trim();
+                            ParseEvents(reader.GetString(3).Trim(), refNode);
 						}
 					    if (!reader.IsDBNull(4))
 					    {
 					        refNode.LastUpdate = reader.GetDateTime(4);
 					    }
+                        if (!reader.IsDBNull(5))
+                        {
+                            refNode.Text = reader.GetString(5).Trim();
+                        }
+                        
 
                         rootRefNode.Nodes.Add(refNode);
 					}

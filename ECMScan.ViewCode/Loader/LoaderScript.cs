@@ -74,7 +74,9 @@ namespace ISBLScan.ViewCode
 						while(reader.Read())
 						{
 							var scriptNode = new IsbNode();
-							scriptNode.Id = reader.GetInt32(0);
+                            scriptNode.Type = IsbNodeType.Script;
+
+                            scriptNode.Id = reader.GetInt32(0);
 							if(! reader.IsDBNull(1))
 							{
 								scriptNode.Name = reader.GetString(1);

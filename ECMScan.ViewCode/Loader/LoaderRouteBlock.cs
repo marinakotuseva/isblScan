@@ -72,8 +72,9 @@ namespace ISBLScan.ViewCode
 						while(reader.Read())
 						{
 							var routeBlockNode = new IsbNode();
-							//ИД
-							routeBlockNode.Id = reader.GetInt32(0);
+                            routeBlockNode.Type = IsbNodeType.RouteBlock;
+                            //ИД
+                            routeBlockNode.Id = reader.GetInt32(0);
 							//Имя
 							if(! reader.IsDBNull(1))
 							{

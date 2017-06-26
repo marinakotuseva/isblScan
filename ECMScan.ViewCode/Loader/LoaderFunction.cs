@@ -179,9 +179,7 @@ order by t.name";
 					} else {
 						systemFuncNode.Name = "Системная";
 					}
-					systemFuncNode.Text = null;
-					systemFuncNode.Nodes = new List<IsbNode> ();
-					listNode.Nodes.Add (systemFuncNode);
+					listNode.Nodes.Add(systemFuncNode);
 					
 					var listGroups = LoadGroups(systemFuncNode, charSysFunc);
 					foreach (var groupNode in listGroups) 
@@ -203,9 +201,9 @@ order by t.name";
 							while (reader.Read()) 
 							{
 								var functionNode = new IsbNode();
-								functionNode.Nodes = new List<IsbNode> ();
-								//ИД
-								functionNode.Id = reader.GetInt32 (0);
+                                functionNode.Type = IsbNodeType.Function;
+                                //ИД
+                                functionNode.Id = reader.GetInt32 (0);
 								//Имя функции
 								if (! reader.IsDBNull (1)) {
 									functionNode.Name = reader.GetString (1);

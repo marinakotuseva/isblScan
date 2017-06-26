@@ -57,12 +57,30 @@ namespace ISBLScan.ViewCode
 		{
 			_connection.Close();
 		}
-		
-		/// <summary>
-		///Зарузка списка узлов, для их отображения в дереве элементов 
+
+        /// <summary>
+		/// Получить версию Builder'a из базы
 		/// </summary>
-		/// <returns>Список узлов</returns>
-		public List<IsbNode> Load(List<IsbNode> isblList)
+		public string GetVersion(ConnectionParams connectionParams)
+        {
+            var version = "";
+            Connect(connectionParams.Server, connectionParams.Database, connectionParams.User, connectionParams.Password, String.IsNullOrWhiteSpace(connectionParams.Password));
+            SqlCommand command = new SqlCommand();
+            command.Connection = _connection;
+            command.CommandText = @"DECLARE	@Version varchar(20)
+EXEC[dbo].[MBGetVersion] @Version = @Version OUTPUT
+SELECT  @Version";
+            version = command.ExecuteScalar().ToString();
+            Disconnect();
+            return version;
+        }
+
+
+        /// <summary>
+        ///Зарузка списка узлов, для их отображения в дереве элементов 
+        /// </summary>
+        /// <returns>Список узлов</returns>
+        public List<IsbNode> Load(List<IsbNode> isblList)
 		{
 		    IsbNode isblNode;
 			

@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
+using System.IO;
+using System.Linq;
 
 namespace ISBLScan.ViewCode
 {
@@ -13,6 +17,16 @@ namespace ISBLScan.ViewCode
         /// Дерево элементов прикладной разработки
         /// </summary>
         public List<IsbNode> Nodes = new List<IsbNode>();
+
+        public ConnectionParams ConnectionParams { get; set; } = new ConnectionParams();
+
+        public void FillParent()
+        {
+            foreach(var node in this.Nodes)
+            {
+                node.FillParent();
+            }
+        }
 
         public void Search(string[] searchStrArray, bool caseSensitive, bool regExp, bool findAll)
         {
@@ -150,6 +164,16 @@ namespace ISBLScan.ViewCode
         /// </summary>
         public DateTime? LastUpdate { get; set; }
 
+        /// <summary>
+        /// Gets or sets Родительский элемент
+        /// </summary>
+        public IsbNode Parent { get; set; }
+
+        /// <summary>
+        /// Gets or sets Тип элемента
+        /// </summary>
+        public IsbNodeType? Type { get; set; }
+
         public IsbNode(string name)
         {
             Name = name;
@@ -157,5 +181,120 @@ namespace ISBLScan.ViewCode
         public IsbNode()
         {
         }
+
+        public IsbNode GetMainNode()
+        {
+            if(Id != 0 && Type != null)
+            {
+                return this;
+            }
+            else
+            {
+                if(Parent != null)
+                {
+                    return Parent.GetMainNode();
+                }
+                else
+                {
+                    return null;
+                }
+            } 
+        }
+
+        public void OpenInSbrte(ConnectionParams connectionParams)
+        {
+            var typeToCMDParams = new Dictionary<IsbNodeType?, string>()
+            {
+                { IsbNodeType.ReferenceType, "-F=\"REFERENCE_TYPES\"" },
+                { IsbNodeType.Function, "-F=\"FUNCTIONS\"" },
+                { IsbNodeType.Report, "-F=\"REPORTS\" -V=\"Design\"" },
+                { IsbNodeType.Script, "-F=\"SCRIPTS\"" },
+                { IsbNodeType.StandardRoute, "-F=\"ТМТ\"" },
+                { IsbNodeType.Wizard, "-F=\"WIZARDS\"" },
+                { IsbNodeType.RouteBlock, "-F=\"ROUTE_BLOCK\"" },
+                { IsbNodeType.EDocType, "-F=\"EDOCUMENT_TYPES\"" },
+                { IsbNodeType.IntegratedReport, "-F=\"REFERENCE_TYPES\"" },
+                { IsbNodeType.Dialog, "-F=\"DIALOGS\"" }
+            };
+            var mainNode = GetMainNode();
+            if(mainNode != null)
+            {
+                var CMDParams = typeToCMDParams[mainNode.Type];
+                var loader = new Loader();
+                var version = loader.GetVersion(connectionParams);
+                var config = LoadVersionToSbrtePathConfig();
+                string FilePath = config.VersionToSbrtePath.Where(c => c.Version == version).FirstOrDefault()?.Path ?? "";
+                if(String.IsNullOrWhiteSpace(FilePath))
+                {
+                    MessageBoxButtons buttons = MessageBoxButtons.OK;
+                    MessageBoxIcon icon = MessageBoxIcon.Information;
+                    MessageBox.Show("Не удалось получить путь к Sbrte для версии " + version, "Ошибка открытия компоненты " + this.Name, buttons, icon);
+                }
+                else
+                {
+                    Process process = new Process();
+                    process.StartInfo.FileName = FilePath;
+                    var authParam = String.IsNullOrWhiteSpace(connectionParams.Password) ? "-IsOSAuth=true" : $"-W=\"{connectionParams.Password}\"";
+                    process.StartInfo.Arguments = $"-S=\"{connectionParams.Server}\" -D=\"{connectionParams.Database}\" -N=\"{connectionParams.User}\" {authParam} -CT=\"Reference\" {CMDParams} -RID={mainNode.Id}";
+                    try
+                    {
+                        process.Start();
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBoxButtons buttons = MessageBoxButtons.OK;
+                        MessageBoxIcon icon = MessageBoxIcon.Information;
+                        MessageBox.Show(e.Message, "Ошибка открытия компоненты " + this.Name, buttons, icon);
+                    }
+                }
+            }
+        }
+
+        public void FillParent()
+        {
+            foreach(var node in this.Nodes)
+            {
+                node.Parent = this;
+                node.FillParent();
+            }
+        }
+
+        private class VersionToSbrtePath
+        {
+            public string Version;
+            public string Path;
+        }
+        private class VersionToSbrtePathConfig
+        {
+            public List<VersionToSbrtePath> VersionToSbrtePath { get; set; }
+        }
+
+        private VersionToSbrtePathConfig LoadVersionToSbrtePathConfig()
+        {
+            var configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "VersionNumToSbrtePathConfig.json");
+            var jsonSettings = File.ReadAllText(configFilePath);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<VersionToSbrtePathConfig>(jsonSettings);
+        }
+    }
+
+    public enum IsbNodeType
+    {
+        ReferenceType = 0,
+        Function = 1,
+        EDocType = 2,
+        Report = 3,
+        IntegratedReport = 4,
+        StandardRoute = 5,
+        RouteBlock = 6,
+        Script = 7,
+        Wizard = 8,
+        Dialog = 9
+    }
+    public class ConnectionParams
+    {
+        public string Server;
+        public string Database;
+        public string User;
+        public string Password;
     }
 }

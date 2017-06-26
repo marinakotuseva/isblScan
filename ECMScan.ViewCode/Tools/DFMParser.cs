@@ -124,7 +124,7 @@ namespace ISBLScan.ViewCode
                             objectData.Take(endIndex + 1)
                         );
             }
-            else if (s.IndexOf("object") > -1)
+            else if (s.Trim().StartsWith("object "))
             {
                 var ident = s.Substring(0, s.IndexOf("object"));
                 endIndex = objectData.ToList().IndexOf(ident + "end");

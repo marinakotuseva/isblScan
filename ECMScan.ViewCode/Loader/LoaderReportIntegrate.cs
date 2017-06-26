@@ -38,8 +38,9 @@ namespace ISBLScan.ViewCode
 						while(reader.Read())
 						{
 							var reportNode = new IsbNode();
-							//ИД отчёта
-							reportNode.Id = reader.GetInt32(0);
+                            reportNode.Type = IsbNodeType.IntegratedReport;
+                            //ИД отчёта
+                            reportNode.Id = reader.GetInt32(0);
 							//Имя отчёта
 							if(! reader.IsDBNull(1))
 							{

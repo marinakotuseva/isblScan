@@ -81,7 +81,7 @@ order by MBAnalit.NameAn";
                     while (reader.Read())
                     {
                         var routeNode = new IsbNode(reader.GetString(1));
-
+                        routeNode.Type = IsbNodeType.StandardRoute;
                         // ИД
                         routeNode.Id = reader.GetInt32(0);
                         // Схема

@@ -7,6 +7,7 @@ using System.Data;
 using System.Data.SqlTypes;
 using System.Data.SqlClient;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ISBLScan.ViewCode
 {
@@ -118,72 +119,6 @@ namespace ISBLScan.ViewCode
 			}
 		}
 		
-		//Выделение в тексте событий вида электронного документа, названий событий
-		private string ParseEventText(string eventText)
-		{
-			string parseResult;
-			parseResult = eventText;
-			string[] eDocTypeEvents = {
-				"КАРТОЧКА.ОТКРЫТИЕ",
-				"КАРТОЧКА.ДОБАВЛЕНИЕ ПОСЛЕ",
-				"КАРТОЧКА.СОХРАНЕНИЕ ВОЗМОЖНОСТЬ",
-				"КАРТОЧКА.СОХРАНЕНИЕ ДО",
-				"КАРТОЧКА.СОХРАНЕНИЕ ПОСЛЕ",
-				
-				"DATASET.OPEN",
-				"CARD.OPEN",
-				"CARD.AFTER_INSERT",
-				"CARD.VALID_UPDATE",
-				"CARD.BEFORE_UPDATE",
-				"CARD.AFTER_UPDATE",
-				"FORM.SHOW"				
-			};
-			int posEnd = 0;
-			int posStart = 0;
-			while(posStart < eventText.Length)
-			{
-				/********************************************************************
-				 * Подсветка названий событий типов карточек электронных документов
-				 ********************************************************************/
-				foreach(string keyword in eDocTypeEvents)
-				{
-					if(posStart+keyword.Length <= parseResult.Length)
-					{
-						string testStr = parseResult.Substring(posStart, keyword.Length);
-						if(testStr == keyword)
-						{
-							bool isKeyword = false;
-							int additionalPos = 0;
-							
-							if(posStart+keyword.Length == parseResult.Length)
-							{
-								isKeyword = true;
-							}
-							else
-							{
-								string postChar = parseResult.Substring(posStart+keyword.Length, 1);
-								if((postChar == "\n")||(postChar == "\r"))
-								{
-									isKeyword = true;
-									additionalPos = 1;
-								}
-							}
-							if(isKeyword)
-							{
-								posEnd = posStart+keyword.Length+additionalPos;
-								parseResult = parseResult.Substring(0, posStart) + (posStart==0?"":"\n") +
-									"-=[ " + keyword + " ]=-\n" + 
-									parseResult.Substring(posEnd, parseResult.Length - posEnd);
-								posStart = posEnd;
-							}
-						}
-					}
-				}
-				posStart = posStart + 1;
-			}
-			return parseResult;
-		}
-		
 		public IsbNode Load()
 		{
 		    IsbNode listNode = null;
@@ -191,7 +126,7 @@ namespace ISBLScan.ViewCode
 			{
 				SqlCommand command = new SqlCommand();
 				command.Connection = Connection;
-				command.CommandText = "select TypeID, Name, Exprn, LastUpd from MBEDocType order by Name ASC";
+				command.CommandText = "select TypeID, Name, Exprn, LastUpd, Comment from MBEDocType order by Name ASC";
 				SqlDataReader reader = command.ExecuteReader();
 				if(reader.HasRows)
 				{
@@ -203,9 +138,9 @@ namespace ISBLScan.ViewCode
 					while(reader.Read())
 					{
 					    var eDocNode = new IsbNode();
-						eDocNode.Nodes = new List<IsbNode>();
-						//ИД 
-						eDocNode.Id = reader.GetInt32(0);
+                        eDocNode.Type = IsbNodeType.EDocType;
+                        //ИД 
+                        eDocNode.Id = reader.GetInt32(0);
 						//Имя 
 						if(! reader.IsDBNull(1))
 						{
@@ -214,20 +149,24 @@ namespace ISBLScan.ViewCode
 						//Текст событий
 						if(! reader.IsDBNull(2))
 						{
-						    eDocNode.Text = reader.GetString(2).Trim(); //ParseEventText(reader.GetString(2));
-
-						}
+                            ParseEvents(reader.GetString(2).Trim(), eDocNode);
+                        }
 						//Дата последнего изменения
 						if(!reader.IsDBNull(3))
 						{
 							eDocNode.LastUpdate = reader.GetDateTime(3);
 						}
+                        //Комментарий
+                        if (!reader.IsDBNull(4))
+                        {
+                            eDocNode.Text = reader.GetString(4);
+                        }
 
-						listNode.Nodes.Add(eDocNode);
+                        listNode.Nodes.Add(eDocNode);
 					}
 				}
 				reader.Close();
-				foreach(var eDocNode in listNode.Nodes)
+				foreach(var eDocNode in listNode.Nodes.Where(n => n.Id != 0))
 				{
 					LoadRecvisite(eDocNode);
 				}

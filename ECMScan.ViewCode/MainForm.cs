@@ -224,7 +224,7 @@ namespace ISBLScan.ViewCode
                 return isFound;
             }
 
-            public void TextEditorShowNextMatchedString()
+            public void TextEditorShowNextMatchedString(bool gotoNextTreeNodeIfNoMore = true)
             {
                 var matchedPos = Search.GetMatchedWordPositions(Search.TextEditor.Text, Search.TextEditor.TextArea.Caret.Offset).FirstOrDefault();
                 if (matchedPos != null)
@@ -236,7 +236,7 @@ namespace ISBLScan.ViewCode
                 }
                 else
                 {
-                    TreeSelectNextMatched(TreeViewResults.Nodes);
+                    if(gotoNextTreeNodeIfNoMore) TreeSelectNextMatched(TreeViewResults.Nodes);
                 }
             }
         }
@@ -248,6 +248,7 @@ namespace ISBLScan.ViewCode
             //
             InitializeComponent();
             this.Load += Window_Loaded;
+            this.KeyDown += MainForm_KeyDown;
             groupBoxSearch_Resize(null, null);
             new SearchControls(this);
 
@@ -336,6 +337,10 @@ namespace ISBLScan.ViewCode
             if (connect)
             {
                 Configuration.Save(textBoxSQLServer.Text, textBoxDB.Text, textBoxLogin.Text, checkBoxWinAuth.Checked);
+                SourceDev.ConnectionParams.Server = textBoxSQLServer.Text;
+                SourceDev.ConnectionParams.Database = textBoxDB.Text;
+                SourceDev.ConnectionParams.User = textBoxLogin.Text;
+                SourceDev.ConnectionParams.Password = checkBoxWinAuth.Checked ? null : textBoxPassword.Text;
             }
             return connect;
         }
@@ -347,6 +352,7 @@ namespace ISBLScan.ViewCode
         {
             SourceDev.Nodes.Clear();
             _isblLoader.Load(SourceDev.Nodes);
+            SourceDev.FillParent();
 
             bool isblNodesIsEmpty = true;
             foreach (var node in SourceDev.Nodes)
@@ -590,7 +596,7 @@ namespace ISBLScan.ViewCode
                 var searchControls = (SearchControls)tabControlSearchText.SelectedTab.Tag;
                 searchControls.Search.TextEditor.Text = node.IsbNode.Text;
                 searchControls.Search.TextEditor.TextArea.Caret.Offset = 0;
-                searchControls.TextEditorShowNextMatchedString();
+                searchControls.TextEditorShowNextMatchedString(false);
                 toolStripStatusLabelSelectedElement.Text = node.Name;
                 toolStripStatusLabelLastUpd.Text = node.IsbNode.LastUpdate?.ToString("yyyy-MM-dd HH:mm");
             }
@@ -619,6 +625,15 @@ namespace ISBLScan.ViewCode
             if (e.KeyCode == Keys.T && e.Control)
             {
                 new SearchControls(this);
+            }
+            if (e.KeyCode == Keys.O && e.Control)
+            {
+                var selectedNode = ((SearchControls)tabControlSearchText.SelectedTab.Tag).TreeViewResults.SelectedNode;
+                if(selectedNode != null)
+                {
+                    ((SearchNode)selectedNode.Tag).IsbNode.OpenInSbrte(SourceDev.ConnectionParams);
+                }
+                
             }
         }
     }

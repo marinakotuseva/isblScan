@@ -6,6 +6,7 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace ISBLScan.ViewCode
 {
@@ -57,6 +58,34 @@ namespace ISBLScan.ViewCode
 	        {'K', "Таблица 6"}
 	    };
 
+        protected readonly Dictionary<string, String> _eventCodePartToTitle = new Dictionary<string, string>()
+        {
+            {"DIALOG.CREATE", "Диалог. Создание"},
+            {"DIALOG.VALID_CLOSE_WITH_RESULT", "Диалог. Закрытие Возможность"},
+            {"DIALOG.CLOSE", "Диалог. Закрытие"},
+            {"FORM.DIALOG_SHOW", "Форма. Показ"},
+            {"FORM.DIALOG_HIDE", "Форма. Скрытие"},
+
+            {"OPEN", "Открытие"},
+            {"CLOSE", "Закрытие"},
+            {"DATASET", "Набор данных"},
+            {"CARD", "Запись"},
+            {"VALID_DELETE", "Удаление возможность"},
+            {"BEFORE_DELETE", "Удаление до"},
+            {"AFTER_DELETE", "Удаление после"},
+            {"BEFORE_INSERT", "Добавление до"},
+            {"AFTER_INSERT", "Добавление после"},
+            {"VALID_UPDATE", "Сохранение возможность"},
+            {"BEFORE_UPDATE", "Сохранение до"},
+            {"AFTER_UPDATE", "Сохранение после"},
+            {"BEFORE_CANCEL", "Отмена до"},
+            {"AFTER_CANCEL", "Отмена после"},
+            {"FORM", "Форма-карточка"},
+            {"SHOW", "Показ"},
+            {"HIDE", "Скрытие"},
+            {"TABLE", "Таблица"}
+        };
+
         protected readonly Dictionary<String, String> _wizardEventCodeToName = new Dictionary<string, string>()
         {
             {"wetWizardBeforeSelection", "До выбора"},
@@ -64,6 +93,22 @@ namespace ISBLScan.ViewCode
             {"wetWizardFinish", "Завершение"},
             {"wetStepStart", "Старт"},
             {"wetStepFinish", "Завершение"},
+        };
+
+        protected readonly string[] _eventIdsRegExPatterns = 
+        {
+            "DATASET{9AFC8FC7-30C4-4076-9076-6E09A49B791C}.[A-ZА-Я_]+",
+            "CARD{2147B5A6-496E-4EFF-88D9-78970D889F1F}.[A-ZА-Я_]+",
+            "FORM{B28D55C1-651A-46C9-AD4E-50E73EF213A8}.[A-ZА-Я_]+",
+            "TABLE{D402E843-74B2-4DC1-BFFD-DE677B48452C}[0-9]*.[A-ZА-Я_]+",
+            "DIALOG{3AA220D8-D906-4914-8586-F534A4C3767E}.[A-ZА-Я_]+",
+            "КАРТОЧКА.[A-ZА-Я_]+",
+            "НАБОР ДАННЫХ.[A-ZА-Я_]+",
+            "ТАБЛИЦА[0-9]*.[A-ZА-Я_]+",
+            "DATASET.[A-ZА-Я_]+",
+            "CARD.[A-ZА-Я_]+",
+            "FORM.[A-ZА-Я_]+",
+            "TABLE[0-9]*.[A-ZА-Я_]+"
         };
 
         /// <summary>
@@ -151,18 +196,36 @@ namespace ISBLScan.ViewCode
 			return vidAnalitId;
 		}
 
-        public string CommentStrings(string comment)
+        public void ParseEvents(string eventsText, IsbNode parent)
         {
-            string[] delimeters = { "\n\r" };
-            string[] commentArray = comment.Split(delimeters, StringSplitOptions.None);
-            string result = "";
-            foreach (string commentStr in commentArray)
+            var pattern = $"^({String.Join("|", _eventIdsRegExPatterns)})";
+            var events = Regex.Split(eventsText, pattern, RegexOptions.Multiline);
+            if(events.Length > 0)
             {
-                if (!string.IsNullOrEmpty(result))
-                    result += "\n\r";
-                result += "/// " + commentStr;
+                var eventsNode = new IsbNode("События");
+                IsbNode eventNode = null;
+                foreach (var eventText in events)
+                {
+                    if (!String.IsNullOrWhiteSpace(eventText))
+                    {
+                        if(Regex.IsMatch(eventText, pattern))
+                        {
+                            var eventName = Regex.Replace(eventText, "\\{[-\\w]+\\}", "");
+                            foreach(var part in _eventCodePartToTitle.Keys)
+                            {
+                                eventName = eventName.Replace(part, _eventCodePartToTitle[part]);
+                            }
+                            eventNode = new IsbNode(eventName);
+                        }
+                        else
+                        {
+                            eventNode.Text = eventText.Substring(2);
+                            eventsNode.Nodes.Add(eventNode);
+                        }
+                    }
+                }
+                parent.Nodes.Add(eventsNode);
             }
-            return result;
         }
 	}
 }
