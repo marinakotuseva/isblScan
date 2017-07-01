@@ -49,7 +49,6 @@ namespace ISBLScan.ViewCode
                         {
                             node.Text = reader.GetString(2);
                         }
-                        node.Nodes = new List<IsbNode>();
                         rootNode.Nodes.Add(node);
                         listGroups.Add(node);
                     }
@@ -176,7 +175,6 @@ namespace ISBLScan.ViewCode
                 listNode.Name = "Мастер действий";
                 listNode.Text = null;
                 listNode.Id = vidAnalitId;
-                listNode.Nodes = new List<IsbNode>();
 
                 var listGroups = LoadGroups(listNode);
                 foreach (var groupNode in listGroups)

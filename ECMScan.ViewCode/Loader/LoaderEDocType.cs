@@ -77,7 +77,6 @@ namespace ISBLScan.ViewCode
 						while(reader.Read())
 						{
 							var eDocRecvNode = new IsbNode();
-							eDocRecvNode.Nodes = new List<IsbNode>();
 							//ИД
 							eDocRecvNode.Id = reader.GetInt32(0);
 							//Имя
@@ -132,8 +131,6 @@ namespace ISBLScan.ViewCode
 				{
 					listNode = new IsbNode();
 					listNode.Name = "Тип карточки электронного документа";
-					listNode.Text = null;
-					listNode.Nodes = new List<IsbNode>();
 					
 					while(reader.Read())
 					{

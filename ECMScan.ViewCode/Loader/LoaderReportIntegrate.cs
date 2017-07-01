@@ -25,8 +25,6 @@ namespace ISBLScan.ViewCode
 			{
 				listNode = new IsbNode();
 				listNode.Name = "Интегрированный отчёт";
-				listNode.Text = null;
-				listNode.Nodes = new List<IsbNode>();
 				
 				{
 					SqlCommand command = new SqlCommand();
@@ -51,7 +49,6 @@ namespace ISBLScan.ViewCode
 							{
 								reportNode.Text = reader.GetString(2);
 							}
-							reportNode.Nodes = new List<IsbNode>();
 							//Шаблон отчёта
 							if(! reader.IsDBNull(4))
 							{

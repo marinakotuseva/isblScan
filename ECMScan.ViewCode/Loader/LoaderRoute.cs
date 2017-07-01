@@ -134,8 +134,6 @@ order by MBAnalit.NameAn";
                                 var nameProperty = block.SelectSingleNode("Properties/Property[@Type = '2' and @Name = 'Name']/Value/Value");
                                 if (nameProperty != null) blockNode.Name = block.Attributes["ID"].Value + ". " + GetNodeString(nameProperty);
                                 else blockNode.Name = block.Attributes["ID"].Value;
-                                
-                                blockNode.Nodes = new List<IsbNode>();
 
                                 var properties = block.SelectNodes("Properties/Property[@Type = '2' and @Name != 'Name']");
                                 foreach (XmlNode property in properties)

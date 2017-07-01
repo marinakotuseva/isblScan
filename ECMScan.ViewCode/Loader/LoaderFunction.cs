@@ -58,8 +58,6 @@ order by t.name";
 						if (!reader.IsDBNull (2)) {
 							node.Text = reader.GetString (2);
 						}
-
-						node.Nodes = new List<IsbNode> ();
 						rootNode.Nodes.Add (node);
 						listGroups.Add (node);
 					}
@@ -168,8 +166,6 @@ order by t.name";
 			if (this.CheckTableExist ("MBFunc")) {
 				listNode = new IsbNode();
 				listNode.Name = "Функция";
-				listNode.Text = null;
-				listNode.Nodes = new List<IsbNode> ();
 				char[] charsSysUserFunc = {'P', 'S'};
 				foreach (char charSysFunc in charsSysUserFunc) 
 				{

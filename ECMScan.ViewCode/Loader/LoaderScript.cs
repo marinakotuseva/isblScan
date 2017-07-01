@@ -38,7 +38,6 @@ namespace ISBLScan.ViewCode
 						{
 							node.Name = reader.GetString(1);
 						}
-						node.Nodes = new List<IsbNode>();
 						rootNode.Nodes.Add(node);
 						listGroups.Add(node);
 					}
@@ -55,8 +54,6 @@ namespace ISBLScan.ViewCode
 			{
 				listNode = new IsbNode();
 				listNode.Name = "Сценарий (расчёт)";
-				listNode.Text = null;
-				listNode.Nodes = new List<IsbNode>();
 				
 				var listGroups = LoadGroups(listNode);
 				foreach(var groupNode in listGroups)
@@ -85,7 +82,6 @@ namespace ISBLScan.ViewCode
 							{
 								scriptNode.Text = reader.GetString(2);
 							}
-							scriptNode.Nodes = new List<IsbNode>();
 							
 							if(! reader.IsDBNull(3))
 							{

@@ -39,7 +39,6 @@ namespace ISBLScan.ViewCode
 						{
 							node.Name = reader.GetString(1);
 						}
-						node.Nodes = new List<IsbNode>();
 						rootNode.Nodes.Add(node);
 						listGroups.Add(node);
 					}
@@ -85,7 +84,6 @@ namespace ISBLScan.ViewCode
 							{
 								routeBlockNode.Text = reader.GetString(2);
 							}
-							routeBlockNode.Nodes = new List<IsbNode>();
 							//Свойства
 							if(! reader.IsDBNull(3))
 							{

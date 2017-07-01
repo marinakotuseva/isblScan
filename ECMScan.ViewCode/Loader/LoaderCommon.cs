@@ -97,18 +97,18 @@ namespace ISBLScan.ViewCode
 
         protected readonly string[] _eventIdsRegExPatterns = 
         {
-            "DATASET{9AFC8FC7-30C4-4076-9076-6E09A49B791C}.[A-ZА-Я_]+",
-            "CARD{2147B5A6-496E-4EFF-88D9-78970D889F1F}.[A-ZА-Я_]+",
-            "FORM{B28D55C1-651A-46C9-AD4E-50E73EF213A8}.[A-ZА-Я_]+",
-            "TABLE{D402E843-74B2-4DC1-BFFD-DE677B48452C}[0-9]*.[A-ZА-Я_]+",
-            "DIALOG{3AA220D8-D906-4914-8586-F534A4C3767E}.[A-ZА-Я_]+",
-            "КАРТОЧКА.[A-ZА-Я_]+",
-            "НАБОР ДАННЫХ.[A-ZА-Я_]+",
-            "ТАБЛИЦА[0-9]*.[A-ZА-Я_]+",
-            "DATASET.[A-ZА-Я_]+",
-            "CARD.[A-ZА-Я_]+",
-            "FORM.[A-ZА-Я_]+",
-            "TABLE[0-9]*.[A-ZА-Я_]+"
+            "DATASET{9AFC8FC7-30C4-4076-9076-6E09A49B791C}.[A-Z А-Я_]+",
+            "CARD{2147B5A6-496E-4EFF-88D9-78970D889F1F}.[A-Z А-Я_]+",
+            "FORM{B28D55C1-651A-46C9-AD4E-50E73EF213A8}.[A-Z А-Я_]+",
+            "TABLE{D402E843-74B2-4DC1-BFFD-DE677B48452C}[0-9]*.[A-Z А-Я_]+",
+            "DIALOG{3AA220D8-D906-4914-8586-F534A4C3767E}.[A-Z А-Я_]+",
+            "КАРТОЧКА.[A-Z А-Я_]+",
+            "НАБОР ДАННЫХ.[A-Z А-Я_]+",
+            "ТАБЛИЦА[0-9]*.[A-Z А-Я_]+",
+            "DATASET.[A-Z А-Я_]+",
+            "CARD.[A-Z А-Я_]+",
+            "FORM.[A-Z А-Я_]+",
+            "TABLE[0-9]*.[A-Z А-Я_]+"
         };
 
         /// <summary>
