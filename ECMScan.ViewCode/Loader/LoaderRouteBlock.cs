@@ -89,38 +89,7 @@ namespace ISBLScan.ViewCode
 							{
                                 var schemaBytes = (byte[])reader.GetValue(3);
                                 string schemaString = System.Text.Encoding.GetEncoding(1251).GetString(schemaBytes);
-                                var schema = new XmlDocument();
-                                schema.LoadXml(schemaString);
-
-                                var events = schema.SelectNodes("/Settings/Event/node()");
-                                foreach (XmlNode eventXmlNode in events)
-                                {
-                                    var eventString = GetNodeString(eventXmlNode);
-                                    if (!System.String.IsNullOrEmpty(eventString))
-                                    {
-                                        var eventNode = new IsbNode();
-                                        eventNode.Name = eventXmlNode.Name;
-                                        eventNode.Text = eventString;
-                                        routeBlockNode.Nodes.Add(eventNode);
-                                    }
-                                }
-
-                                var properties = schema.SelectNodes("//Properties/Property[@Type = '2' and @Name != 'Name']");
-                                foreach (XmlNode property in properties)
-                                {
-                                    var propertyStringNode = property.SelectSingleNode("Value/Value");
-                                    if (propertyStringNode != null)
-                                    {
-                                        var propertyString = GetNodeString(propertyStringNode);
-                                        if (!System.String.IsNullOrEmpty(propertyString))
-                                        {
-                                            var blockStringNode = new IsbNode();
-                                            blockStringNode.Name = property.Attributes["Description"].Value;
-                                            blockStringNode.Text = propertyString;
-                                            routeBlockNode.Nodes.Add(blockStringNode);
-                                        }
-                                    }
-                                }
+                                RouteParser.ParseBlockProperties(schemaString, routeBlockNode);
                             }
 						    if (!reader.IsDBNull(4))
 						    {

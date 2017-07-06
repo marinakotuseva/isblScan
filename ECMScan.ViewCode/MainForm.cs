@@ -279,6 +279,9 @@ namespace ISBLScan.ViewCode
             string dataBase;
             string login;
             string password;
+            string isxPath;
+            string srPath;
+            string wizPath;
 
             string sqlServerTarget;
             string dataBaseTarget;
@@ -304,11 +307,17 @@ namespace ISBLScan.ViewCode
                 namedArguments.TryGetValue("-D", out dataBase);
                 namedArguments.TryGetValue("-N", out login);
                 namedArguments.TryGetValue("-W", out password);
+                namedArguments.TryGetValue("-ISX", out isxPath);
+                namedArguments.TryGetValue("-SR", out srPath);
+                namedArguments.TryGetValue("-WIZ", out wizPath);
 
                 SourceDev.ConnectionParams.Server = sqlServer;
                 SourceDev.ConnectionParams.Database = dataBase;
                 SourceDev.ConnectionParams.Login = login;
                 SourceDev.ConnectionParams.Password = password;
+                SourceDev.ConnectionParams.ISXPath = isxPath;
+                SourceDev.ConnectionParams.SRPath = srPath;
+                SourceDev.ConnectionParams.WIZPath = wizPath;
                 SourceDev.Load();
 
 

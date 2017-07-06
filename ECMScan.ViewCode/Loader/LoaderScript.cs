@@ -60,7 +60,7 @@ namespace ISBLScan.ViewCode
 				{
 					SqlCommand command = new SqlCommand();
 					command.Connection = Connection;
-					command.CommandText = "select XRecID, NameRpt, Comment, Report, LastUpd from MBReports where TypeRpt='Function' and RegUnit=@groupID order by NameRpt";
+					command.CommandText = "select XRecID, NameRpt, Description, Report, LastUpd from MBReports where TypeRpt='Function' and RegUnit=@groupID order by NameRpt";
 					SqlParameter paramGroupId = new SqlParameter("@groupID", SqlDbType.Int);
 					paramGroupId.Value = groupNode.Id;
 					command.Parameters.Add(paramGroupId);

@@ -40,7 +40,7 @@ namespace ISBLScan.ViewCode
 					if(! reader.IsDBNull(0))
 					{
 					    var sectionCode = reader.GetString(0)[0];
-                        var groupNode = new IsbNode(_sectionCodeToName.ContainsKey(sectionCode) ? _sectionCodeToName[sectionCode] : "Неизвестно [" + sectionCode + "]");
+                        var groupNode = new IsbNode(ReferenceEventsParser.SectionCodeToName.ContainsKey(sectionCode) ? ReferenceEventsParser.SectionCodeToName[sectionCode] : "Неизвестно [" + sectionCode + "]");
 					    groupNode.Code = sectionCode.ToString();
                         eDocTypeNode.Nodes.Add(groupNode);
 						listGroups.Add(groupNode);
@@ -146,7 +146,7 @@ namespace ISBLScan.ViewCode
 						//Текст событий
 						if(! reader.IsDBNull(2))
 						{
-                            ParseEvents(reader.GetString(2).Trim(), eDocNode);
+                            ReferenceEventsParser.ParseEvents(reader.GetString(2).Trim(), eDocNode);
                         }
 						//Дата последнего изменения
 						if(!reader.IsDBNull(3))

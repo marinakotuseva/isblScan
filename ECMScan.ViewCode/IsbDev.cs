@@ -32,16 +32,24 @@ namespace ISBLScan.ViewCode
 
         public void Load()
         {
-            var loader = new Loader();
-            if (loader.Connect(ConnectionParams))
+            if(ConnectionParams.Database != null)
             {
-                loader.Load(this.Nodes);
-                FillParent();
+                var loader = new Loader();
+                if (loader.Connect(ConnectionParams))
+                {
+                    loader.Load(this.Nodes);
+                    FillParent();
+                }
+                else
+                {
+                    MessageBox.Show(loader.ErrorText, "Ошибка открытия базы данных");
+                }
             }
             else
             {
-                MessageBox.Show(loader.ErrorText, "Ошибка открытия базы данных");
+                ReaderAll.Read(this.Nodes, ConnectionParams);
             }
+           
         }
 
         public void Search(string[] searchStrArray, bool caseSensitive, bool regExp, bool findAll)
@@ -136,7 +144,7 @@ namespace ISBLScan.ViewCode
 
         public void CompareWith(IsbDev targetDev)
         {
-            ComparedNodes = Nodes.CompareWith(targetDev.Nodes);
+            ComparedNodes = Nodes.CompareWith(targetDev.Nodes, false); //ConnectionParams.Server == null);
         }
     }
 
@@ -307,6 +315,9 @@ namespace ISBLScan.ViewCode
         public string Database;
         public string Login;
         public string Password;
+        public string ISXPath;
+        public string SRPath;
+        public string WIZPath;
     }
 
     public enum CompareResult
@@ -380,7 +391,7 @@ namespace ISBLScan.ViewCode
 
     public class IsbNodesList : List<IsbNode>
     {
-        public List<IsbComparedNode> CompareWith(List<IsbNode> targetNodes)
+        public List<IsbComparedNode> CompareWith(List<IsbNode> targetNodes, bool onlyDeletedAndChanged)
         {
             var comparedNodes = new List<IsbComparedNode>();
 
@@ -396,38 +407,33 @@ namespace ISBLScan.ViewCode
             {
                 comparedNodes.Add(new IsbComparedNode(node, null, CompareResult.Deleted));
             }
-
-            var newNodes = targetNodes.Where(tar => !this.Exists(src =>
+            if (!onlyDeletedAndChanged)
             {
-                return ((tar.Code == src.Code
-                           && !String.IsNullOrWhiteSpace(src.Code))
-                        || (tar.Name == src.Name
-                              && String.IsNullOrWhiteSpace(tar.Code)
-                              && String.IsNullOrWhiteSpace(src.Code)));
-            }));
-            foreach (var node in newNodes)
-            {
-                comparedNodes.Add(new IsbComparedNode(null, node, CompareResult.Added));
+                var newNodes = targetNodes.Where(tar => !this.Exists(src =>
+                {
+                    return ((tar.Code == src.Code
+                               && !String.IsNullOrWhiteSpace(src.Code))
+                            || (tar.Name == src.Name
+                                  && String.IsNullOrWhiteSpace(tar.Code)
+                                  && String.IsNullOrWhiteSpace(src.Code)));
+                }));
+                foreach (var node in newNodes)
+                {
+                    comparedNodes.Add(new IsbComparedNode(null, node, CompareResult.Added));
+                }
             }
 
-            var otherComparedNodes = this.SelectMany(tar => targetNodes, (tar, src) => {
-                if ((tar.Code == src.Code
-                           && !String.IsNullOrWhiteSpace(src.Code))
-                        || (tar.Name == src.Name
-                              && String.IsNullOrWhiteSpace(tar.Code)
-                              && String.IsNullOrWhiteSpace(src.Code)))
-                {
-                    var compNode = new IsbComparedNode(src, tar, src.Text == tar.Text ? CompareResult.Equal : CompareResult.Changed);
-                    var childNodesCompared = src.Nodes.CompareWith(tar.Nodes);
+            var otherComparedNodes = this.Select(src => new {
+                source = src,
+                target = targetNodes.FirstOrDefault(tar => (!String.IsNullOrWhiteSpace(src.Code) && tar.Code == src.Code) 
+                    || (String.IsNullOrWhiteSpace(tar.Code) && String.IsNullOrWhiteSpace(src.Code) && tar.Name == src.Name))}).
+                Where(pr => pr.target != null).Select(pr => {
+                    var compNode = new IsbComparedNode(pr.source, pr.target, pr.source.Text == pr.target.Text ? CompareResult.Equal : CompareResult.Changed);
+                    var childNodesCompared = pr.source.Nodes.CompareWith(pr.target.Nodes, pr.source.Type != null ? false : onlyDeletedAndChanged);
                     compNode.Nodes.AddRange(childNodesCompared);
 
                     return compNode;
-                }
-                else
-                {
-                    return null;
-                } 
-            }).Where(n => n != null).Where(n => n.Nodes.Count > 0 || n.SourceNode.Text != n.TargetNode.Text);
+                }).Where(n => n.Nodes.Count > 0 || n.SourceNode.Text != n.TargetNode.Text);
             comparedNodes.AddRange(otherComparedNodes);
 
             return comparedNodes;

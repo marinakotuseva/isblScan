@@ -101,7 +101,7 @@ namespace ISBLScan.ViewCode
 					while(reader.Read())
 					{
 					    var sectionCode = reader.GetString(0)[0];
-                        var recvGroupNode = new IsbNode(_sectionCodeToName.ContainsKey(sectionCode) ? _sectionCodeToName[sectionCode] : "Неизвестно [" + sectionCode + "]");
+                        var recvGroupNode = new IsbNode(ReferenceEventsParser.SectionCodeToName.ContainsKey(sectionCode) ? ReferenceEventsParser.SectionCodeToName[sectionCode] : "Неизвестно [" + sectionCode + "]");
 					    recvGroupNode.Code = sectionCode.ToString();
 					    recvGroupNode.Id = refNode.Id;
 
@@ -138,9 +138,13 @@ namespace ISBLScan.ViewCode
 						{
 							refNode.Name = reader.GetString(1).Trim() + " (" + reader.GetString(2).Trim() + ")";
 						}
-						if(! reader.IsDBNull(3))
+                        if (!reader.IsDBNull(2))
+                        {
+                            refNode.Code = reader.GetString(2).Trim();
+                        }
+                        if (! reader.IsDBNull(3))
 						{
-                            ParseEvents(reader.GetString(3).Trim(), refNode);
+                            ReferenceEventsParser.ParseEvents(reader.GetString(3).Trim(), refNode);
 						}
 					    if (!reader.IsDBNull(4))
 					    {
