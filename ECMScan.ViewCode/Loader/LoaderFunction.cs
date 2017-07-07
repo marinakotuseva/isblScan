@@ -56,10 +56,8 @@ order by t.name";
 						}
 						//Примечание
 						if (!reader.IsDBNull (2)) {
-							node.Text = reader.GetString (2);
+							//node.Text = reader.GetString (2);
 						}
-
-						node.Nodes = new List<IsbNode> ();
 						rootNode.Nodes.Add (node);
 						listGroups.Add (node);
 					}
@@ -67,51 +65,6 @@ order by t.name";
 				reader.Close ();
 			}
 			return listGroups;
-		}
-
-		private string GetTypeName (string typeCode)
-		{
-			string typeName = "";
-			switch (typeCode.ToUpper ()) 
-			{
-			case "V":
-				typeName = "Вариантный";
-				break;
-			case "Д":
-				typeName = "Дата";
-				break;
-			case "Ч":
-				typeName = "Дробное число";
-				break;
-			case "I":
-				typeName = "Интерфейс";
-				break;
-			case "К":
-				typeName = "Константа";
-				break;
-			case "L":
-				typeName = "Логический";
-				break;
-			case "У":
-				typeName = "Реквизит справочника";
-				break;
-			case "А":
-				typeName = "Справочник";
-				break;
-			case "С":
-				typeName = "Строка";
-				break;
-			case "M":
-				typeName = "Тип справочника";
-				break;
-			case "Ц":
-				typeName = "Целое число";
-				break;
-			default:
-				typeName = "Неизвестный тип (" + typeCode + ")";
-				break;
-			}
-			return typeName;
 		}
 
 		/// <summary>
@@ -127,7 +80,7 @@ order by t.name";
 			{
 				SqlCommand command = new SqlCommand ();
 				command.Connection = this.Connection;
-				command.CommandText = "SELECT [NumPar], [Ident], [Name], [Type], [ValueDef] FROM [MBFuncRecv] WHERE [FName] = @funcName";
+				command.CommandText = "SELECT [NumPar], [Ident], [Name], [Type], [ValueDef] FROM [MBFuncRecv] WHERE [FName] = @funcName ORDER BY [NumPar] ASC";
 				SqlParameter paramFuncName = new SqlParameter ("@funcName", SqlDbType.NVarChar, 512);
 				paramFuncName.Value = rootNode.Name;
 				command.Parameters.Add (paramFuncName);
@@ -146,13 +99,13 @@ order by t.name";
 						if (!reader.IsDBNull (1)) {
 							funcRecvNode.Text += reader.GetString (1) + ".\t";
 						}
-						//Для внутреннего использования
-						if (!reader.IsDBNull (2)) {
-							funcRecvNode.Text += reader.GetString (2) + ".\t";
-						}
+						////Для внутреннего использования
+						//if (!reader.IsDBNull (2)) {
+						//	funcRecvNode.Text += reader.GetString (2) + ".\t";
+						//}
 						//Тип параметра
 						if (!reader.IsDBNull (3)) {
-							funcRecvNode.Text += this.GetTypeName (reader.GetString (3)) + ".\t";
+							funcRecvNode.Text += CodeToNameConverter.FunctionParamTypeIDToName(reader.GetString (3)) + ".\t";
 						}
 						funcRecvNode.Text += "\r\n";
 					}
@@ -168,8 +121,6 @@ order by t.name";
 			if (this.CheckTableExist ("MBFunc")) {
 				listNode = new IsbNode();
 				listNode.Name = "Функция";
-				listNode.Text = null;
-				listNode.Nodes = new List<IsbNode> ();
 				char[] charsSysUserFunc = {'P', 'S'};
 				foreach (char charSysFunc in charsSysUserFunc) 
 				{

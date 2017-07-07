@@ -37,7 +37,6 @@ namespace ISBLScan.ViewCode
 						{
 							node.Name = reader.GetString(1);
 						}
-						node.Nodes = new List<IsbNode>();
 						rootNode.Nodes.Add(node);
 						listGroups.Add(node);
 					}
@@ -54,15 +53,13 @@ namespace ISBLScan.ViewCode
 			{
 				listNode = new IsbNode();
 				listNode.Name = "Аналитический отчёт";
-				listNode.Text = null;
-				listNode.Nodes = new List<IsbNode>();
 				
 				var listGroups = LoadGroups(listNode);
 				foreach(var groupNode in listGroups)
 				{
 					SqlCommand command = new SqlCommand();
 					command.Connection = Connection;
-					command.CommandText = "select XRecID, NameRpt, Comment, Exprn, Report, Viewer, LastUpd from MBReports where TypeRpt='MBAnAccRpt' and RegUnit=@groupID order by NameRpt ASC";
+					command.CommandText = "select XRecID, NameRpt, Description, Exprn, Report, Viewer, LastUpd from MBReports where TypeRpt='MBAnAccRpt' and RegUnit=@groupID order by NameRpt ASC";
 					SqlParameter paramGroupId = new SqlParameter("@groupID", SqlDbType.Int);
 					paramGroupId.Value = groupNode.Id;
 					command.Parameters.Add(paramGroupId);
@@ -86,7 +83,6 @@ namespace ISBLScan.ViewCode
 							{
 								reportNode.Text = reader.GetString(2);
 							}
-							reportNode.Nodes = new List<IsbNode>();
 							//Шаблон отчёта
 							if(! reader.IsDBNull(4))
 							{

@@ -8,7 +8,7 @@ using System.Data;
 using System.Data.SqlTypes;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Xml;
+
 
 namespace ISBLScan.ViewCode
 {
@@ -61,6 +61,7 @@ order by NameAn";
                 command.Connection = Connection;
                 command.CommandText = @"
 select MBAnalit.Analit
+    , ltrim(MBAnalit.Kod)
     , MBAnalit.NameAn + ' (' + ltrim(MBAnalit.Kod) + ')'
     , MBText.SearchCondition 
     , (select max(prot.DateAct)
@@ -80,90 +81,20 @@ order by MBAnalit.NameAn";
                 {
                     while (reader.Read())
                     {
-                        var routeNode = new IsbNode(reader.GetString(1));
+                        var routeNode = new IsbNode(reader.GetString(2));
                         routeNode.Type = IsbNodeType.StandardRoute;
-                        // ИД
                         routeNode.Id = reader.GetInt32(0);
+                        routeNode.Code = reader.GetString(1);
                         // Схема
-                        if (!reader.IsDBNull(2))
-                        {
-                            var schemaBytes = (byte[])reader.GetValue(2);
-                            string schemaString = System.Text.Encoding.GetEncoding(1251).GetString(schemaBytes);
-                            var schema = new XmlDocument();
-                            schema.LoadXml(schemaString);
-                            var events = schema.SelectNodes("/Settings/Event/node()");
-                            var eventNameToTitle = new Dictionary<String, String>()
-                            {
-                                {"InitScript", "Начало выбора"},
-                                {"Script", "Завершение выбора"},
-                                {"TaskStart", "Возможность старта"},
-                                {"TaskAbortPossibility", "Возможность прекращения"},
-                                {"TaskAbort", "Прекращение"}
-                            };
-                            foreach (XmlNode eventXmlNode in events)
-                            {
-                                var eventString = GetNodeString(eventXmlNode);
-                                if (!System.String.IsNullOrEmpty(eventString))
-                                {
-                                    var eventNode = new IsbNode();
-                                    eventNode.Name = eventNameToTitle.ContainsKey(eventXmlNode.Name) ? eventNameToTitle[eventXmlNode.Name] : eventXmlNode.Name;
-                                    eventNode.Text = eventString;
-                                    routeNode.Nodes.Add(eventNode);
-                                }
-                            }
-                            var routeProperties = schema.SelectNodes("/Settings/Properties/Property[@Type = '2' and @Name != 'Name']");
-                            foreach (XmlNode property in routeProperties)
-                            {
-                                var propertyStringNode = property.SelectSingleNode("Value/Value");
-                                if (propertyStringNode != null)
-                                {
-                                    var propertyString = GetNodeString(propertyStringNode);
-                                    if (!System.String.IsNullOrEmpty(propertyString))
-                                    {
-                                        var routeStringNode = new IsbNode(property.Attributes["Description"].Value);
-                                        routeStringNode.Text = propertyString;
-                                        routeNode.Nodes.Add(routeStringNode);
-                                    }
-                                }
-                            }
-
-                            var blocks = schema.SelectNodes("//Block");
-                            foreach (XmlNode block in blocks)
-                            {
-                                var blockNode = new IsbNode();
-                                var nameProperty = block.SelectSingleNode("Properties/Property[@Type = '2' and @Name = 'Name']/Value/Value");
-                                if (nameProperty != null) blockNode.Name = block.Attributes["ID"].Value + ". " + GetNodeString(nameProperty);
-                                else blockNode.Name = block.Attributes["ID"].Value;
-                                
-                                blockNode.Nodes = new List<IsbNode>();
-
-                                var properties = block.SelectNodes("Properties/Property[@Type = '2' and @Name != 'Name']");
-                                foreach (XmlNode property in properties)
-                                {
-                                    var propertyStringNode = property.SelectSingleNode("Value/Value");
-                                    if (propertyStringNode != null)
-                                    {
-                                        var propertyString = GetNodeString(propertyStringNode);
-                                        if (!System.String.IsNullOrEmpty(propertyString))
-                                        {
-                                            var blockStringNode = new IsbNode(property.Attributes["Description"].Value);
-                                            blockStringNode.Text = propertyString;
-                                            blockNode.Nodes.Add(blockStringNode);
-                                        }
-                                    }
-                                }
-
-                                if (blockNode.Nodes.Count > 0)
-                                {
-                                    routeNode.Nodes.Add(blockNode);
-                                }
-                                else blockNode = null;
-
-                            }
-                        }
                         if (!reader.IsDBNull(3))
                         {
-                            routeNode.LastUpdate = reader.GetDateTime(3);
+                            var schemaBytes = (byte[])reader.GetValue(3);
+                            string schemaString = System.Text.Encoding.GetEncoding(1251).GetString(schemaBytes);
+                            RouteParser.ParseRoute(schemaString, routeNode);
+                        }
+                        if (!reader.IsDBNull(4))
+                        {
+                            routeNode.LastUpdate = reader.GetDateTime(4);
                         }
                         groupNode.Nodes.Add(routeNode);
                     }
@@ -173,18 +104,6 @@ order by MBAnalit.NameAn";
             return listNode;
         }
 
-        private string GetNodeString(XmlNode node)
-        {
-            string parsedString = "";
-            parsedString = node.InnerText;
-            parsedString = parsedString.Replace("{5314B05F-CF9F-4F66-99EC-24992A5FB114}", "");
-            try
-            {
-                byte[] data = Convert.FromBase64String(parsedString);
-                parsedString = System.Text.Encoding.GetEncoding(1251).GetString(data);
-            }
-            catch { }
-            return parsedString;
-        }
+        
 	}
 }

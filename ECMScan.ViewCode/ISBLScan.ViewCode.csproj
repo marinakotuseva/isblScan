@@ -15,6 +15,21 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <SynchReleaseVersion>false</SynchReleaseVersion>
     <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -52,6 +67,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
@@ -62,7 +78,14 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeToNameConverter.cs" />
+    <Compile Include="DiffMatchPatch.cs" />
     <Compile Include="Loader\LoaderDialog.cs" />
+    <Compile Include="Models\ISX.cs" />
+    <Compile Include="Parsers\ReferenceEventsParser.cs" />
+    <Compile Include="Parsers\RouteParser.cs" />
+    <Compile Include="Parsers\WizardParser.cs" />
+    <Compile Include="Reader\ReaderAll.cs" />
     <Compile Include="Search.cs" />
     <Compile Include="IsbDev.cs" />
     <Compile Include="Loader\LoaderCommon.cs" />
@@ -92,7 +115,7 @@
     <Compile Include="SynchronizedScrollRichTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Tools\DFMParser.cs" />
+    <Compile Include="Parsers\DFMParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -199,5 +222,25 @@
     <None Include="CustomCalculationConfig.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.4.5">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 4.5</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Tools\" />
   </ItemGroup>
 </Project>

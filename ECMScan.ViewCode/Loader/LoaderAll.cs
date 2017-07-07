@@ -50,6 +50,11 @@ namespace ISBLScan.ViewCode
 			}
 		}
 
+        public bool Connect(ConnectionParams cp)
+        {
+            return Connect(cp.Server, cp.Database, cp.Login, cp.Password, String.IsNullOrWhiteSpace(cp.Password));
+        }
+
 		/// <summary>
 		///Отключиться от базы данных 
 		/// </summary>
@@ -64,7 +69,7 @@ namespace ISBLScan.ViewCode
 		public string GetVersion(ConnectionParams connectionParams)
         {
             var version = "";
-            Connect(connectionParams.Server, connectionParams.Database, connectionParams.User, connectionParams.Password, String.IsNullOrWhiteSpace(connectionParams.Password));
+            Connect(connectionParams.Server, connectionParams.Database, connectionParams.Login, connectionParams.Password, String.IsNullOrWhiteSpace(connectionParams.Password));
             SqlCommand command = new SqlCommand();
             command.Connection = _connection;
             command.CommandText = @"DECLARE	@Version varchar(20)
