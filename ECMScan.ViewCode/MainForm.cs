@@ -236,7 +236,7 @@ namespace ISBLScan.ViewCode
                 }
                 else
                 {
-                    if(gotoNextTreeNodeIfNoMore) TreeSelectNextMatched(TreeViewResults.Nodes);
+                    if (gotoNextTreeNodeIfNoMore) TreeSelectNextMatched(TreeViewResults.Nodes);
                 }
             }
         }
@@ -273,18 +273,15 @@ namespace ISBLScan.ViewCode
             }
             if (namedArguments.Count > 0)
             {
-                string isWinAuthString = "false";
                 namedArguments.TryGetValue("-S", out sqlServer);
                 namedArguments.TryGetValue("-D", out dataBase);
                 namedArguments.TryGetValue("-N", out login);
                 namedArguments.TryGetValue("-W", out password);
-                namedArguments.TryGetValue("-IsOSAuth", out isWinAuthString);
-                isWinAuth = isWinAuthString?.ToLower() == "true";
 
                 textBoxSQLServer.Text = sqlServer;
                 textBoxDB.Text = dataBase;
                 textBoxLogin.Text = login;
-                checkBoxWinAuth.Checked = isWinAuth;
+                checkBoxWinAuth.Checked = String.IsNullOrWhiteSpace(password);
                 textBoxPassword.Text = password;
 
                 ConnectAndGetIsbl();
@@ -339,7 +336,7 @@ namespace ISBLScan.ViewCode
                 Configuration.Save(textBoxSQLServer.Text, textBoxDB.Text, textBoxLogin.Text, checkBoxWinAuth.Checked);
                 SourceDev.ConnectionParams.Server = textBoxSQLServer.Text;
                 SourceDev.ConnectionParams.Database = textBoxDB.Text;
-                SourceDev.ConnectionParams.User = textBoxLogin.Text;
+                SourceDev.ConnectionParams.Login = textBoxLogin.Text;
                 SourceDev.ConnectionParams.Password = checkBoxWinAuth.Checked ? null : textBoxPassword.Text;
             }
             return connect;
@@ -629,11 +626,11 @@ namespace ISBLScan.ViewCode
             if (e.KeyCode == Keys.O && e.Control)
             {
                 var selectedNode = ((SearchControls)tabControlSearchText.SelectedTab.Tag).TreeViewResults.SelectedNode;
-                if(selectedNode != null)
+                if (selectedNode != null)
                 {
                     ((SearchNode)selectedNode.Tag).IsbNode.OpenInSbrte(SourceDev.ConnectionParams);
                 }
-                
+
             }
         }
     }

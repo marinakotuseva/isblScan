@@ -26,8 +26,10 @@ namespace ISBLScan.ViewCode
 		{
 			var connBuilder = new SqlConnectionStringBuilder();
 			connBuilder.DataSource = server;
-			connBuilder.Pooling = false;
-			connBuilder.InitialCatalog = dataBase;
+			connBuilder.Pooling = true;
+            connBuilder.AsynchronousProcessing = true;
+            connBuilder.MultipleActiveResultSets = true;
+            connBuilder.InitialCatalog = dataBase;
 			connBuilder.ApplicationName = "ISBLScan.ViewCode";
 			if(isWinAuth)
 			{

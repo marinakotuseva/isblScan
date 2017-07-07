@@ -235,7 +235,7 @@ namespace ISBLScan.ViewCode
                     Process process = new Process();
                     process.StartInfo.FileName = FilePath;
                     var authParam = String.IsNullOrWhiteSpace(connectionParams.Password) ? "-IsOSAuth=true" : $"-W=\"{connectionParams.Password}\"";
-                    process.StartInfo.Arguments = $"-S=\"{connectionParams.Server}\" -D=\"{connectionParams.Database}\" -N=\"{connectionParams.User}\" {authParam} -CT=\"Reference\" {CMDParams} -RID={mainNode.Id}";
+                    process.StartInfo.Arguments = $"-S=\"{connectionParams.Server}\" -D=\"{connectionParams.Database}\" -N=\"{connectionParams.Login}\" {authParam} -CT=\"Reference\" {CMDParams} -RID={mainNode.Id}";
                     try
                     {
                         process.Start();
@@ -294,7 +294,7 @@ namespace ISBLScan.ViewCode
     {
         public string Server;
         public string Database;
-        public string User;
+        public string Login;
         public string Password;
     }
 }
