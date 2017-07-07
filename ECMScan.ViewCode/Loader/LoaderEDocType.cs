@@ -22,75 +22,72 @@ namespace ISBLScan.ViewCode
 
         private void LoadRecvisites(IsbNode eDocTypeNode)
         {
-            if (CheckTableExist("MBEDocTypeRecv"))
+            SqlCommand command = new SqlCommand();
+            command.Connection = Connection;
+            command.CommandText = "select [Name], [Kod], [Exprn], [InpExprn], [Razd] from MBEDocTypeRecv where [TypeID] = @eDocTypeID and (not([Exprn] is null) or not([InpExprn] is null)) order by [Name]";
+            SqlParameter paramEDocTypeId = new SqlParameter("@eDocTypeID", SqlDbType.Int);
+            paramEDocTypeId.Value = eDocTypeNode.Id;
+            command.Parameters.Add(paramEDocTypeId);
+            command.Prepare();
+            SqlDataReader reader = command.ExecuteReader();
+
+            if (reader.HasRows)
             {
-                SqlCommand command = new SqlCommand();
-                command.Connection = Connection;
-                command.CommandText = "select [Name], [Kod], [Exprn], [InpExprn], [Razd] from MBEDocTypeRecv where [TypeID] = @eDocTypeID and (not([Exprn] is null) or not([InpExprn] is null)) order by [Name]";
-                SqlParameter paramEDocTypeId = new SqlParameter("@eDocTypeID", SqlDbType.Int);
-                paramEDocTypeId.Value = eDocTypeNode.Id;
-                command.Parameters.Add(paramEDocTypeId);
-                command.Prepare();
-                SqlDataReader reader = command.ExecuteReader();
-
-                if (reader.HasRows)
+                var sectionCodeToSectionNode = new Dictionary<Char, IsbNode>();
+                while (reader.Read())
                 {
-                    var sectionCodeToSectionNode = new Dictionary<Char, IsbNode>();
-                    while (reader.Read())
+                    var section = reader.GetString(4)[0];
+                    IsbNode recvGroupNode = null;
+                    if (sectionCodeToSectionNode.ContainsKey(section))
                     {
-                        var section = reader.GetString(4)[0];
-                        IsbNode recvGroupNode = null;
-                        if (sectionCodeToSectionNode.ContainsKey(section))
-                        {
-                            recvGroupNode = sectionCodeToSectionNode[section];
-                        }
-                        else
-                        {
-                            var sectionName = ReferenceEventsParser.SectionCodeToName.ContainsKey(section) ? ReferenceEventsParser.SectionCodeToName[section] : "Неизвестно [" + section + "]";
-                            recvGroupNode = new IsbNode(sectionName);
-                            eDocTypeNode.Nodes.Add(recvGroupNode);
-                            sectionCodeToSectionNode.Add(section, recvGroupNode);
-                        }
-
-                        var eDocRecvNode = new IsbNode();
-                        //Имя
-                        if (!reader.IsDBNull(0))
-                        {
-                            eDocRecvNode.Name = reader.GetString(0);
-                        }
-                        //Код реквизита
-                        if (!reader.IsDBNull(1))
-                        {
-                            eDocRecvNode.Code = reader.GetString(1);
-                            eDocRecvNode.Name = string.Format("{0} ({1})", eDocRecvNode.Name, eDocRecvNode.Code);
-                        }
-                        //Вычисление для реквизита и действия
-                        if (!reader.IsDBNull(2))
-                        {
-                            var exprnEDocRecvNode = new IsbNode();
-                            exprnEDocRecvNode.Name = "-=[ Вычисление ]=-";
-                            exprnEDocRecvNode.Text = reader.GetString(2);
-                            eDocRecvNode.Nodes.Add(exprnEDocRecvNode);
-                        }
-                        //Выбор из справочника для реквизита типа "справочник" или "строка"
-                        if (!reader.IsDBNull(3))
-                        {
-                            var eventEDocRecvNode = new IsbNode();
-                            eventEDocRecvNode.Name = "-=[ Выбор из справочника ]=-";
-                            eventEDocRecvNode.Text = reader.GetString(3);
-                            eDocRecvNode.Nodes.Add(eventEDocRecvNode);
-                        }
-                        recvGroupNode.Nodes.Add(eDocRecvNode);
+                        recvGroupNode = sectionCodeToSectionNode[section];
                     }
+                    else
+                    {
+                        var sectionName = ReferenceEventsParser.SectionCodeToName.ContainsKey(section) ? ReferenceEventsParser.SectionCodeToName[section] : "Неизвестно [" + section + "]";
+                        recvGroupNode = new IsbNode(sectionName);
+                        eDocTypeNode.Nodes.Add(recvGroupNode);
+                        sectionCodeToSectionNode.Add(section, recvGroupNode);
+                    }
+
+                    var eDocRecvNode = new IsbNode();
+                    //Имя
+                    if (!reader.IsDBNull(0))
+                    {
+                        eDocRecvNode.Name = reader.GetString(0);
+                    }
+                    //Код реквизита
+                    if (!reader.IsDBNull(1))
+                    {
+                        eDocRecvNode.Code = reader.GetString(1);
+                        eDocRecvNode.Name = string.Format("{0} ({1})", eDocRecvNode.Name, eDocRecvNode.Code);
+                    }
+                    //Вычисление для реквизита и действия
+                    if (!reader.IsDBNull(2))
+                    {
+                        var exprnEDocRecvNode = new IsbNode();
+                        exprnEDocRecvNode.Name = "-=[ Вычисление ]=-";
+                        exprnEDocRecvNode.Text = reader.GetString(2);
+                        eDocRecvNode.Nodes.Add(exprnEDocRecvNode);
+                    }
+                    //Выбор из справочника для реквизита типа "справочник" или "строка"
+                    if (!reader.IsDBNull(3))
+                    {
+                        var eventEDocRecvNode = new IsbNode();
+                        eventEDocRecvNode.Name = "-=[ Выбор из справочника ]=-";
+                        eventEDocRecvNode.Text = reader.GetString(3);
+                        eDocRecvNode.Nodes.Add(eventEDocRecvNode);
+                    }
+                    recvGroupNode.Nodes.Add(eDocRecvNode);
                 }
-                reader.Close();
             }
+            reader.Close();
         }
 
         public IsbNode Load()
         {
             IsbNode listNode = null;
-            if (this.CheckTableExist("MBEDocType"))
+            if (this.CheckTableExist("MBEDocType") && CheckTableExist("MBEDocTypeRecv"))
             {
                 SqlCommand command = new SqlCommand();
                 command.Connection = Connection;
