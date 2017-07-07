@@ -23,26 +23,38 @@ namespace ISBLScan.ViewCode
         /// Ссылка на узел диалога
         /// A <see cref="IsbNode"/>
         /// </param>
-        void LoadRecvisite(IsbNode recvGroupNode)
+        void LoadRecvisites(IsbNode refNode)
 		{
 			if(this.CheckTableExist("SBDialogRequisiteLink"))
 			{
 				SqlCommand command = new SqlCommand();
 				command.Connection = this.Connection;
-				command.CommandText = "SELECT [Name], [Code], [ChangeEventHandlerText], [LookupEventHandlerText] FROM [SBDialogRequisiteLink] WHERE [DialogID]=@DialogID AND [Section]=@Section AND ([ChangeEventHandlerText] IS NOT NULL OR [LookupEventHandlerText] IS NOT NULL) ORDER BY [RequisiteNumber]";
+				command.CommandText = "SELECT [Name], [Code], [ChangeEventHandlerText], [LookupEventHandlerText], [Section] FROM [SBDialogRequisiteLink] WHERE [DialogID]=@DialogID AND ([ChangeEventHandlerText] IS NOT NULL OR [LookupEventHandlerText] IS NOT NULL) ORDER BY [RequisiteNumber]";
 				SqlParameter paramVid = new SqlParameter("@DialogID", SqlDbType.Int);
-				paramVid.Value = recvGroupNode.Id;
-				SqlParameter paramRazd = new SqlParameter("@Section", SqlDbType.NChar, 1);
-				paramRazd.Value = recvGroupNode.Code;
+				paramVid.Value = refNode.Id;
 				command.Parameters.Add(paramVid);
-				command.Parameters.Add(paramRazd);
 				command.Prepare();
 				SqlDataReader reader = command.ExecuteReader();
 				if(reader.HasRows)
 				{
-					while(reader.Read())
+                    var sectionCodeToSectionNode = new Dictionary<Char, IsbNode>();
+                    while (reader.Read())
 					{
-						var recvNode = new IsbNode();
+                        var section = reader.GetString(4)[0];
+                        IsbNode recvGroupNode = null;
+                        if (sectionCodeToSectionNode.ContainsKey(section))
+                        {
+                            recvGroupNode = sectionCodeToSectionNode[section];
+                        }
+                        else
+                        {
+                            var sectionName = ReferenceEventsParser.SectionCodeToName.ContainsKey(section) ? ReferenceEventsParser.SectionCodeToName[section] : "Неизвестно [" + section + "]";
+                            recvGroupNode = new IsbNode(sectionName);
+                            refNode.Nodes.Add(recvGroupNode);
+                            sectionCodeToSectionNode.Add(section, recvGroupNode);
+                        }
+
+                        var recvNode = new IsbNode();
 						if(!reader.IsDBNull(0))
 						{
 							recvNode.Name = reader.GetString(0);
@@ -67,48 +79,9 @@ namespace ISBLScan.ViewCode
 							recvNode.Nodes.Add(inpExprnRefRecvNode);
 						}
 						recvGroupNode.Nodes.Add(recvNode);
-					}
+                    }
 				}
 				reader.Close();
-			}
-		}
-
-		/// <summary>
-		/// Загрузка разделов реквизитов
-		/// </summary>
-		/// <param name="refNode">
-		/// A <see cref="Node"/>
-		/// </param>
-		void LoadGroupRecv(IsbNode refNode)
-		{
-			if(this.CheckTableExist("SBDialogRequisiteLink"))
-			{
-				SqlCommand command = new SqlCommand();
-				command.Connection = this.Connection;
-				command.CommandText = "SELECT DISTINCT [Section] FROM [SBDialogRequisiteLink] WHERE [DialogID] = @DialogID AND ([LookupEventHandlerText] IS NOT NULL OR [ChangeEventHandlerText] IS NOT NULL) ORDER BY [Section] DESC";
-				SqlParameter paramVid = new SqlParameter("@DialogID", SqlDbType.Int);
-				paramVid.Value = refNode.Id;
-				command.Parameters.Add(paramVid);
-				command.Prepare();
-				SqlDataReader reader = command.ExecuteReader();
-
-                if (reader.HasRows)
-				{
-					while(reader.Read())
-					{
-					    var sectionCode = reader.GetString(0)[0];
-                        var recvGroupNode = new IsbNode(ReferenceEventsParser.SectionCodeToName.ContainsKey(sectionCode) ? ReferenceEventsParser.SectionCodeToName[sectionCode] : "Неизвестно [" + sectionCode + "]");
-					    recvGroupNode.Code = sectionCode.ToString();
-					    recvGroupNode.Id = refNode.Id;
-
-                        refNode.Nodes.Add(recvGroupNode);
-                    }
-                }
-				reader.Close();
-			    foreach (var node in refNode.Nodes.Where(n => n.Id != 0))
-			    {
-			        LoadRecvisite(node);
-                }
 			}
 		}
 
@@ -127,13 +100,9 @@ namespace ISBLScan.ViewCode
 					{
 						var refNode = new IsbNode();
                         refNode.Type = IsbNodeType.Dialog;
-                        //ИД 
                         refNode.Id = reader.GetInt32(0);
-						//Имя (Код)
-						if((! reader.IsDBNull(1))&&(! reader.IsDBNull(2)))
-						{
-							refNode.Name = reader.GetString(1).Trim() + " (" + reader.GetString(2).Trim() + ")";
-						}
+                        refNode.Code = reader.GetString(2).Trim();
+                        refNode.Name = reader.GetString(1).Trim() + " (" + refNode.Code + ")";
 						if(! reader.IsDBNull(3))
 						{
                             ReferenceEventsParser.ParseEvents(reader.GetString(3).Trim(), refNode);
@@ -154,7 +123,7 @@ namespace ISBLScan.ViewCode
 				reader.Close();
 			    foreach (var node in rootRefNode.Nodes)
 			    {
-			        LoadGroupRecv(node);
+                    LoadRecvisites(node);
                 }
 			}
 			return rootRefNode;

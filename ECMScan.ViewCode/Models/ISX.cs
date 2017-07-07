@@ -156,6 +156,11 @@ namespace ISBLScan.ViewCode.Models.ISX
         [XmlElement(ElementName = "Reports")]
         public List<Component> Components { get; set; }
     }
+    public class Dialogs
+    {
+        [XmlElement(ElementName = "Dialogs")]
+        public List<Component> Components { get; set; }
+    }
 
     [XmlRoot(ElementName = "Components")]
     public class Components
@@ -188,6 +193,8 @@ namespace ISBLScan.ViewCode.Models.ISX
         public Scripts Scripts { get; set; }
         [XmlElement(ElementName = "Viewers")]
         public Viewers Viewers { get; set; }
+        [XmlElement(ElementName = "Dialogs")]
+        public Dialogs Dialogs { get; set; }
         [XmlAttribute(AttributeName = "PlatformVesion")]
         public string PlatformVesion { get; set; }
         [XmlAttribute(AttributeName = "SystemMask")]

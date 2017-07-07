@@ -144,7 +144,7 @@ namespace ISBLScan.ViewCode
 
         public void CompareWith(IsbDev targetDev)
         {
-            ComparedNodes = Nodes.CompareWith(targetDev.Nodes, false); //ConnectionParams.Server == null);
+            ComparedNodes = Nodes.CompareWith(targetDev.Nodes, ConnectionParams.Server == null);
         }
     }
 

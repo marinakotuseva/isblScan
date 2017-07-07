@@ -318,13 +318,47 @@ namespace ISBLScan.ViewCode
                         var RequisitesSections = item.Datasets.DetailDataSet1.Requisites.Select(r => r.ByCode("ISBRefTypeReqSection").ValueLocalizeID).Distinct();
                         foreach(var section in RequisitesSections)
                         {
+                            var sectionName = ReferenceEventsParser.SectionLocalizedIDToName[section];
+                            var sectionNode = new IsbNode(sectionName);
 
+                            var requisites = item.Datasets.DetailDataSet1.Requisites
+                                .Where(r => r.ByCode("ISBRefTypeReqSection").ValueLocalizeID == section)
+                                .Select(r => new
+                                {
+                                    Name = r.ByCode("ISBRefTypeReqDescription").Text.Trim() + " (" + r.ByCode("ISBRefTypeReqCode").Text.Trim() + ")",
+                                    Code = r.ByCode("ISBRefTypeReqCode").Text.Trim(),
+                                    OnSelect = r.ByCode("ISBRefTypeReqOnSelect").Text,
+                                    OnChange = r.ByCode("ISBRefTypeReqOnChange").Text
+                                });
+                            foreach (var requisite in requisites.Where(r => !String.IsNullOrWhiteSpace(r.OnChange) || !String.IsNullOrWhiteSpace(r.OnSelect)))
+                            {
+                                var requisiteNode = new IsbNode(requisite.Name);
+                                requisiteNode.Code = requisite.Code;
+
+                                if (!String.IsNullOrWhiteSpace(requisite.OnChange))
+                                {
+                                    var exprnRefRecvNode = new IsbNode("-=[ Вычисление ]=-");
+                                    exprnRefRecvNode.Text = requisite.OnChange;
+                                    requisiteNode.Nodes.Add(exprnRefRecvNode);
+                                }
+                                if (!String.IsNullOrWhiteSpace(requisite.OnSelect))
+                                {
+                                    var inpExprnRefRecvNode = new IsbNode("-=[ Выбор из справочника ]=-");
+                                    inpExprnRefRecvNode.Text = requisite.OnSelect;
+                                    requisiteNode.Nodes.Add(inpExprnRefRecvNode);
+                                }
+                                sectionNode.Nodes.Add(requisiteNode);
+                            }
+                            if(sectionNode.Nodes.Count > 0)
+                            {
+                                itemNode.Nodes.Add(sectionNode);
+                            }
                         }
 
                         if(item.Datasets.DetailDataSet2 != null)
                         {
-                            var actionsNode = new IsbNode(ReferenceEventsParser.SectionCodeToName['К']);
-                            actionsNode.Code = "К";
+                            var sectionLocalizedID = item.Datasets.DetailDataSet2.Requisites.First().ByCode("ISBRefTypeActSection").ValueLocalizeID;
+                            var actionsNode = new IsbNode(ReferenceEventsParser.SectionLocalizedIDToName[sectionLocalizedID]);
                             foreach (var action in item.Datasets.DetailDataSet2.Requisites)
                             {
                                 var actionNode = new IsbNode(action.ByCode("ISBRefTypeActDescription").Text);
@@ -346,76 +380,262 @@ namespace ISBLScan.ViewCode
                     }
                     nodes.Add(itemsNode);
                 }
+                if (components.EDCardTypes != null)
+                {
+                    var itemsNode = new IsbNode("Тип карточки электронного документа");
+
+                    var items = components.EDCardTypes.Components
+                        .Select(c => new
+                        {
+                            Id = int.Parse(c.Requisites.ByCode(IDReqName).Value),
+                            Code = c.KeyValue.Trim(),
+                            Name = c.DisplayValue.Trim() + " (" + c.KeyValue.Trim() + ")",
+                            Note = c.Requisites.ByCode("ISBEDocTypeComment").Text.Trim(),
+                            Events = c.Requisites.ByCode("ISBEDocTypeEventText").Text.Trim(),
+                            Datasets = c.DetailDataSet
+                        });
+                    foreach (var item in items)
+                    {
+                        var itemNode = new IsbNode(item.Name);
+                        itemNode.Type = IsbNodeType.ReferenceType;
+                        itemNode.Id = item.Id;
+                        itemNode.Code = item.Code;
+                        if (!String.IsNullOrWhiteSpace(item.Note))
+                        {
+                            itemNode.Text = item.Note;
+                        }
+                        if (!String.IsNullOrWhiteSpace(item.Events))
+                        {
+                            ReferenceEventsParser.ParseEvents(item.Events, itemNode);
+                        }
+                        var RequisitesSections = item.Datasets.DetailDataSet1.Requisites.Select(r => r.ByCode("ISBEDocTypeReqSection").ValueLocalizeID).Distinct();
+                        foreach (var section in RequisitesSections)
+                        {
+                            var sectionName = ReferenceEventsParser.SectionLocalizedIDToName[section];
+                            var sectionNode = new IsbNode(sectionName);
+
+                            var requisites = item.Datasets.DetailDataSet1.Requisites
+                                .Where(r => r.ByCode("ISBEDocTypeReqSection").ValueLocalizeID == section)
+                                .Select(r => new
+                                {
+                                    Name = r.ByCode("ISBEDocTypeReqDescription").Text.Trim() + " (" + r.ByCode("ISBEDocTypeReqCode").Text.Trim() + ")",
+                                    Code = r.ByCode("ISBEDocTypeReqCode").Text.Trim(),
+                                    OnSelect = r.ByCode("ISBEDocTypeReqOnSelect").Text,
+                                    OnChange = r.ByCode("ISBEDocTypeReqOnChange").Text
+                                });
+                            foreach (var requisite in requisites.Where(r => !String.IsNullOrWhiteSpace(r.OnChange) || !String.IsNullOrWhiteSpace(r.OnSelect)))
+                            {
+                                var requisiteNode = new IsbNode(requisite.Name);
+                                requisiteNode.Code = requisite.Code;
+
+                                if (!String.IsNullOrWhiteSpace(requisite.OnChange))
+                                {
+                                    var exprnRefRecvNode = new IsbNode("-=[ Вычисление ]=-");
+                                    exprnRefRecvNode.Text = requisite.OnChange;
+                                    requisiteNode.Nodes.Add(exprnRefRecvNode);
+                                }
+                                if (!String.IsNullOrWhiteSpace(requisite.OnSelect))
+                                {
+                                    var inpExprnRefRecvNode = new IsbNode("-=[ Выбор из справочника ]=-");
+                                    inpExprnRefRecvNode.Text = requisite.OnSelect;
+                                    requisiteNode.Nodes.Add(inpExprnRefRecvNode);
+                                }
+                                sectionNode.Nodes.Add(requisiteNode);
+                            }
+                            if (sectionNode.Nodes.Count > 0)
+                            {
+                                itemNode.Nodes.Add(sectionNode);
+                            }
+                        }
+
+                        if (item.Datasets.DetailDataSet2 != null)
+                        {
+                            var sectionLocalizedID = item.Datasets.DetailDataSet2.Requisites.First().ByCode("ISBEDocTypeActSection").ValueLocalizeID;
+                            var actionsNode = new IsbNode(ReferenceEventsParser.SectionLocalizedIDToName[sectionLocalizedID]);
+                            foreach (var action in item.Datasets.DetailDataSet2.Requisites)
+                            {
+                                var actionNode = new IsbNode(action.ByCode("ISBEDocTypeActDescription").Text);
+                                actionNode.Code = action.ByCode("ISBEDocTypeActCode").Text;
+
+                                var text = action.ByCode("ISBEDocTypeActOnExecute").Text;
+                                if (!String.IsNullOrWhiteSpace(text))
+                                {
+                                    var exprnRefRecvNode = new IsbNode("-=[ Вычисление ]=-");
+                                    exprnRefRecvNode.Text = text;
+                                    actionNode.Nodes.Add(exprnRefRecvNode);
+                                }
+                                actionsNode.Nodes.Add(actionNode);
+                            }
+                            itemNode.Nodes.Add(actionsNode);
+                        }
+
+                        itemsNode.Nodes.Add(itemNode);
+                    }
+                    nodes.Add(itemsNode);
+                }
+                if (components.Dialogs != null)
+                {
+                    var itemsNode = new IsbNode("Диалог");
+
+                    var items = components.Dialogs.Components
+                        .Select(c => new
+                        {
+                            Id = int.Parse(c.Requisites.ByCode(IDReqName).Value),
+                            Code = c.KeyValue.Trim(),
+                            Name = c.DisplayValue.Trim() + " (" + c.KeyValue.Trim() + ")",
+                            Note = c.Requisites.ByCode("ISBDialogComment").Text.Trim(),
+                            Events = c.Requisites.ByCode("ISBDialogEventText").Text.Trim(),
+                            Datasets = c.DetailDataSet
+                        });
+                    foreach (var item in items)
+                    {
+                        var itemNode = new IsbNode(item.Name);
+                        itemNode.Type = IsbNodeType.ReferenceType;
+                        itemNode.Id = item.Id;
+                        itemNode.Code = item.Code;
+                        if (!String.IsNullOrWhiteSpace(item.Note))
+                        {
+                            itemNode.Text = item.Note;
+                        }
+                        if (!String.IsNullOrWhiteSpace(item.Events))
+                        {
+                            ReferenceEventsParser.ParseEvents(item.Events, itemNode);
+                        }
+                        var RequisitesSections = item.Datasets.DetailDataSet1.Requisites.Select(r => r.ByCode("ISBDialogReqSection").ValueLocalizeID).Distinct();
+                        foreach (var section in RequisitesSections)
+                        {
+                            var sectionName = ReferenceEventsParser.SectionLocalizedIDToName[section];
+                            var sectionNode = new IsbNode(sectionName);
+
+                            var requisites = item.Datasets.DetailDataSet1.Requisites
+                                .Where(r => r.ByCode("ISBDialogReqSection").ValueLocalizeID == section)
+                                .Select(r => new
+                                {
+                                    Name = r.ByCode("ISBDialogReqDescription").Text.Trim() + " (" + r.ByCode("ISBDialogReqCode").Text.Trim() + ")",
+                                    Code = r.ByCode("ISBDialogReqCode").Text.Trim(),
+                                    OnSelect = r.ByCode("ISBDialogReqOnSelect").Text,
+                                    OnChange = r.ByCode("ISBDialogReqOnChange").Text
+                                });
+                            foreach (var requisite in requisites.Where(r => !String.IsNullOrWhiteSpace(r.OnChange) || !String.IsNullOrWhiteSpace(r.OnSelect)))
+                            {
+                                var requisiteNode = new IsbNode(requisite.Name);
+                                requisiteNode.Code = requisite.Code;
+
+                                if (!String.IsNullOrWhiteSpace(requisite.OnChange))
+                                {
+                                    var exprnRefRecvNode = new IsbNode("-=[ Вычисление ]=-");
+                                    exprnRefRecvNode.Text = requisite.OnChange;
+                                    requisiteNode.Nodes.Add(exprnRefRecvNode);
+                                }
+                                if (!String.IsNullOrWhiteSpace(requisite.OnSelect))
+                                {
+                                    var inpExprnRefRecvNode = new IsbNode("-=[ Выбор из справочника ]=-");
+                                    inpExprnRefRecvNode.Text = requisite.OnSelect;
+                                    requisiteNode.Nodes.Add(inpExprnRefRecvNode);
+                                }
+                                sectionNode.Nodes.Add(requisiteNode);
+                            }
+                            if (sectionNode.Nodes.Count > 0)
+                            {
+                                itemNode.Nodes.Add(sectionNode);
+                            }
+                        }
+
+                        if (item.Datasets.DetailDataSet2 != null)
+                        {
+                            var sectionLocalizedID = item.Datasets.DetailDataSet2.Requisites.First().ByCode("ISBDialogActSection").ValueLocalizeID;
+                            var actionsNode = new IsbNode(ReferenceEventsParser.SectionLocalizedIDToName[sectionLocalizedID]);
+                            foreach (var action in item.Datasets.DetailDataSet2.Requisites)
+                            {
+                                var actionNode = new IsbNode(action.ByCode("ISBDialogActDescription").Text);
+                                actionNode.Code = action.ByCode("ISBDialogActCode").Text;
+
+                                var text = action.ByCode("ISBDialogActOnExecute").Text;
+                                if (!String.IsNullOrWhiteSpace(text))
+                                {
+                                    var exprnRefRecvNode = new IsbNode("-=[ Вычисление ]=-");
+                                    exprnRefRecvNode.Text = text;
+                                    actionNode.Nodes.Add(exprnRefRecvNode);
+                                }
+                                actionsNode.Nodes.Add(actionNode);
+                            }
+                            itemNode.Nodes.Add(actionsNode);
+                        }
+
+                        itemsNode.Nodes.Add(itemNode);
+                    }
+                    nodes.Add(itemsNode);
+                }
             }
-            //if (!String.IsNullOrWhiteSpace(connectionParams.SRPath))
-            //{
-            //    var routesNode = new IsbNode("Типовой маршрут");
+            if (!String.IsNullOrWhiteSpace(connectionParams.SRPath))
+            {
+                var routesNode = new IsbNode("Типовой маршрут");
 
-            //    var package = new XmlDocument();
-            //    package.Load(connectionParams.SRPath);
+                var package = new XmlDocument();
+                package.Load(connectionParams.SRPath);
 
-            //    var groups = package.SelectNodes("/ROOT/RecordRef/Requisite/RecordRef[@RefName = 'STANDARD_ROUTE_GROUPS']");
-            //    var existingGroups = new List<string>();
-            //    foreach (XmlNode group in groups)
-            //    {
-            //        var groupName = group.Attributes["Name"].Value;
-            //        var groupCode = group.Attributes["Code"].Value;
+                var groups = package.SelectNodes("/ROOT/RecordRef/Requisite/RecordRef[@RefName = 'STANDARD_ROUTE_GROUPS']");
+                var existingGroups = new List<string>();
+                foreach (XmlNode group in groups)
+                {
+                    var groupName = group.Attributes["Name"].Value;
+                    var groupCode = group.Attributes["Code"].Value;
 
-            //        if (!existingGroups.Exists(n => n == groupCode))
-            //        {
-            //            existingGroups.Add(groupCode);
-            //            var groupNode = new IsbNode(groupName);
-            //            routesNode.Nodes.Add(groupNode);
+                    if (!existingGroups.Exists(n => n == groupCode))
+                    {
+                        existingGroups.Add(groupCode);
+                        var groupNode = new IsbNode(groupName);
+                        routesNode.Nodes.Add(groupNode);
 
-            //            var routes = package.SelectNodes("/ROOT/RecordRef[@RefName = 'STANDARD_ROUTES' and Requisite/RecordRef[@RefName = 'STANDARD_ROUTE_GROUPS']/@Code = '" + groupCode + "']");
-            //            foreach (XmlNode route in routes)
-            //            {
-            //                var name = route.Attributes["Name"].Value;
-            //                var IMGFileName = route.SelectSingleNode("Requisite[@Name = 'ISBSearchCondition']").Attributes["Value"].Value;
-            //                var fullIMGPath = Path.Combine(Path.GetDirectoryName(connectionParams.SRPath), IMGFileName);
-            //                var routeNode = new IsbNode(name);
-            //                routeNode.Name = route.Attributes["Name"].Value;
-            //                routeNode.Code = route.Attributes["Code"].Value;
-            //                routeNode.Type = IsbNodeType.StandardRoute;
-            //                var IMGFileData = File.ReadAllText(fullIMGPath);
-            //                var schemaString = System.Text.Encoding.GetEncoding(1251).GetString(Convert.FromBase64String(IMGFileData));
-            //                RouteParser.ParseRoute(schemaString, routeNode);
-            //                groupNode.Nodes.Add(routeNode);
-            //            }
-            //        }
-            //    }
+                        var routes = package.SelectNodes("/ROOT/RecordRef[@RefName = 'STANDARD_ROUTES' and Requisite/RecordRef[@RefName = 'STANDARD_ROUTE_GROUPS']/@Code = '" + groupCode + "']");
+                        foreach (XmlNode route in routes)
+                        {
+                            var name = route.Attributes["Name"].Value;
+                            var IMGFileName = route.SelectSingleNode("Requisite[@Name = 'ISBSearchCondition']").Attributes["Value"].Value;
+                            var fullIMGPath = Path.Combine(Path.GetDirectoryName(connectionParams.SRPath), IMGFileName);
+                            var routeNode = new IsbNode(name);
+                            routeNode.Name = route.Attributes["Name"].Value;
+                            routeNode.Code = route.Attributes["Code"].Value;
+                            routeNode.Type = IsbNodeType.StandardRoute;
+                            var IMGFileData = File.ReadAllText(fullIMGPath);
+                            var schemaString = System.Text.Encoding.GetEncoding(1251).GetString(Convert.FromBase64String(IMGFileData));
+                            RouteParser.ParseRoute(schemaString, routeNode);
+                            groupNode.Nodes.Add(routeNode);
+                        }
+                    }
+                }
 
-            //    nodes.Add(routesNode);
-            //}
-            //if (!String.IsNullOrWhiteSpace(connectionParams.WIZPath))
-            //{
-            //    var wizardsNode = new IsbNode("Мастер действий");
+                nodes.Add(routesNode);
+            }
+            if (!String.IsNullOrWhiteSpace(connectionParams.WIZPath))
+            {
+                var wizardsNode = new IsbNode("Мастер действий");
 
-            //    var package = new XmlDocument();
-            //    package.Load(connectionParams.WIZPath);
-            //    var groups = package.SelectNodes("/ROOT/RecordRef[@RefName = 'WIZARD_GROUPS']");
-            //    foreach (XmlNode group in groups)
-            //    {
-            //        var groupName = group.Attributes["Name"].Value;
-            //        var groupCode = group.Attributes["Code"].Value;
+                var package = new XmlDocument();
+                package.Load(connectionParams.WIZPath);
+                var groups = package.SelectNodes("/ROOT/RecordRef[@RefName = 'WIZARD_GROUPS']");
+                foreach (XmlNode group in groups)
+                {
+                    var groupName = group.Attributes["Name"].Value;
+                    var groupCode = group.Attributes["Code"].Value;
 
-            //        var groupNode = new IsbNode(groupName);
-            //        wizardsNode.Nodes.Add(groupNode);
+                    var groupNode = new IsbNode(groupName);
+                    wizardsNode.Nodes.Add(groupNode);
 
-            //        var wizards = package.SelectNodes("/ROOT/RecordRef[@RefName = 'WIZARDS' and Requisite/RecordRef[@RefName = 'WIZARD_GROUPS']/@Code = '" + groupCode + "']");
-            //        foreach (XmlNode wizard in wizards)
-            //        {
-            //            var name = wizard.Attributes["Name"].Value;
-            //            var text = GetNodeString(wizard.SelectSingleNode("Requisite[@Name = 'ISBSearchCondition']/node()"));
-            //            var wizardNode = new IsbNode(name);
-            //            wizardNode.Type = IsbNodeType.Wizard;
-            //            WizardParser.ParseWizardText(text, wizardNode);
-            //            groupNode.Nodes.Add(wizardNode);
-            //        }
-            //    }
+                    var wizards = package.SelectNodes("/ROOT/RecordRef[@RefName = 'WIZARDS' and Requisite/RecordRef[@RefName = 'WIZARD_GROUPS']/@Code = '" + groupCode + "']");
+                    foreach (XmlNode wizard in wizards)
+                    {
+                        var name = wizard.Attributes["Name"].Value;
+                        var text = GetNodeString(wizard.SelectSingleNode("Requisite[@Name = 'ISBSearchCondition']/node()"));
+                        var wizardNode = new IsbNode(name);
+                        wizardNode.Type = IsbNodeType.Wizard;
+                        WizardParser.ParseWizardText(text, wizardNode);
+                        groupNode.Nodes.Add(wizardNode);
+                    }
+                }
 
-            //    nodes.Add(wizardsNode);
-            //}
+                nodes.Add(wizardsNode);
+            }
         }
     }
 }

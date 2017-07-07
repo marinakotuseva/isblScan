@@ -27,34 +27,46 @@ namespace ISBLScan.ViewCode
         /// Ссылка на узел справочника
         /// A <see cref="Node"/>
         /// </param>
-        void LoadRecvisite(IsbNode recvGroupNode)
+        void LoadRecvisites(IsbNode refNode)
 		{
 			if(this.CheckTableExist("MBVidAnRecv"))
 			{
 				SqlCommand command = new SqlCommand();
 				command.Connection = this.Connection;
-				command.CommandText = "SELECT [Name], [Kod], [Exprn], [InpExprn] FROM [MBVidAnRecv] WHERE [Vid]=@Vid AND [Razd]=@Razd AND ([Exprn] IS NOT NULL OR [InpExprn] IS NOT NULL) ORDER BY [NumRecv]";
+				command.CommandText = "SELECT [Name], [Kod], [Exprn], [InpExprn], [Razd] FROM [MBVidAnRecv] WHERE [Vid]=@Vid AND ([Exprn] IS NOT NULL OR [InpExprn] IS NOT NULL) ORDER BY [NumRecv]";
 				SqlParameter paramVid = new SqlParameter("@Vid", SqlDbType.Int);
-				paramVid.Value = recvGroupNode.Id;
-				SqlParameter paramRazd = new SqlParameter("@Razd", SqlDbType.NChar, 1);
-				paramRazd.Value = recvGroupNode.Code;
+				paramVid.Value = refNode.Id;
 				command.Parameters.Add(paramVid);
-				command.Parameters.Add(paramRazd);
 				command.Prepare();
 				SqlDataReader reader = command.ExecuteReader();
 				if(reader.HasRows)
 				{
+                    var sectionCodeToSectionNode = new Dictionary<Char, IsbNode>();
 					while(reader.Read())
 					{
-						var recvNode = new IsbNode();
+                        var section = reader.GetString(4)[0];
+                        IsbNode recvGroupNode = null;
+                        if (sectionCodeToSectionNode.ContainsKey(section))
+                        {
+                            recvGroupNode = sectionCodeToSectionNode[section];
+                        }
+                        else
+                        {
+                            var sectionName = ReferenceEventsParser.SectionCodeToName.ContainsKey(section) ? ReferenceEventsParser.SectionCodeToName[section] : "Неизвестно [" + section + "]";
+                            recvGroupNode = new IsbNode(sectionName);
+                            refNode.Nodes.Add(recvGroupNode);
+                            sectionCodeToSectionNode.Add(section, recvGroupNode);
+                        } 
+
+                        var recvNode = new IsbNode();
 						if(!reader.IsDBNull(0))
 						{
-							recvNode.Name = reader.GetString(0);
+							recvNode.Name = reader.GetString(0).Trim();
 						}
 						if(!reader.IsDBNull(1))
 						{
-							recvNode.Code = reader.GetString(1);
-							recvNode.Name += " (" + recvNode.Code + ")";
+							recvNode.Code = reader.GetString(1).Trim();
+							recvNode.Name += " (" + recvNode.Code.Trim() + ")";
 						}
 						if(!reader.IsDBNull(2))
 						{
@@ -70,49 +82,10 @@ namespace ISBLScan.ViewCode
 							inpExprnRefRecvNode.Text = reader.GetString(3);
 							recvNode.Nodes.Add(inpExprnRefRecvNode);
 						}
-						recvGroupNode.Nodes.Add(recvNode);
+                        recvGroupNode.Nodes.Add(recvNode);
 					}
-				}
-				reader.Close();
-			}
-		}
-
-		/// <summary>
-		/// Загрузка разделов реквизитов
-		/// </summary>
-		/// <param name="refNode">
-		/// A <see cref="Node"/>
-		/// </param>
-		void LoadGroupRecv(IsbNode refNode)
-		{
-			if(this.CheckTableExist("MBVidAnRecv"))
-			{
-				SqlCommand command = new SqlCommand();
-				command.Connection = this.Connection;
-				command.CommandText = "SELECT DISTINCT [Razd] FROM [MBVidAnRecv] WHERE [Vid] = @Vid AND ([Exprn] IS NOT NULL OR [InpExprn] IS NOT NULL) ORDER BY [Razd] DESC";
-				SqlParameter paramVid = new SqlParameter("@Vid", SqlDbType.Int);
-				paramVid.Value = refNode.Id;
-				command.Parameters.Add(paramVid);
-				command.Prepare();
-				SqlDataReader reader = command.ExecuteReader();
-
-                if (reader.HasRows)
-				{
-					while(reader.Read())
-					{
-					    var sectionCode = reader.GetString(0)[0];
-                        var recvGroupNode = new IsbNode(ReferenceEventsParser.SectionCodeToName.ContainsKey(sectionCode) ? ReferenceEventsParser.SectionCodeToName[sectionCode] : "Неизвестно [" + sectionCode + "]");
-					    recvGroupNode.Code = sectionCode.ToString();
-					    recvGroupNode.Id = refNode.Id;
-
-                        refNode.Nodes.Add(recvGroupNode);
-                    }
                 }
 				reader.Close();
-			    foreach (var node in refNode.Nodes.Where(n => n.Id != 0))
-			    {
-			        LoadRecvisite(node);
-                }
 			}
 		}
 
@@ -162,7 +135,7 @@ namespace ISBLScan.ViewCode
 				reader.Close();
 			    foreach (var node in rootRefNode.Nodes)
 			    {
-			        LoadGroupRecv(node);
+                    LoadRecvisites(node);
                 }
 			}
 			return rootRefNode;

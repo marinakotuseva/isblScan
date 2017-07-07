@@ -122,9 +122,9 @@ SELECT  @Version";
             isblNode = loaderReportInt.Load();
             isblList.Add(isblNode);
 
-            ////Загрузка типовых маршрутов(событий маршрутов)
-            //isblNode = loaderRoute.Load();
-            //isblList.Add(isblNode);
+            //Загрузка типовых маршрутов(событий маршрутов)
+            isblNode = loaderRoute.Load();
+            isblList.Add(isblNode);
 
             //Загрузка вычислений блоков типовых маршрутов
             isblNode = loaderRouteBlock.Load();
@@ -134,9 +134,9 @@ SELECT  @Version";
             isblNode = loaderScript.Load();
             isblList.Add(isblNode);
 
-            ////Загрузка вычислений мастеров действий
-            //isblNode = loaderWizard.Load();
-            //isblList.Add(isblNode);
+            //Загрузка вычислений мастеров действий
+            isblNode = loaderWizard.Load();
+            isblList.Add(isblNode);
 
             //Загрузка вычислений из справочников
             isblNode = loaderCustom.Load();

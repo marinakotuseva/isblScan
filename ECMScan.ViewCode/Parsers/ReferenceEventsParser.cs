@@ -43,6 +43,35 @@ namespace ISBLScan.ViewCode
             {'J', "Таблица 5"},
             {'K', "Таблица 6"}
         };
+        public static Dictionary<String, String> SectionLocalizedIDToName = new Dictionary<String, string>()
+        {
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_CARD", "Карточка"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE", "Таблица"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE2", "Таблица 2"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE3", "Таблица 3"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE4", "Таблица 4"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE5", "Таблица 5"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE6", "Таблица 6"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE7", "Таблица 7"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE8", "Таблица 8"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE9", "Таблица 9"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE10", "Таблица 10"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE11", "Таблица 11"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE12", "Таблица 12"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE13", "Таблица 13"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE14", "Таблица 14"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE15", "Таблица 15"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE16", "Таблица 16"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE17", "Таблица 17"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE18", "Таблица 18"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE19", "Таблица 19"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE20", "Таблица 20"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE21", "Таблица 21"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE22", "Таблица 22"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE23", "Таблица 23"},
+            {"SYSRES_SYSCOMP.REQUISITE_SECTION_TABLE24", "Таблица 24"},
+            {"SYSRES_SYSCOMP.CARD_ACTION_SECTION_ACTIONS", "Действие"}
+        };
 
         static Dictionary<string, String> EventCodePartToTitle = new Dictionary<string, string>()
         {
