@@ -43,7 +43,7 @@ namespace ISBLScan.ViewCode
 			try {
 				_connection = new SqlConnection(connBuilder.ConnectionString);
 				_connection.Open();
-				ErrorText = null;
+                ErrorText = null;
                 //tryLoadAndExecuteDebugSQLScript(connection);
 				return true;
 			} catch (Exception e) {

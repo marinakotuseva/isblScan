@@ -69,53 +69,6 @@ order by t.name";
             return listGroups;
         }
 
-        /// <summary>
-        /// Загрузка параметров (реквизитов) функции
-        /// </summary>
-        /// <param name="rootNode">
-        /// Узел дерева элементов, соотвествующий функции.
-        /// A <see cref="Node"/>
-        /// </param>
-        private void LoadRecvisites(IsbNode rootNode)
-        {
-            SqlCommand command = new SqlCommand();
-            command.Connection = this.Connection;
-            command.CommandText = "SELECT [NumPar], [Ident], [Name], [Type], [ValueDef] FROM [MBFuncRecv] WHERE [FName] = @funcName ORDER BY [NumPar] ASC";
-            SqlParameter paramFuncName = new SqlParameter("@funcName", SqlDbType.NVarChar, 512);
-            paramFuncName.Value = rootNode.Name;
-            command.Parameters.Add(paramFuncName);
-            command.Prepare();
-            SqlDataReader reader = command.ExecuteReader();
-            if (reader.HasRows)
-            {
-                var funcRecvNode = new IsbNode();
-                funcRecvNode.Name = "-=[ Параметры функции ]=-";
-                rootNode.Nodes.Add(funcRecvNode);
-                while (reader.Read())
-                {
-                    //Номер параметра функции
-                    funcRecvNode.Text += reader.GetInt32(0).ToString() + ".\t";
-                    //Идентификатор параметра
-                    if (!reader.IsDBNull(1))
-                    {
-                        funcRecvNode.Text += reader.GetString(1) + ".\t";
-                    }
-                    ////Для внутреннего использования
-                    //if (!reader.IsDBNull (2)) {
-                    //	funcRecvNode.Text += reader.GetString (2) + ".\t";
-                    //}
-                    //Тип параметра
-                    if (!reader.IsDBNull(3))
-                    {
-                        funcRecvNode.Text += CodeToNameConverter.FunctionParamTypeIDToName(reader.GetString(3)) + ".\t";
-                    }
-                    funcRecvNode.Text += "\r\n";
-                }
-                funcRecvNode.LastUpdate = rootNode.LastUpdate;
-            }
-            reader.Close();
-        }
-
         public IsbNode Load()
         {
             IsbNode listNode = null;
@@ -143,7 +96,7 @@ order by t.name";
                         SqlCommand command = new SqlCommand();
                         command.Connection = Connection;
                         //command.CommandText = "select XRecID, FName, Comment, Help, Txt from MBFunc where NGroup=@groupID and SysFunc=@sysFunc and not(Txt is null) order by FName";
-                        command.CommandText = "select XRecID, FName, Comment, Help, Txt, LastUpd from MBFunc where NGroup=@groupID and SysFunc=@sysFunc order by FName";
+                        command.CommandText = "select XRecID, FName, Txt, LastUpd from MBFunc where NGroup=@groupID and SysFunc=@sysFunc order by FName";
                         SqlParameter paramGroupId = new SqlParameter("@groupID", SqlDbType.Int);
                         SqlParameter paramSysFunc = new SqlParameter("@sysFunc", SqlDbType.NChar, 1);
                         paramGroupId.Value = groupNode.Id;
@@ -165,47 +118,20 @@ order by t.name";
                                 {
                                     functionNode.Name = reader.GetString(1);
                                 }
-                                //Комментарий к функции
+                                //Текст функции
                                 if (!reader.IsDBNull(2))
                                 {
-                                    var funcDescriptionNode = new IsbNode();
-                                    funcDescriptionNode.Name = "-=[ Описание функции ]=-";
-                                    funcDescriptionNode.Text = reader.GetString(2);
-                                    functionNode.Nodes.Add(funcDescriptionNode);
-                                }
-                                //Справка по функции
-                                /*
-								if(! reader.IsDBNull(3))
-								{
-									Node funcHelpNode = new Node();
-									funcHelpNode.name = "Справка по функции";
-									funcHelpNode.text = reader.GetString(3);;
-									funcHelpNode.parent = functionNode;
-									functionNode.nodes.Add(funcHelpNode);
-								}
-								*/
-                                //Текст функции
-                                if (!reader.IsDBNull(4))
-                                {
-                                    var funcTextNode = new IsbNode();
-                                    funcTextNode.Name = "-=[ Текст функции ]=-";
-                                    funcTextNode.Text = reader.GetString(4);
-                                    functionNode.Nodes.Add(funcTextNode);
+                                    functionNode.Text = reader.GetString(2);
                                 }
                                 //Дата и время последнего изменения
-                                if (!reader.IsDBNull(5))
+                                if (!reader.IsDBNull(3))
                                 {
-                                    functionNode.LastUpdate = reader.GetDateTime(5);
+                                    functionNode.LastUpdate = reader.GetDateTime(3);
                                 }
                                 groupNode.Nodes.Add(functionNode);
                             }
                         }
                         reader.Close();
-                        //Загрузка параметров функций для функций текущей группы
-                        foreach (var funcNode in groupNode.Nodes)
-                        {
-                            this.LoadRecvisites(funcNode);
-                        }
                     }
 
                 }
