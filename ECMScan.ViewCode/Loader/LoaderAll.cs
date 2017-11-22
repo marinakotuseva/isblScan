@@ -4,12 +4,12 @@ using System.Data.SqlClient;
 
 namespace ISBLScan.ViewCode
 {
-	/// <summary>
-	/// Загрузчик прикладной разработки. Устанавливает соединение с системой и вызывает загрузчики конкретных компонент.
-	/// </summary>
-	public class Loader
-	{
-		private SqlConnection _connection;
+    /// <summary>
+    /// Загрузчик прикладной разработки. Устанавливает соединение с системой и вызывает загрузчики конкретных компонент.
+    /// </summary>
+    public class Loader
+    {
+        private SqlConnection _connection;
 
         public string ErrorText;
 
@@ -45,25 +45,27 @@ namespace ISBLScan.ViewCode
 				_connection.Open();
                 ErrorText = null;
                 //tryLoadAndExecuteDebugSQLScript(connection);
-				return true;
-			} catch (Exception e) {
-				ErrorText = e.Message;
-				return false;
-			}
-		}
+                return true;
+            }
+            catch (Exception e)
+            {
+                ErrorText = e.Message;
+                return false;
+            }
+        }
 
         public bool Connect(ConnectionParams cp)
         {
             return Connect(cp.Server, cp.Database, cp.Login, cp.Password, String.IsNullOrWhiteSpace(cp.Password));
         }
 
-		/// <summary>
-		///Отключиться от базы данных 
-		/// </summary>
-		public void Disconnect()
-		{
-			_connection.Close();
-		}
+        /// <summary>
+        ///Отключиться от базы данных 
+        /// </summary>
+        public void Disconnect()
+        {
+            _connection.Close();
+        }
 
         /// <summary>
 		/// Получить версию Builder'a из базы
@@ -88,19 +90,19 @@ SELECT  @Version";
         /// </summary>
         /// <returns>Список узлов</returns>
         public List<IsbNode> Load(List<IsbNode> isblList)
-		{
-		    IsbNode isblNode;
-			
-			var loaderEDocType = new EDocType(_connection);
-		    var loaderFunction = new Function(_connection);
-		    var loaderReference = new Reference(_connection);
-		    var loaderReport = new Report(_connection);
-		    var loaderReportInt = new ReportIntegrate(_connection);
-		    var loaderRoute = new Route(_connection);
-		    var loaderRouteBlock = new RouteBlock(_connection);
-		    var loaderScript = new Script(_connection);
-		    var loaderWizard = new Wizard(_connection);
-		    var loaderCustom = new CustomCalculations(_connection);
+        {
+            IsbNode isblNode;
+
+            var loaderEDocType = new EDocType(_connection);
+            var loaderFunction = new Function(_connection);
+            var loaderReference = new Reference(_connection);
+            var loaderReport = new Report(_connection);
+            var loaderReportInt = new ReportIntegrate(_connection);
+            var loaderRoute = new Route(_connection);
+            var loaderRouteBlock = new RouteBlock(_connection);
+            var loaderScript = new Script(_connection);
+            var loaderWizard = new Wizard(_connection);
+            var loaderCustom = new CustomCalculations(_connection);
             var loaderDialog = new Dialog(_connection);
 
 
@@ -149,6 +151,6 @@ SELECT  @Version";
             isblList.Add(isblNode);
 
             return isblList;
-		}
-	}
+        }
+    }
 }
