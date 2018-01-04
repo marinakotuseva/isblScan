@@ -7,6 +7,7 @@ using System.Data;
 using System.Data.SqlTypes;
 using System.Data.SqlClient;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ISBLScan.ViewCode
 {
@@ -19,124 +20,61 @@ namespace ISBLScan.ViewCode
         {
         }
 
-        private List<IsbNode> LoadGroups(IsbNode rootNode, char charSysFunc)
+        private void LoadGroups(IsbNode rootNode)
         {
-            var listGroups = new List<IsbNode>();
-            if (this.CheckTableExist("MBRegUnit"))
+            SqlCommand command = new SqlCommand();
+            command.Connection = this.Connection;
+            command.CommandText = @"
+select NGroup [id], GrName [name]
+from MBGrFunc
+order by GrName";
+            SqlDataReader reader = command.ExecuteReader();
+            if (reader.HasRows)
             {
-                SqlCommand command = new SqlCommand();
-                command.Connection = this.Connection;
-                //command.CommandText = "select t.id, t.name from (select MBGrFunc.NGroup [id], Max(MBGrFunc.GrName) [name] from MBGrFunc join MBFunc on (MBGrFunc.NGroup = MBFunc.NGroup) where MBFunc.SysFunc=@funcCategory and not(Txt is null) group by MBGrFunc.NGroup) t order by t.name";
-                command.CommandText = @"
-select t.id, t.name, t.Comment
-from
-(
-    select MBGrFunc.NGroup [id], Max(MBGrFunc.GrName) [name], Max(MBGrFunc.LastUpd) [LastUpd], Max(CAST(MBGrFunc.Comment as NVARCHAR(MAX))) [Comment]
-    from MBGrFunc 
-    join MBFunc on (MBGrFunc.NGroup = MBFunc.NGroup) 
-    where MBFunc.SysFunc=@funcCategory 
-    group by MBGrFunc.NGroup
-) t 
-order by t.name";
-                SqlParameter paramFuncCategory = new SqlParameter("@funcCategory", SqlDbType.NChar, 1);
-                paramFuncCategory.Value = charSysFunc;
-                command.Parameters.Add(paramFuncCategory);
-                command.Prepare();
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.HasRows)
+                while (reader.Read())
                 {
-                    while (reader.Read())
-                    {
-                        var node = new IsbNode();
-                        //Номер группы функций
-                        node.Id = reader.GetInt32(0);
-                        //Имя группы функций
-                        if (!reader.IsDBNull(1))
-                        {
-                            node.Name = reader.GetString(1);
-                        }
-                        //Примечание
-                        if (!reader.IsDBNull(2))
-                        {
-                            //node.Text = reader.GetString (2);
-                        }
-                        rootNode.Nodes.Add(node);
-                        listGroups.Add(node);
-                    }
+                    var node = new IsbNode();
+                    //Номер группы функций
+                    node.Id = reader.GetInt32(0);
+                    //Имя группы функций
+                    node.Name = reader.GetString(1);
+                    rootNode.Nodes.Add(node);
                 }
-                reader.Close();
             }
-            return listGroups;
+            reader.Close();
         }
 
         public IsbNode Load()
         {
-            IsbNode listNode = null;
-            if (this.CheckTableExist("MBFunc") && this.CheckTableExist("MBFuncRecv"))
+            var functionsNode = new IsbNode("Функция");
+            LoadGroups(functionsNode);
+            SqlCommand command = new SqlCommand();
+            command.Connection = Connection;
+            command.CommandText = "select XRecID, FName, Txt, LastUpd, NGroup from MBFunc where Txt is not null order by FName";
+            SqlDataReader reader = command.ExecuteReader();
+            if (reader.HasRows)
             {
-                listNode = new IsbNode();
-                listNode.Name = "Функция";
-                char[] charsSysUserFunc = { 'P', 'S' };
-                foreach (char charSysFunc in charsSysUserFunc)
+                while (reader.Read())
                 {
-                    var systemFuncNode = new IsbNode();
-                    if (charSysFunc == 'P')
+                    var functionNode = new IsbNode();
+                    functionNode.Type = IsbNodeType.Function;
+                    //ИД
+                    functionNode.Id = reader.GetInt32(0);
+                    //Имя функции
+                    functionNode.Name = reader.GetString(1);
+                    //Текст функции
+                    functionNode.Text = reader.GetString(2);
+                    //Дата и время последнего изменения
+                    if (!reader.IsDBNull(3))
                     {
-                        systemFuncNode.Name = "Пользовательская";
+                        functionNode.LastUpdate = reader.GetDateTime(3);
                     }
-                    else
-                    {
-                        systemFuncNode.Name = "Системная";
-                    }
-                    listNode.Nodes.Add(systemFuncNode);
-
-                    var listGroups = LoadGroups(systemFuncNode, charSysFunc);
-                    foreach (var groupNode in listGroups)
-                    {
-                        SqlCommand command = new SqlCommand();
-                        command.Connection = Connection;
-                        //command.CommandText = "select XRecID, FName, Comment, Help, Txt from MBFunc where NGroup=@groupID and SysFunc=@sysFunc and not(Txt is null) order by FName";
-                        command.CommandText = "select XRecID, FName, Txt, LastUpd from MBFunc where NGroup=@groupID and SysFunc=@sysFunc order by FName";
-                        SqlParameter paramGroupId = new SqlParameter("@groupID", SqlDbType.Int);
-                        SqlParameter paramSysFunc = new SqlParameter("@sysFunc", SqlDbType.NChar, 1);
-                        paramGroupId.Value = groupNode.Id;
-                        paramSysFunc.Value = charSysFunc;
-                        command.Parameters.Add(paramGroupId);
-                        command.Parameters.Add(paramSysFunc);
-                        command.Prepare();
-                        SqlDataReader reader = command.ExecuteReader();
-                        if (reader.HasRows)
-                        {
-                            while (reader.Read())
-                            {
-                                var functionNode = new IsbNode();
-                                functionNode.Type = IsbNodeType.Function;
-                                //ИД
-                                functionNode.Id = reader.GetInt32(0);
-                                //Имя функции
-                                if (!reader.IsDBNull(1))
-                                {
-                                    functionNode.Name = reader.GetString(1);
-                                }
-                                //Текст функции
-                                if (!reader.IsDBNull(2))
-                                {
-                                    functionNode.Text = reader.GetString(2);
-                                }
-                                //Дата и время последнего изменения
-                                if (!reader.IsDBNull(3))
-                                {
-                                    functionNode.LastUpdate = reader.GetDateTime(3);
-                                }
-                                groupNode.Nodes.Add(functionNode);
-                            }
-                        }
-                        reader.Close();
-                    }
-
+                    functionsNode.Nodes.First(g => g.Id == reader.GetInt32(4)).Nodes.Add(functionNode);
                 }
             }
-            return listNode;
+            reader.Close();
+            functionsNode.Nodes = functionsNode.Nodes.Where(n => n.Nodes.Count > 0).ToList();
+            return functionsNode;
         }
 
     }
