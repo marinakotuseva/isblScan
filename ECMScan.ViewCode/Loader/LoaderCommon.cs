@@ -64,46 +64,6 @@ namespace ISBLScan.ViewCode
 			reader.Dispose();
 			command.Dispose();
 			return flagTableExist;			
-		}
-		
-		/// <summary>
-		/// Получение ИД для вида аналитики с указанным имененем.
-		/// Часто используемый метод, поэтому вынесен в базовый класс.
-		/// </summary>
-		/// <param name="vidAnalitKod">
-		/// Строка с кодом видам аналитики (значение колонки Kod в таблице MBVidAn)
-		/// </param>
-		/// <returns>
-		/// null - аналитика с указанным кодом не найдена, либо ИД аналитики
-		/// </returns>
-		public int GetVidAnalitId(string vidAnalitKod)
-		{
-			int vidAnalitId = -1;
-			if(this.CheckTableExist("MBVidAn"))
-			{
-				SqlCommand command = new SqlCommand();
-				command.Connection = Connection;
-				command.CommandText = "select Vid from MBVidAn where Kod = @vidAnalitKod";
-				SqlParameter paramVidAnalitKod = new SqlParameter("@vidAnalitKod", SqlDbType.NVarChar, 255);
-				paramVidAnalitKod.Value = vidAnalitKod;
-				command.Parameters.Add(paramVidAnalitKod);
-				command.Prepare();
-				SqlDataReader reader = command.ExecuteReader();
-				if(reader.HasRows)
-				{
-					if(reader.Read())
-					{
-						if(!reader.IsDBNull(0))
-						{
-							vidAnalitId = reader.GetInt32(0);
-						}
-					}
-				}
-				reader.Close();
-			}
-			return vidAnalitId;
-		}
-
-        
+		}   
 	}
 }

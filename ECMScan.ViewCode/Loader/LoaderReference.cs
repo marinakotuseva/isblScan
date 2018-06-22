@@ -105,7 +105,7 @@ namespace ISBLScan.ViewCode
       reader.Close();
     }
 
-    public IsbNode Load()
+    public void Load(List<IsbNode> isblList)
     {
       var rootRefNode = new IsbNode("Тип справочника");
       SqlCommand command = new SqlCommand();
@@ -152,7 +152,7 @@ namespace ISBLScan.ViewCode
       //{
       //  if (CheckTableExist("MBVidAnMethod")) LoadMethods(node);
       //}
-      return rootRefNode;
+      isblList.Add(rootRefNode);
     }
   }
 }

@@ -43,7 +43,7 @@ namespace ISBLScan.ViewCode
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Config>(jsonSettings);
         }
 
-        public IsbNode Load()
+        public void Load(List<IsbNode> isblList)
 		{
 		    IsbNode listNode = null;
             listNode = new IsbNode("Custom Calculations");
@@ -119,7 +119,7 @@ where ref.Vid = (select Vid from MBVidAn where Kod = '" + setting.ReferenceName 
                 }
                 reader.Close();
             }
-            return listNode;
-        }
+      isblList.Add(listNode);
+    }
 	}
 }
