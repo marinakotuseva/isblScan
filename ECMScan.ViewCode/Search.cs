@@ -133,7 +133,7 @@ namespace ISBLScan.ViewCode
                 },
                 ShowLineNumbers = true,
                 Text = "",
-                IsReadOnly = true
+                IsReadOnly = false
             };
             TextEditor.TextArea.TextView.LineTransformers.Add(new HighlightSearchedStrings(this));
             TextEditor.FontFamily = new FontFamily("Courier New, Courier, monospace");

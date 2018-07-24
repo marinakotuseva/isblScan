@@ -40,6 +40,7 @@ namespace ISBLScan.ViewCode
             this.panelSearchText = new System.Windows.Forms.Panel();
             this.tabControlSearchText = new System.Windows.Forms.TabControl();
             this.panelSearchButtons = new System.Windows.Forms.Panel();
+            this.buttonSave = new System.Windows.Forms.Button();
             this.buttonSearch = new System.Windows.Forms.Button();
             this.groupBoxConnect = new System.Windows.Forms.GroupBox();
             this.buttonExpand = new System.Windows.Forms.Button();
@@ -160,7 +161,7 @@ namespace ISBLScan.ViewCode
             // 
             this.tabControlSearchText.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControlSearchText.Location = new System.Drawing.Point(0, 0);
-            this.tabControlSearchText.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabControlSearchText.Margin = new System.Windows.Forms.Padding(2);
             this.tabControlSearchText.Name = "tabControlSearchText";
             this.tabControlSearchText.SelectedIndex = 0;
             this.tabControlSearchText.Size = new System.Drawing.Size(640, 130);
@@ -169,6 +170,7 @@ namespace ISBLScan.ViewCode
             // 
             // panelSearchButtons
             // 
+            this.panelSearchButtons.Controls.Add(this.buttonSave);
             this.panelSearchButtons.Controls.Add(this.buttonSearch);
             this.panelSearchButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panelSearchButtons.Location = new System.Drawing.Point(3, 146);
@@ -177,11 +179,20 @@ namespace ISBLScan.ViewCode
             this.panelSearchButtons.Size = new System.Drawing.Size(640, 23);
             this.panelSearchButtons.TabIndex = 300;
             // 
+            // buttonSave
+            // 
+            this.buttonSave.Location = new System.Drawing.Point(512, 0);
+            this.buttonSave.Name = "buttonSave";
+            this.buttonSave.Size = new System.Drawing.Size(128, 23);
+            this.buttonSave.TabIndex = 201;
+            this.buttonSave.Text = "Save";
+            this.buttonSave.UseVisualStyleBackColor = true;
+            this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
+            // 
             // buttonSearch
             // 
-            this.buttonSearch.Dock = System.Windows.Forms.DockStyle.Right;
             this.buttonSearch.Enabled = false;
-            this.buttonSearch.Location = new System.Drawing.Point(500, 0);
+            this.buttonSearch.Location = new System.Drawing.Point(366, 0);
             this.buttonSearch.Name = "buttonSearch";
             this.buttonSearch.Size = new System.Drawing.Size(140, 23);
             this.buttonSearch.TabIndex = 200;
@@ -356,7 +367,7 @@ namespace ISBLScan.ViewCode
             // 
             this.panelFilterTreeDate.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panelFilterTreeDate.Location = new System.Drawing.Point(0, 22);
-            this.panelFilterTreeDate.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.panelFilterTreeDate.Margin = new System.Windows.Forms.Padding(2);
             this.panelFilterTreeDate.Name = "panelFilterTreeDate";
             this.panelFilterTreeDate.Size = new System.Drawing.Size(280, 20);
             this.panelFilterTreeDate.TabIndex = 1;
@@ -365,7 +376,7 @@ namespace ISBLScan.ViewCode
             // 
             this.panelFilterTreeName.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelFilterTreeName.Location = new System.Drawing.Point(0, 0);
-            this.panelFilterTreeName.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.panelFilterTreeName.Margin = new System.Windows.Forms.Padding(2);
             this.panelFilterTreeName.Name = "panelFilterTreeName";
             this.panelFilterTreeName.Size = new System.Drawing.Size(280, 20);
             this.panelFilterTreeName.TabIndex = 0;
@@ -526,6 +537,7 @@ namespace ISBLScan.ViewCode
         private System.Windows.Forms.TabPage tabPageSimpleSearchText;
         private System.Windows.Forms.Panel panelFilterTreeName;
         private System.Windows.Forms.Panel panelFilterTreeDate;
+        private System.Windows.Forms.Button buttonSave;
         //Main menu
 
 

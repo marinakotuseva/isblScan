@@ -580,6 +580,34 @@ namespace ISBLScan.ViewCode
             }
             treeViewResults.EndUpdate();
         }
+        private void buttonSave_Click(object sender, EventArgs e)
+        {
+            var selectedNode = ((SearchControls)tabControlSearchText.SelectedTab.Tag).TreeViewResults.SelectedNode;
+            if (selectedNode != null)
+            {
+                var searchControls = (SearchControls)tabControlSearchText.SelectedTab.Tag;
+                var modifiedText = searchControls.Search.TextEditor.Text;
+                var isbNode = ((SearchNode)selectedNode.Tag).IsbNode;
+                var sourceText = isbNode.Text;
+                if (modifiedText.CompareTo(sourceText) != 0)
+                {
+                    using (var connection = new SBRTEConnector(SourceDev.ConnectionParams))
+                    {
+                        if (isbNode.Type == IsbNodeType.Function)
+                        {
+                            var functionRecord = connection.Application.ReferencesFactory.ReferenceFactory["FUNCTIONS"].GetObjectByID(isbNode.Id);
+                            functionRecord.Requisites["ISBFuncText"].Value = modifiedText;
+                            functionRecord.Save();
+                        }
+                    }
+
+
+
+                }
+            }
+
+
+        }
         /// <summary>
         /// Выбор узла в дереве разработки
         /// </summary>
@@ -633,5 +661,6 @@ namespace ISBLScan.ViewCode
 
             }
         }
+
     }
 }
